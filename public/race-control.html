@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Control</title>
+</head>
+<body>
+    <h1>Race Control Interface</h1>
+    <form id="access-form">
+        <label for="access-key">Enter Access Key:</label>
+        <input type="password" id="access-key" required>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="control-panel" style="display:none;">
+        <button id="start-race">Start Race</button>
+        <button id="safe-mode">Safe Mode</button>
+        <button id="hazard-mode">Hazard Mode</button>
+        <button id="danger-mode">Danger Mode</button>
+        <button id="finish-mode">Finish Mode</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('access-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const key = document.getElementById('access-key').value;
+            // Send access key to the server to validate
+            socket.emit('validate-key', { key, role: 'safety' });
+        });
+
+        socket.on('key-validation', function(response) {
+            if (response.success) {
+                document.getElementById('access-form').style.display = 'none';
+                document.getElementById('control-panel').style.display = 'block';
+            } else {
+                alert('Invalid access key.');
+            }
+        });
+
+        document.getElementById('start-race').addEventListener('click', () => {
+            socket.emit('start-race');
+        });
+
+        document.getElementById('safe-mode').addEventListener('click', () => {
+            socket.emit('change-mode', 'Safe');
+        });
+
+        document.getElementById('hazard-mode').addEventListener('click', () => {
+            socket.emit('change-mode', 'Hazard');
+        });
+
+        document.getElementById('danger-mode').addEventListener('click', () => {
+            socket.emit('change-mode', 'Danger');
+        });
+
+        document.getElementById('finish-mode').addEventListener('click', () => {
+            socket.emit('change-mode', 'Finish');
+        });
+    </script>
+</body>
+</html>
