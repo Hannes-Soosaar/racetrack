@@ -18,6 +18,11 @@ app.use(express.static('public'));
 // Register the API routes
 app.use('/api', driverRoutes);
 
+// Route to serve the main page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+
 // Route to serve front-desk.html
 app.get('/front-desk', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'front-desk.html'));
@@ -26,6 +31,27 @@ app.get('/front-desk', (req, res) => {
 // Route to serve race-control.html
 app.get('/race-control', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'race-control.html'));
+});
+
+// Add routes for other pages as needed
+app.get('/lap-line-tracker', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'lap-line-tracker.html'));
+});
+
+app.get('/leader-board', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'leader-board.html'));
+});
+
+app.get('/next-race', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'next-race.html'));
+});
+
+app.get('/race-countdown', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'race-countdown.html'));
+});
+
+app.get('/race-flags', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'race-flags.html'));
 });
 
 // Handle Socket.IO connections
