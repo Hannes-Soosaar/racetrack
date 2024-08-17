@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Control</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>Race Control Access</h1>
+    <form id="access-form">
+        <label for="access-key">Enter Access Key:</label>
+        <input type="password" id="access-key" required>
+        <button type="submit">Submit</button>
+        <p id="error-message"></p>
+    </form>
+
+    <div id="content">
+        <h2>Race Control</h2>
+        <button id="start-race">Start Race</button>
+        <button id="pause-race">Pause Race</button>
+        <button id="end-race">End Race</button>
+
+        <h3>Current Race Mode: <span id="race-mode">Safe</span></h3>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/race-control.js"></script> <!-- Link to the new JS file -->
+</body>
+</html>
