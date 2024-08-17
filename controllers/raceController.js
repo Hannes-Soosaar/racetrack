@@ -42,3 +42,37 @@ exports.getRaceSessions = (req, res) => {
         }
     });
 };
+
+// Update a race session
+exports.updateRaceSession = (req, res) => {
+    const { id } = req.params;
+    const { sessionName, isActive } = req.body;
+    const query = `UPDATE race_sessions SET sessionName = ?, isActive = ? WHERE id = ?`;
+
+    db.run(query, [sessionName, isActive, id], function(err) {
+        if (err) {
+            res.status(500).json({ error: 'Could not update race session', details: err });
+        } else if (this.changes === 0) {
+            res.status(404).json({ error: 'Race session not found' });
+        } else {
+            res.status(200).json({ id, sessionName, isActive });
+        }
+    });
+};
+
+// Delete a race session
+exports.deleteRaceSession = (req, res) => {
+    const { id } = req.params;
+    const query = `DELETE FROM race_sessions WHERE id = ?`;
+
+    db.run(query, [id], function(err) {
+        if (err) {
+            res.status(500).json({ error: 'Could not delete race session', details: err });
+        } else if (this.changes === 0) {
+            res.status(404).json({ error: 'Race session not found' });
+        } else {
+            res.status(200).json({ message: 'Race session deleted successfully' });
+        }
+    });
+};
+
