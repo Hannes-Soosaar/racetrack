@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front Desk</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        #content {
+            display: none; /* Hide content until key is verified */
+        }
+        #access-form {
+            margin-bottom: 20px;
+        }
+        #error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Front Desk Access</h1>
+    <form id="access-form">
+        <label for="access-key">Enter Access Key:</label>
+        <input type="password" id="access-key" required>
+        <button type="submit">Submit</button>
+        <p id="error-message"></p>
+    </form>
+
+    <div id="content">
+        <h2>Welcome to the Front Desk Interface</h2>
+        <p>This is the front desk interface for managing race sessions. You can add, edit, and remove race sessions from here.</p>
+
+        <form id="add-race-form">
+            <label for="session-name">Race Session Name:</label>
+            <input type="text" id="session-name" name="sessionName" required>
+            <button type="submit">Add Race Session</button>
+        </form>
+
+        <div id="race-sessions">
+            <h2>Upcoming Race Sessions</h2>
+            <ul id="session-list">
+                <!-- Race sessions will be dynamically added here -->
+            </ul>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const accessForm = document.getElementById('access-form');
+        const accessKeyInput = document.getElementById('access-key');
+        const contentDiv = document.getElementById('content');
+        const errorMessage = document.getElementById('error-message');
+
+        // Handle access key submission
+        accessForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const accessKey = accessKeyInput.value;
+
+            // Send the access key to the server for validation
+            socket.emit('validate-key', { key: accessKey, role: 'receptionist' });
+        });
+
+        // Handle key validation response
+        socket.on('key-validation', function(response) {
+            if (response.success) {
+                accessForm.style.display = 'none';
+                contentDiv.style.display = 'block';
+            } else {
+                errorMessage.textContent = 'Invalid access key. Please try again.';
+            }
+        });
+    </script>
+</body>
+</html>
