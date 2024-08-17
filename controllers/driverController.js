@@ -1,21 +1,28 @@
-// controllers/driverController.js
-const Driver = require('../models/driverModel');
+const db = require('../config/db');
 
-exports.createDriver = async (req, res) => {
-  try {
+// Create a new driver
+exports.createDriver = (req, res) => {
     const { name, carNumber } = req.body;
-    const newDriver = await Driver.create({ name, carNumber });
-    res.status(201).json(newDriver);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating driver', error });
-  }
+    const query = `INSERT INTO drivers (name, carNumber) VALUES (?, ?)`;
+
+    db.run(query, [name, carNumber], function(err) {
+        if (err) {
+            res.status(500).json({ error: 'Could not add driver', details: err });
+        } else {
+            res.status(201).json({ id: this.lastID, name, carNumber });
+        }
+    });
 };
 
-exports.getDrivers = async (req, res) => {
-  try {
-    const drivers = await Driver.findAll();
-    res.status(200).json(drivers);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching drivers', error });
-  }
+// Get all drivers
+exports.getDrivers = (req, res) => {
+    const query = `SELECT * FROM drivers`;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: 'Could not retrieve drivers', details: err });
+        } else {
+            res.status(200).json(rows);
+        }
+    });
 };

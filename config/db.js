@@ -1,23 +1,17 @@
-// config/db.js
-const { Sequelize } = require('sequelize');
-const dotenv = require('dotenv');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-dotenv.config();
+// Define the database file path
+const dbPath = path.resolve(__dirname, '../database.sqlite');
 
-// Initialize Sequelize with SQLite database
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite' // File path to the SQLite database
+// Initialize the database connection
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error('Could not connect to the database', err);
+    } else {
+        console.log('Connected to the SQLite database');
+    }
 });
 
-const connectDB = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('SQLite connected');
-  } catch (error) {
-    console.error('SQLite connection failed:', error);
-    process.exit(1); // Exit process with failure
-  }
-};
-
-module.exports = { sequelize, connectDB };
+// Export the database connection
+module.exports = db;
