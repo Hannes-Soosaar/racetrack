@@ -3,18 +3,65 @@ A real-time system so that everyone has the information they need, exactly when 
 
 User.
 
-A employee must login. based on the credentials they will have access to one or more functions of the app. 
+The landing page is the guest page.
+To access other functionality you must be logged in. 
+based on the credentials they will have access to one or more functions of the app. 
 
-    Need - A users table 
-    Need - User name and Password with bcrypt 
-    Need - Need to have have rolls 
 
-There exists a button 'guest' that allows access to a the general views and leader board.
+Interface	Persona	Route
+Front Desk	Receptionist	/front-desk
+Race Control	Safety Official	/race-control
+Lap-line Tracker	Lap-line Observer	/lap-line-tracker
 
-The Admin
+
+    Need - A Users 
+
+Rolls:
+
+Employee
+    Flag Bearer
+    Receptionist
+    Safety Official
+    Lap-line Observer
+
+Guest
+    RaceDriver
+    Spectator
+
+Receptionist
 
 Can create/modify a driver
 Can create/add a race
+
+
+Table
+
+RaceSessions
+    8 drivers
+    8 cars
+    10 minutes
+    winner_driverId
+    safetyOfficial_Id
+    status_id
+
+Laps
+    raceSession_id
+    diver_id
+
+Users
+    User name
+    Password bcrypt / (KEY)
+    roll_id
+
+    
+Rolls (Accesskey)
+ Receptionist 
+ Safety Official
+ Lap-line 
+ Observer
+
+
+
 
 
 
