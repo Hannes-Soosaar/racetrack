@@ -3,7 +3,6 @@ const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
 const errorMessage = document.getElementById('error-message');
-
 const startRaceButton = document.getElementById('start-race');
 const pauseRaceButton = document.getElementById('pause-race');
 const endRaceButton = document.getElementById('end-race');
@@ -29,7 +28,7 @@ socket.on('key-validation', function(response) {
 // Start race
 startRaceButton.addEventListener('click', () => {
     console.log('Start Race button clicked');
-    socket.emit('start-race');
+    socket.emit('start-race'); 
 });
 
 // Pause race
@@ -42,6 +41,9 @@ pauseRaceButton.addEventListener('click', () => {
 endRaceButton.addEventListener('click', () => {
     console.log('End Race button clicked');
     socket.emit('end-race');
+    // Not tied to the BE 
+    // updateRace(stirng id)
+
 });
 
 // Update race mode display

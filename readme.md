@@ -9,6 +9,8 @@ based on the credentials they will have access to one or more functions of the a
 
 
 Interface	Persona	Route
+
+
 Front Desk	Receptionist	/front-desk
 Race Control	Safety Official	/race-control
 Lap-line Tracker	Lap-line Observer	/lap-line-tracker
@@ -34,7 +36,7 @@ Can create/modify a driver
 Can create/add a race
 
 
-Table
+    Table
 
 RaceSessions
     8 drivers
@@ -50,10 +52,9 @@ Laps
 
 Users
     User name
-    Password bcrypt / (KEY)
+    Password bcrypt / (KEY) ".env file check!"
     roll_id
 
-    
 Rolls (Accesskey)
  Receptionist 
  Safety Official

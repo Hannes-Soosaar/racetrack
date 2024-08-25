@@ -3,12 +3,11 @@ const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
 const errorMessage = document.getElementById('error-message');
-
 const driverForm = document.getElementById('driver-form');
 const driverIdInput = document.getElementById('driver-id');
 const driverNameInput = document.getElementById('driver-name');
 const carNumberInput = document.getElementById('car-number');
-const driverList = document.getElementById('driver-list');
+const driverList = document.getElementById('driver-list'); //move to db
 
 // Handle access key submission
 accessForm.addEventListener('submit', function(event) {
@@ -30,6 +29,7 @@ socket.on('key-validation', function(response) {
 
 // Load drivers from the server
 function loadDrivers() {
+        console.log("Im doing the driver update using an API call!");
     fetch('/api/drivers')
         .then(response => response.json())
         .then(drivers => {
@@ -38,17 +38,14 @@ function loadDrivers() {
                 const li = document.createElement('li');
                 li.textContent = `${driver.name} (Car Number: ${driver.carNumber})`;
                 li.dataset.id = driver.id;
-
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Edit';
                 editButton.addEventListener('click', () => editDriver(driver));
                 li.appendChild(editButton);
-
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
                 deleteButton.addEventListener('click', () => deleteDriver(driver.id));
                 li.appendChild(deleteButton);
-
                 driverList.appendChild(li);
             });
         });

@@ -4,7 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 const dotenv = require('dotenv');
 const db = require('./config/db'); // Database connection
-const driverRoutes = require('./routes/driverRoutes'); // Import driver routes
+const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
 
 dotenv.config();
 
@@ -57,7 +57,6 @@ app.get('/race-flags', (req, res) => {
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
     console.log('New client connected');
-
     // Handle key validation
     socket.on('validate-key', ({ key, role }) => {
         let validKey = false;
@@ -68,7 +67,6 @@ io.on('connection', (socket) => {
         } else if (role === 'observer' && key === process.env.OBSERVER_KEY) {
             validKey = true;
         }
-
         console.log(`Key validation result: ${validKey}`);
         socket.emit('key-validation', { success: validKey });
     });
@@ -99,8 +97,11 @@ io.on('connection', (socket) => {
     });
 });
 
-// Start the server
+
 const PORT = process.env.PORT || 3000;
+
+// Start the server
 server.listen(PORT, () => {
+    //TODO:Check keys!
     console.log(`Server is running on port ${PORT}`);
 });
