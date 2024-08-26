@@ -1,1 +1,0 @@
-SQL script to make create a DEMO DB.

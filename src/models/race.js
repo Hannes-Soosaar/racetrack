@@ -1,3 +1,5 @@
+
+// This Race is flawed.
 class Race {
 	constructor(id, car_id, driver_id, status) {
 		this.id = id;
