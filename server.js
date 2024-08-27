@@ -6,7 +6,6 @@ const dotenv = require('dotenv');
 const db = require('./config/db'); // Database connection
 const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
 
-
 dotenv.config();
 
 const app = express();
@@ -39,8 +38,8 @@ app.get('/lap-line-tracker', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'lap-line-tracker.html'));
 });
 
-app.get('/leader-board', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'leader-board.html'));
+app.get('/leaderboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'leaderboard.html'));
 });
 
 app.get('/next-race', (req, res) => {
