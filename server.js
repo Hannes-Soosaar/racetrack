@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const db = require('./config/db'); // Database connection
 const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
 
+
 dotenv.config();
 
 const app = express();
@@ -54,6 +55,8 @@ app.get('/race-flags', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'race-flags.html'));
 });
 
+
+
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
     console.log('New client connected');
@@ -98,8 +101,9 @@ io.on('connection', (socket) => {
 });
 
 
-const PORT = process.env.PORT || 3000;
 
+
+const PORT = process.env.PORT || 3000;
 // Start the server
 server.listen(PORT, () => {
     //TODO:Check keys!
