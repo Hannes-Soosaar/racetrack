@@ -54,7 +54,9 @@ app.get('/race-flags', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'race-flags.html'));
 });
 
-
+const raceControl = require('./src/js/race-control'); // Import race control
+const frontDesk = require('./src/js/front-desk'); // Import front desk
+const lapLineTracker = require('./src/js/lap-line-tracker'); // Import lap line tracker
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
@@ -71,31 +73,16 @@ io.on('connection', (socket) => {
         }
         console.log(`Key validation result: ${validKey}`);
         socket.emit('key-validation', { success: validKey });
-    });
 
-    // Handle starting the race
-    socket.on('start-race', () => {
-        console.log('Race started');
-        io.emit('race-status', 'Race started');
-        io.emit('race-mode', 'Safe'); // Assuming the race starts in 'Safe' mode
-    });
-
-    // Handle changing race mode
-    socket.on('change-mode', (mode) => {
-        console.log(`Race mode changed to ${mode}`);
-        io.emit('race-mode', mode);
-    });
-
-    // Handle ending the race
-    socket.on('end-race', () => {
-        console.log('Race ended');
-        io.emit('race-status', 'Race ended');
-        io.emit('race-mode', 'Finished');
-    });
-
-    // Handle disconnect
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
+        if (validKey) {
+            if (role === 'receptionist') {
+                frontDesk(io, socket)
+            } else if (role === 'safety') {
+                raceControl(io, socket)
+            } else if (role === 'observer') {
+                lapLineTracker(io, socket)
+            }
+        }
     });
 });
 
