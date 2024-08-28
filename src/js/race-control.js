@@ -1,4 +1,5 @@
-// src/raceControl.js
+//const db = require('../config/db.js')
+
 module.exports = (io, socket) => {
     console.log('Setting up race control');
 

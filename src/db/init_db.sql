@@ -63,7 +63,10 @@ CREATE  TABLE IF NOT EXISTS races(
 
 -- add demo race
 INSERT INTO races (created,car_1_id,car_2_id,car_3_id,car_4_id,car_5_id,car_6_id,car_7_id,car_8_id,status) VALUES
-(08272024,1,2,3,4,5,6,7,8,8);
+(08272024,1,2,3,4,5,6,7,8,4);
+
+INSERT INTO races (created,car_1_id,car_2_id,car_3_id,car_4_id,car_5_id,car_6_id,car_7_id,car_8_id,status) VALUES
+(08272025,8,7,6,5,4,3,2,1,6);
 
 -- each race has 8 slots each with a driver and a car
 --NOT NEEDED
