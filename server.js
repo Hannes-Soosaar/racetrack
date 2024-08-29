@@ -3,7 +3,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const dotenv = require('dotenv');
-const db = require('./config/db'); // Database connection
 const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
 
 dotenv.config();

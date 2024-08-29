@@ -1,13 +1,27 @@
-//const db = require('../config/db.js')
+const db = require('../../config/db.js');
+const Race = require('../models/race.js');
 
 module.exports = (io, socket) => {
     console.log('Setting up race control');
 
     // Handle starting the race
     socket.on('start-race', () => {
-        console.log('Race started');
-        io.emit('race-status', 'Race started');
-        io.emit('race-mode', 'Safe'); // Assuming the race starts in 'Safe' mode
+        db.get("SELECT * FROM races WHERE status = '8' LIMIT 1", (err, row) => {
+            if (err) {
+                console.error(err.message)
+                return
+            }
+
+            if (row) {
+                console.log('Race started');
+                const race = new Race(row)
+                console.log(race)
+                io.emit('race-status', 'Race started');
+                io.emit('race-mode', 'Safe'); // Assuming the race starts in 'Safe' mode
+            } else {
+                io.emit('race-status', 'No upcoming race found')
+            }
+        })
     });
 
     // Handle changing race mode
