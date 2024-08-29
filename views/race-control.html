@@ -17,9 +17,17 @@
         <p id="error-message"></p>
     </form>
 
-    <div id="content">
+    <div id="session-content" style="display: none;">
+        <button id="see-new-session">Start the next session</button>
+    </div>
+    <div id="content" style="display: none;">
         <h2>Race Control</h2>
+        <div id="race-information">
+
+        </div>
+
         <button id="start-race">Start Race</button>
+        <h3>Race status: <span id="race-status-display">Not started</span></h3>
     </div>
     <div id="content-after-start" style="display: none;">
         <h2>Race Control</h2>
@@ -27,7 +35,11 @@
         <button id="mode-hazard">Hazard</button>
         <button id="mode-danger">Danger</button>
         <button id="end-race">Finish</button>
+        <h3>Race status: <span id="race-status-display-2">Not started</span></h3>
         <h3>Current Race Mode: <span id="race-mode-start">Safe</span></h3>
+    </div>
+    <div id="content-after-finish" style="display: none;">
+        <button id="end-session">End session</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
