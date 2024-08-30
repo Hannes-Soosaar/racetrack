@@ -59,7 +59,7 @@ const lapLineTracker = require('./src/js/lap-line-tracker'); // Import lap line 
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
-    console.log('New client connected');
+    console.log("New client connected again:", socket.id );     // ADDEd for debug
     // Handle key validation
     socket.on('validate-key', ({ key, role }) => {
         let validKey = false;
@@ -91,6 +91,6 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 // Start the server
 server.listen(PORT, () => {
-    //TODO:Check keys!
+    //TODO: implement check keys last!
     console.log(`Server is running on port ${PORT}`);
 });
