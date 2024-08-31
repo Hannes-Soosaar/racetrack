@@ -4,10 +4,11 @@ const socketIo = require('socket.io');
 const path = require('path');
 const dotenv = require('dotenv');
 const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
+const carRoutes = require('./src/routes/carRoutes'); // Import car routes
 
 dotenv.config();
 
-const app = express();
+const app = express(); // Initialize app here
 const server = http.createServer(app);
 const io = socketIo(server);
 
@@ -16,6 +17,7 @@ app.use(express.static('public'));
 
 // Register the API routes
 app.use('/api', driverRoutes);
+app.use('/api', carRoutes);
 
 // Route to serve the main page
 app.get('/', (req, res) => {
@@ -85,10 +87,7 @@ io.on('connection', (socket) => {
     });
 });
 
-
-
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 // Start the server
 server.listen(PORT, () => {
     //TODO: implement check keys last!

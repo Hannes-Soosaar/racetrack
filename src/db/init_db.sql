@@ -10,44 +10,27 @@ CREATE TABLE IF NOT EXISTS drivers (
     id INTEGER PRIMARY KEY,
     first_name TEXT,
     last_name TEXT,
-    status INTEGER
+    status INTEGER,
+    createdAt TEXT,  -- Removed NOT NULL
+    updatedAt TEXT   -- Removed NOT NULL
 );
--- Add demo driver
-INSERT INTO drivers (first_name,last_name,status) VALUES
-('Hannes','Man',8),
-('Peppa','Pig',8),
-('Peeter','Sky',8),
-('Olli','Sea',8),
-('Mari','Kari',8),
-('Tiit','Kask',8),
-('Teet','Kala',8),
-('Paul','Mari',8);
 
--- the car is main data carrier. Each race will have unique Car/slot ID's
-CREATE TABLE IF NOT EXISTS cars(
+-- the car is the main data carrier. Each race will have unique Car/slot ID's
+CREATE TABLE IF NOT EXISTS cars (
     id INTEGER PRIMARY KEY,
-    driver_id INTEGER NOT NULL,
+    driver_id INTEGER, -- Allow this to be NULL so a car can exist without a driver
     name TEXT,
-    number INTEGER,
-    race_lap INTEGER,
-    current_lap_time NUMBER,
-    best_lap_time NUMBER,
-    race_elapse_time NUMBER,
-    status INTEGER
+    number INTEGER UNIQUE, -- Ensure car numbers are unique
+    race_lap INTEGER DEFAULT 0,
+    current_lap_time NUMBER DEFAULT 0.0,
+    best_lap_time NUMBER DEFAULT 0.0,
+    race_elapse_time NUMBER DEFAULT 0.0,
+    status INTEGER,
+    FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE SET NULL -- Set driver_id to NULL if the driver is deleted
 );
--- add demo cars
-INSERT INTO cars (driver_id, name, number,race_lap,current_lap_time,best_lap_time,race_elapse_time,status) VALUES
-(1,'one',01,0,0,0,0,8),
-(2,'two',02,0,0,0,0,8),
-(3,'three',03,0,0,0,0,8),
-(4,'four',04,0,0,0,0,8),
-(5,'five',05,0,0,0,0,8),
-(6,'six',06,0,0,0,0,8),
-(7,'seven',07,0,0,0,0,8),
-(8,'eight',08,0,0,0,0,8);
 
 -- This table is updated -- the car ID's must be unique 
-CREATE  TABLE IF NOT EXISTS races(
+CREATE TABLE IF NOT EXISTS races (
     id INTEGER PRIMARY KEY,
     created NUMBER,
     car_1_id INTEGER,
@@ -58,18 +41,22 @@ CREATE  TABLE IF NOT EXISTS races(
     car_6_id INTEGER,
     car_7_id INTEGER,
     car_8_id INTEGER,
-    status INTEGER
+    status INTEGER,
+    FOREIGN KEY (car_1_id) REFERENCES cars(id) ON DELETE SET NULL,
+    FOREIGN KEY (car_2_id) REFERENCES cars(id) ON DELETE SET NULL,
+    FOREIGN KEY (car_3_id) REFERENCES cars(id) ON DELETE SET NULL,
+    FOREIGN KEY (car_4_id) REFERENCES cars(id) ON DELETE SET NULL,
+    FOREIGN KEY (car_5_id) REFERENCES cars(id) ON DELETE SET NULL,
+    FOREIGN KEY (car_6_id) REFERENCES cars(id) ON DELETE SET NULL,
+    FOREIGN KEY (car_7_id) REFERENCES cars(id) ON DELETE SET NULL,
+    FOREIGN KEY (car_8_id) REFERENCES cars(id) ON DELETE SET NULL
 );
 
--- add demo race
-INSERT INTO races (created,car_1_id,car_2_id,car_3_id,car_4_id,car_5_id,car_6_id,car_7_id,car_8_id,status) VALUES
-(08272024,1,2,3,4,5,6,7,8,8);
-
-INSERT INTO races (created,car_1_id,car_2_id,car_3_id,car_4_id,car_5_id,car_6_id,car_7_id,car_8_id,status) VALUES
-(08272025,8,7,6,5,4,3,2,1,8);
+INSERT INTO cars (name, number, status) VALUES ('Car One', 1, 1), ('Car Two', 2, 1);
 
 -- each race has 8 slots each with a driver and a car
---NOT NEEDED
+-- NOT NEEDED
+
 -- CREATE TABLE IF NOT EXISTS race_slots (
 --     id INTEGER PRIMARY KEY,
 --     car_id INTEGER,
@@ -82,10 +69,11 @@ INSERT INTO races (created,car_1_id,car_2_id,car_3_id,car_4_id,car_5_id,car_6_id
 
 -- each driver gets a result that is tied to the race
 -- the result will be an ordered race.
+
 -- CREATE TABLE IF NOT EXISTS race_results (
 --     id INTEGER PRIMARY KEY,
 --     driver_id INTEGER,
 --     race_id INTEGER,
---     palace INTEGER, -- might not be needed
+--     place INTEGER, -- might not be needed
 --     time NUMBER
 -- );
