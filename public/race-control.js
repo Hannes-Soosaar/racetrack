@@ -35,6 +35,10 @@ socket.on('key-validation', function (response) {
 
 //TODO: currently just shows the race info, needs to be changed to show driver and what car they drive
 socket.on('display-race', (race) => {
+
+    contentDiv.style.display = 'block'
+    newSessionDiv.style.display = 'none'
+
     raceInformationDiv.innerHTML = '';
 
     for (const [key, value] of Object.entries(race)) {
@@ -46,8 +50,6 @@ socket.on('display-race', (race) => {
 
 newSessionButton.addEventListener('click', () => {
     socket.emit('start-session');
-    contentDiv.style.display = 'block';
-    newSessionDiv.style.display = 'none'
 });
 
 // Start race
@@ -90,21 +92,26 @@ socket.on('race-status', (status) => {
     // Update the UI with the new race status
     document.getElementById('race-status-display').innerText = status;
     if (status === 'No upcoming race found') {
-        contentDiv.style.display = 'block'
+        contentDiv.style.display = 'none'
         contentDivAfterStart.style.display = 'none'
-    } else {
+        newSessionDiv.style.display = 'block'
+        document.getElementById('race-status-display-session').innerText = status
+    } else if (status === 'Race ended') {
+        disableButtons()
+        contentDivAfterFinish.style.display = 'block'
+    } else if (status === 'Race started') {
         contentDiv.style.display = 'none'
         contentDivAfterStart.style.display = 'block'
         document.getElementById('race-status-display-2').innerText = status;
+    } else if (status === 'Session ended') {
+        contentDivAfterFinish.style.display = 'none'
+        contentDiv.style.display = 'none'
+        contentDivAfterStart.style.display = 'none'
+        newSessionDiv.style.display = 'block'
+        document.getElementById('race-status-display-session').innerText = status
+        enableButtons()
     }
 });
-
-socket.on('race-status', (status) => {
-    if (status === 'Race ended') {
-        disableButtons()
-        contentDivAfterFinish.style.display = 'block'
-    }
-})
 
 function disableButtons() {
     document.getElementById('mode-safe').disabled = true

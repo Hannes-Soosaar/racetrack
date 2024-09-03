@@ -11,7 +11,6 @@ module.exports = (io, socket) => {
                 console.error(err.message)
                 return
             }
-
             if (row) {
                 console.log('Session found');
                 const race = new Race(row)
@@ -30,6 +29,7 @@ module.exports = (io, socket) => {
 
     socket.on('end-session', () => {
         //TODO: if this is called, prepare the next session. Set the previous race to inactive in DB, set the next race status to 8, set the next queued race status to 4. 
+        io.emit('race-status', 'Session ended')
     })
 
     // Handle changing race mode
