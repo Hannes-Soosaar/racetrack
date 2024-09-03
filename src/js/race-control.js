@@ -6,7 +6,7 @@ module.exports = (io, socket) => {
 
     // Handle starting the race
     socket.on('start-session', () => {
-        db.get("SELECT * FROM races WHERE status = '8' LIMIT 1", (err, row) => {
+        db.get("SELECT * FROM races WHERE status = '6' LIMIT 1", (err, row) => {
             if (err) {
                 console.error(err.message)
                 return
