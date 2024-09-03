@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS race_results;
 
 --Define and build tables
 CREATE TABLE IF NOT EXISTS drivers (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name TEXT,
     last_name TEXT,
     status INTEGER,

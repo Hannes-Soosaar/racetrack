@@ -41,7 +41,7 @@ function loadDrivers() {
             driverList.innerHTML = '';
             drivers.forEach(driver => {
                 const li = document.createElement('li');
-                li.textContent = `${driver.first_name} ${driver.last_name} (Status: ${driver.status})`;
+                li.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.carNumber}, Status: ${driver.status})`;
                 li.dataset.id = driver.id;
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Edit';
@@ -60,6 +60,7 @@ function loadDrivers() {
         });
 }
 
+
 // Load available cars for selection
 function loadAvailableCars() {
     fetch('/api/cars')
@@ -72,10 +73,12 @@ function loadAvailableCars() {
         .then(cars => {
             carNumberSelect.innerHTML = ''; // Clear existing options
             cars.forEach(car => {
-                const option = document.createElement('option');
-                option.value = car.number;
-                option.textContent = `Car ${car.number} - ${car.name}`;
-                carNumberSelect.appendChild(option);
+                if (car.driver_id === null) { // Only show cars without assigned drivers
+                    const option = document.createElement('option');
+                    option.value = car.number;
+                    option.textContent = `Car ${car.number} - ${car.name}`;
+                    carNumberSelect.appendChild(option);
+                }
             });
         })
         .catch(error => {
@@ -83,6 +86,10 @@ function loadAvailableCars() {
             alert('Failed to load cars. Please check the console for more details.');
         });
 }
+
+
+
+
 
 
 // Handle form submission for creating/updating a driver
@@ -105,9 +112,15 @@ driverForm.addEventListener('submit', function(event) {
     .then(response => response.json())
     .then(() => {
         driverForm.reset();
-        loadDrivers();
+        loadDrivers();       // Reload the list of drivers
+        loadAvailableCars(); // Reload the list of available cars
+    })
+    .catch(error => {
+        console.error('Error processing driver:', error);
+        alert('Failed to save driver. Please try again.');
     });
 });
+
 
 // Populate the form with driver data for editing
 function editDriver(driver) {
@@ -126,7 +139,8 @@ function deleteDriver(id) {
             if (data.error) {
                 alert('Failed to delete driver: ' + data.error);
             } else {
-                loadDrivers();  // Reload the driver list
+                loadDrivers();       // Reload the list of drivers
+                loadAvailableCars(); // Reload the list of available cars
             }
         })
         .catch(error => {
@@ -134,3 +148,4 @@ function deleteDriver(id) {
             alert('Failed to delete driver. Please try again.');
         });
 }
+
