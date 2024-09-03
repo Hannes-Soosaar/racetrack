@@ -1,8 +1,8 @@
-// controllers/carController.js
 const db = require('../config/db');
 
+// Get all available cars (cars without a driver assigned)
 exports.getCars = (req, res) => {
-    const query = `SELECT * FROM cars`;
+    const query = `SELECT * FROM cars WHERE driver_id IS NULL`;
 
     db.all(query, [], (err, rows) => {
         if (err) {
