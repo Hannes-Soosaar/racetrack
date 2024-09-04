@@ -16,6 +16,7 @@
     </form>
 
     <div id="content" style="display:none;">
+        <!-- Section for managing drivers -->
         <h2>Manage Drivers</h2>
 
         <!-- Form to create or update a driver -->
@@ -27,7 +28,7 @@
             <input type="text" id="last-name" required>
             <label for="car-number">Car Number:</label>
             <select id="car-number" required>
-                <!-- Options will be populated dynamically -->
+                <!-- Car options will be populated dynamically -->
             </select>
             <label for="status">Status:</label>
             <input type="number" id="status" value="8" required>
@@ -37,6 +38,20 @@
         <!-- List of drivers -->
         <h3>Driver List</h3>
         <ul id="driver-list"></ul>
+
+        <!-- Section for managing race sessions -->
+        <h2>Manage Race Sessions</h2>
+
+        <!-- Form to create a race session -->
+        <form id="race-session-form">
+            <label for="race-date">Race Date:</label>
+            <input type="date" id="race-date" required>
+            <button type="submit">Create Race</button>
+        </form>
+
+        <!-- List of race sessions -->
+        <h3>Race Session List</h3>
+        <ul id="race-session-list"></ul>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

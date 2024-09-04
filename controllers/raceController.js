@@ -2,77 +2,86 @@ const db = require('../config/db');
 
 // Create a new race session
 exports.createRaceSession = (req, res) => {
-    const { sessionName, driverIds } = req.body;
-    const query = `INSERT INTO race_sessions (sessionName) VALUES (?)`;
+    const { race_date, driverCarAssignments } = req.body;
+    const created_at = new Date().toISOString();
+    const updated_at = created_at;
 
-    db.run(query, [sessionName], function(err) {
+    const query = `INSERT INTO races (race_date, created_at, updated_at) VALUES (?, ?, ?)`;
+    
+    db.run(query, [race_date, created_at, updated_at], function(err) {
         if (err) {
-            res.status(500).json({ error: 'Could not create race session', details: err });
-        } else {
-            const sessionId = this.lastID;
-            const insertRaceDrivers = `INSERT INTO race_drivers (sessionId, driverId) VALUES (?, ?)`;
-
-            driverIds.forEach(driverId => {
-                db.run(insertRaceDrivers, [sessionId, driverId], (err) => {
-                    if (err) {
-                        console.error('Could not assign driver to session', err);
-                    }
-                });
-            });
-
-            res.status(201).json({ id: sessionId, sessionName });
+            return res.status(500).json({ error: 'Could not create race session', details: err });
         }
+        
+        const raceId = this.lastID;
+
+        const insertRaceSlots = `INSERT INTO race_slots (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
+
+        driverCarAssignments.forEach(({ driverId, carNumber }) => {
+            db.run(insertRaceSlots, [raceId, driverId, carNumber], (err) => {
+                if (err) {
+                    console.error('Error assigning driver and car to race session:', err);
+                }
+            });
+        });
+
+        res.status(201).json({ id: raceId, race_date });
     });
 };
 
 // Get all race sessions
 exports.getRaceSessions = (req, res) => {
     const query = `
-        SELECT rs.id, rs.sessionName, rs.isActive, d.name, d.carNumber
-        FROM race_sessions rs
-        LEFT JOIN race_drivers rd ON rs.id = rd.sessionId
-        LEFT JOIN drivers d ON rd.driverId = d.id
+        SELECT rs.id, rs.race_date, rs.status, d.first_name, d.last_name, d.carNumber
+        FROM races rs
+        LEFT JOIN race_slots rd ON rs.id = rd.race_id
+        LEFT JOIN drivers d ON rd.driver_id = d.id
     `;
 
     db.all(query, [], (err, rows) => {
         if (err) {
-            res.status(500).json({ error: 'Could not retrieve race sessions', details: err });
-        } else {
-            res.status(200).json(rows);
+            console.error('Error fetching race sessions:', err.message);  // Log error
+            return res.status(500).json({ error: 'Could not retrieve race sessions', details: err.message });
         }
+        if (!Array.isArray(rows)) {
+            return res.status(500).json({ error: 'Expected an array of race sessions', details: 'Data returned is not an array' });
+        }
+        res.status(200).json(rows);
     });
 };
 
-// Update a race session
+
+// Update race session status
 exports.updateRaceSession = (req, res) => {
     const { id } = req.params;
-    const { sessionName, isActive } = req.body;
-    const query = `UPDATE race_sessions SET sessionName = ?, isActive = ? WHERE id = ?`;
+    const { status } = req.body;
+    const updated_at = new Date().toISOString();
+    
+    const query = `UPDATE races SET status = ?, updated_at = ? WHERE id = ?`;
 
-    db.run(query, [sessionName, isActive, id], function(err) {
+    db.run(query, [status, updated_at, id], function(err) {
         if (err) {
-            res.status(500).json({ error: 'Could not update race session', details: err });
+            return res.status(500).json({ error: 'Could not update race session', details: err });
         } else if (this.changes === 0) {
-            res.status(404).json({ error: 'Race session not found' });
-        } else {
-            res.status(200).json({ id, sessionName, isActive });
+            return res.status(404).json({ error: 'Race session not found' });
         }
+
+        res.status(200).json({ id, status });
     });
 };
 
 // Delete a race session
 exports.deleteRaceSession = (req, res) => {
     const { id } = req.params;
-    const query = `DELETE FROM race_sessions WHERE id = ?`;
+    const query = `DELETE FROM races WHERE id = ?`;
 
     db.run(query, [id], function(err) {
         if (err) {
-            res.status(500).json({ error: 'Could not delete race session', details: err });
+            return res.status(500).json({ error: 'Could not delete race session', details: err });
         } else if (this.changes === 0) {
-            res.status(404).json({ error: 'Race session not found' });
-        } else {
-            res.status(200).json({ message: 'Race session deleted successfully' });
+            return res.status(404).json({ error: 'Race session not found' });
         }
+
+        res.status(200).json({ message: 'Race session deleted successfully' });
     });
 };
-

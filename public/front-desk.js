@@ -10,21 +10,25 @@ const lastNameInput = document.getElementById('last-name');
 const statusInput = document.getElementById('status');
 const driverList = document.getElementById('driver-list');
 const carNumberSelect = document.getElementById('car-number');
+const raceSessionForm = document.getElementById('race-session-form');
+const raceDateInput = document.getElementById('race-date');
+const raceSessionList = document.getElementById('race-session-list');
 
 // Handle access key submission
-accessForm.addEventListener('submit', function(event) {
+accessForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const accessKey = accessKeyInput.value;
     socket.emit('validate-key', { key: accessKey, role: 'receptionist' });
 });
 
 // Handle key validation response
-socket.on('key-validation', function(response) {
+socket.on('key-validation', function (response) {
     if (response.success) {
         accessForm.style.display = 'none';
         contentDiv.style.display = 'block';
         loadDrivers();
         loadAvailableCars();
+        loadRaceSessions();
     } else {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
@@ -60,7 +64,6 @@ function loadDrivers() {
         });
 }
 
-
 // Load available cars for selection
 function loadAvailableCars() {
     fetch('/api/cars')
@@ -87,13 +90,8 @@ function loadAvailableCars() {
         });
 }
 
-
-
-
-
-
 // Handle form submission for creating/updating a driver
-driverForm.addEventListener('submit', function(event) {
+driverForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const id = driverIdInput.value;
     const firstName = firstNameInput.value;
@@ -109,18 +107,17 @@ driverForm.addEventListener('submit', function(event) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(() => {
-        driverForm.reset();
-        loadDrivers();       // Reload the list of drivers
-        loadAvailableCars(); // Reload the list of available cars
-    })
-    .catch(error => {
-        console.error('Error processing driver:', error);
-        alert('Failed to save driver. Please try again.');
-    });
+        .then(response => response.json())
+        .then(() => {
+            driverForm.reset();
+            loadDrivers();       // Reload the list of drivers
+            loadAvailableCars(); // Reload the list of available cars
+        })
+        .catch(error => {
+            console.error('Error processing driver:', error);
+            alert('Failed to save driver. Please try again.');
+        });
 });
-
 
 // Populate the form with driver data for editing
 function editDriver(driver) {
@@ -149,3 +146,77 @@ function deleteDriver(id) {
         });
 }
 
+// Load race sessions from the server
+function loadRaceSessions() {
+    fetch('/api/races')
+        .then(response => response.json())
+        .then(raceSessions => {
+            if (!Array.isArray(raceSessions)) {
+                throw new Error('Expected an array of race sessions');
+            }
+
+            raceSessionList.innerHTML = ''; // Clear the list
+
+            raceSessions.forEach(session => {
+                const li = document.createElement('li');
+                li.textContent = `Race on ${session.race_date} - Status: ${session.status}`;
+
+                // Optionally, you can include drivers and cars
+                if (session.first_name && session.last_name && session.carNumber) {
+                    li.textContent += ` | Driver: ${session.first_name} ${session.last_name} | Car: ${session.carNumber}`;
+                }
+
+                raceSessionList.appendChild(li);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading race sessions:', error);
+            alert('Failed to load race sessions. Please try again later.');
+        });
+}
+
+// Handle race session form submission
+raceSessionForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const raceDate = raceDateInput.value;
+    if (!raceDate) {
+        alert('Race date is required');
+        return;
+    }
+
+    const raceData = {
+        race_date: raceDate,
+        driverCarAssignments: [
+            // Sample assignments: driverId and carNumber
+            { driverId: 1, carNumber: 1 },
+            { driverId: 2, carNumber: 2 }
+        ]
+    };
+
+    fetch('/api/races', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(raceData)
+    })
+        .then(response => response.json())
+        .then(() => {
+            raceSessionForm.reset();
+            loadRaceSessions();  // Reload the race sessions after adding a new one
+        });
+});
+
+// Delete a race session
+function deleteRaceSession(raceId) {
+    fetch(`/api/races/${raceId}`, { method: 'DELETE' })
+        .then(() => loadRaceSessions())  // Reload the race sessions
+        .catch(error => {
+            console.error('Error deleting race session:', error);
+            alert('Failed to delete race session. Please try again.');
+        });
+}
+
+// Initial load of race sessions and other data
+loadDrivers();
+loadAvailableCars();
+loadRaceSessions();
