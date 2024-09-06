@@ -52,28 +52,18 @@ CREATE TABLE IF NOT EXISTS races (
     FOREIGN KEY (car_8_id) REFERENCES cars(id) ON DELETE SET NULL
 );
 
-INSERT INTO cars (name, number, status) VALUES ('Car One', 1, 1), ('Car Two', 2, 1);
-
--- each race has 8 slots each with a driver and a car
--- NOT NEEDED
-
--- CREATE TABLE IF NOT EXISTS race_slots (
---     id INTEGER PRIMARY KEY,
---     car_id INTEGER,
---     driver_id INTEGER,
---     -- do we need this? 
---     race_id  INTEGER,
---     -- can active or closed.
---     status INTEGER
--- );
-
--- each driver gets a result that is tied to the race
--- the result will be an ordered race.
-
--- CREATE TABLE IF NOT EXISTS race_results (
---     id INTEGER PRIMARY KEY,
---     driver_id INTEGER,
---     race_id INTEGER,
---     place INTEGER, -- might not be needed
---     time NUMBER
--- );
+-- add a car to a slot
+CREATE TABLE IF NOT EXISTS races_test (
+    id INTEGER PRIMARY KEY,
+    created NUMBER,
+    slot_1_id INTEGER,
+    slot_2_id INTEGER,
+    slot_3_id INTEGER,
+    slot_4_id INTEGER,
+    slot_5_id INTEGER,
+    slot_6_id INTEGER,
+    slot_7_id INTEGER,
+    slot_8_id INTEGER,
+    status INTEGER,
+    flag INTEGER   --split the flags to this integer
+);
