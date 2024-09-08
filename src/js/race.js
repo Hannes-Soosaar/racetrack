@@ -1,59 +1,70 @@
 const Race = require("../models/race");
 const status = require("../config/const");
 const Car = require("../models/car");
-
-
-const NewRace = new Race(
-	1, // ID
-	1, // created
-	1, // CAR 1
-	2, // CAR
-	3, // CAR
-	4, // CAR
-	5, // CAR
-	6, // CAR
-	7, // CAR
-	8, // CAR
-	status.ACTIVE
-);
-console.log(NewRace);
+const db = require('../config/db');  // this uses the establised connection 
 
 //TODO: try to get the demo race from the DB.
 
-//TODO: 
 // finds the race by the status and returns a race object
 function getRaceIdByStatus(raceStatus) {
-	return raceID;
+	db.get('SELECT id FROM race_test WHERE status=?', raceStatus, (err, raceID) => {
+		if (err) {
+			console.log(`There is an error with the query`);
+		} else {
+			console.log(`The Race ID is: ` + raceID);
+			return raceID;
+		}
+	});
 }
 
-// takes in a race object returns a sorted array with cars. 
-//? Do we need anything else here like the duration to be returned?
-function getRaceResults(race) {
-	result = `sport Wins!`
-	return result;
+
+// Returns the race object
+function getRaceByRaceId(raceId) {
+	db.get("SELECT * FROM race_test WHERE  id=?", raceID, (err, row) => {
+		if (err) {
+			console.log(`Somethings up with the db or query`)
+		} else {
+			console.log('The result is' + row)
+			const race = new Race(row);
+			return race;
+		}
+	});
 }
 
 //return a flag (number) that is gotten from the db.
-function getRacesFlag() {
-	return status.SAFE
+function getRacesFlagByRaceID(raceID) {
+	db.get('SELECT flag FROM race_test WHERE id=?', raceID, (err, flag) => {
+		if (err) {
+		} else {
+			console.log(`The flag is: ` + flag);
+			return flag
+		}
+	});
 }
+
 
 //Sets the Race Status
-function setRaceStatusByRaceId(raceId){
+function setRaceStatusByRaceId(raceId) {
+
 
 }
 
-function setRaceFlagByRaceId(raceId){
+// sets/update the Race timer
+function setRaceCreatedByRaceId(raceId){
+
+}
+
+function setRaceFlagByRaceId(raceId) {
 
 }
 
 // Adds a car by Id to a race Slot from 
-function setCarToRaceSlotBySlotId(RaceId,carId,slotId) {
+function setCarToRaceSlotBySlotId(RaceId, carId, slotId) {
 	return success;
 }
 
 //! not needed the slot content should update when the car is updated
-function updateRaceSlotBySlotId(RaceId,SlotId){
+function updateRaceSlotBySlotId(RaceId, SlotId) {
 	//Add car to slot if empty
 	return success;
 }

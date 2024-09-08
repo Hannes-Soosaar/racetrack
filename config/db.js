@@ -12,6 +12,8 @@ const db = new sqlite3.Database(path.join(__dirname, '../src/db/racetrack.db'), 
     }
 });
 
+// TODO: When do we close the DB connection ?
+
 // Create the drivers table if it doesn't exist
 // db.run(`
 //     CREATE TABLE IF NOT EXISTS drivers (
