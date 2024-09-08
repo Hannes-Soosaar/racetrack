@@ -62,7 +62,7 @@ const lapLineTracker = require('./src/js/lap-line-tracker'); // Import lap line 
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
-    console.log("New client connected again:", socket.id );     // ADDEd for debug
+    console.log("New client connected again:", socket.id);     // ADDEd for debug
     // Handle key validation
     socket.on('validate-key', ({ key, role }) => {
         let validKey = false;

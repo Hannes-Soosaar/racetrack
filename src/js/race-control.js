@@ -1,21 +1,23 @@
 const db = require('../../config/db.js');
 const Race = require('../models/race.js');
+let currentRace = null
+let nextRace = null
 
 module.exports = (io, socket) => {
     console.log('Setting up race control');
 
     // Handle starting the race
     socket.on('start-session', () => {
-        db.get("SELECT * FROM races WHERE status = '6' LIMIT 1", (err, row) => {
+        db.get("SELECT * FROM races WHERE status = '4' LIMIT 1", (err, row) => {
             if (err) {
                 console.error(err.message)
                 return
             }
             if (row) {
                 console.log('Session found');
-                const race = new Race(row)
-                console.log(race)
-                io.emit('display-race', race)
+                currentRace = new Race(row)
+                console.log(currentRace)
+                io.emit('display-race', currentRace)
             } else {
                 io.emit('race-status', 'No upcoming race found')
             }
@@ -25,6 +27,8 @@ module.exports = (io, socket) => {
     socket.on('start-race', () => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
+        changeFlag(1)
+        io.emit('race-flags-update', 1)
     })
 
     socket.on('end-session', () => {
@@ -36,6 +40,22 @@ module.exports = (io, socket) => {
     socket.on('change-mode', (mode) => {
         console.log(`Race mode changed to ${mode}`);
         io.emit('race-mode', mode);
+        switch (mode) {
+            case 'Safe':
+                changeFlag(1)
+                io.emit('race-flags-update', 1)
+                break
+            case 'Hazard':
+                changeFlag(5)
+                io.emit('race-flags-update', 5)
+                break
+            case 'Danger':
+                changeFlag(2)
+                io.emit('race-flags-update', 2)
+                break
+            default:
+                changeFlag(null)
+        }
     });
 
     // Handle ending the race
@@ -43,6 +63,8 @@ module.exports = (io, socket) => {
         console.log('Race ended');
         io.emit('race-status', 'Race ended');
         io.emit('race-mode', 'Finished');
+        changeFlag(3)
+        io.emit('race-flags-update', 3)
     });
 
     // Handle disconnection
@@ -50,3 +72,13 @@ module.exports = (io, socket) => {
         console.log('Client disconnected from race control');
     });
 };
+
+function changeFlag(flagID) {
+    const sql = `UPDATE races SET flag = ? WHERE id = ?`
+    db.run(sql, [flagID, currentRace.id], function (err) {
+        if (err) {
+            return console.log(err.message)
+        }
+    })
+}
+
