@@ -107,16 +107,16 @@ driverForm.addEventListener('submit', function (event) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(response => response.json())
-        .then(() => {
-            driverForm.reset();
-            loadDrivers();       // Reload the list of drivers
-            loadAvailableCars(); // Reload the list of available cars
-        })
-        .catch(error => {
-            console.error('Error processing driver:', error);
-            alert('Failed to save driver. Please try again.');
-        });
+    .then(response => response.json())
+    .then(() => {
+        driverForm.reset();
+        loadDrivers();       // Reload the list of drivers
+        loadAvailableCars(); // Reload the list of available cars
+    })
+    .catch(error => {
+        console.error('Error processing driver:', error);
+        alert('Failed to save driver. Please try again.');
+    });
 });
 
 // Populate the form with driver data for editing
@@ -146,35 +146,6 @@ function deleteDriver(id) {
         });
 }
 
-// Load race sessions from the server
-function loadRaceSessions() {
-    fetch('/api/races')
-        .then(response => response.json())
-        .then(raceSessions => {
-            if (!Array.isArray(raceSessions)) {
-                throw new Error('Expected an array of race sessions');
-            }
-
-            raceSessionList.innerHTML = ''; // Clear the list
-
-            raceSessions.forEach(session => {
-                const li = document.createElement('li');
-                li.textContent = `Race on ${session.race_date} - Status: ${session.status}`;
-
-                // Optionally, you can include drivers and cars
-                if (session.first_name && session.last_name && session.carNumber) {
-                    li.textContent += ` | Driver: ${session.first_name} ${session.last_name} | Car: ${session.carNumber}`;
-                }
-
-                raceSessionList.appendChild(li);
-            });
-        })
-        .catch(error => {
-            console.error('Error loading race sessions:', error);
-            alert('Failed to load race sessions. Please try again later.');
-        });
-}
-
 // Handle race session form submission
 raceSessionForm.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -185,38 +156,165 @@ raceSessionForm.addEventListener('submit', function (event) {
         return;
     }
 
-    const raceData = {
-        race_date: raceDate,
-        driverCarAssignments: [
-            // Sample assignments: driverId and carNumber
-            { driverId: 1, carNumber: 1 },
-            { driverId: 2, carNumber: 2 }
-        ]
-    };
+    const raceData = { race_date: raceDate };
 
     fetch('/api/races', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(raceData)
     })
-        .then(response => response.json())
-        .then(() => {
-            raceSessionForm.reset();
-            loadRaceSessions();  // Reload the race sessions after adding a new one
-        });
+    .then(response => response.json())
+    .then(() => {
+        raceSessionForm.reset();
+        loadRaceSessions();  // Reload the race sessions after adding a new one
+    })
+    .catch(error => {
+        console.error('Error creating race session:', error);
+        alert('Failed to create race session. Please try again later.');
+    });
 });
 
-// Delete a race session
-function deleteRaceSession(raceId) {
-    fetch(`/api/races/${raceId}`, { method: 'DELETE' })
-        .then(() => loadRaceSessions())  // Reload the race sessions
+// Open the modal to select drivers
+function openAddDriverModal(raceId) {
+    const modal = document.getElementById("addDriverModal");
+    modal.style.display = "block"; // Show the modal
+
+    // Fetch drivers not yet assigned to this race
+    fetch(`/api/drivers/not-in-race/${raceId}`)
+        .then(response => response.json())
+        .then(drivers => {
+            console.log(drivers);  // Debug: log drivers to see if the response is correct
+            const driverSelect = document.getElementById("modal-driver-selection");
+            driverSelect.innerHTML = '';  // Clear previous options
+
+            if (drivers.length === 0) {
+                const option = document.createElement('option');
+                option.textContent = "No drivers available to add";
+                driverSelect.appendChild(option);
+                return;
+            }
+
+            drivers.forEach(driver => {
+                const option = document.createElement('option');
+                option.value = driver.id;
+                option.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.carNumber})`;
+                driverSelect.appendChild(option);
+            });
+
+            // Attach an event listener to add the selected driver to the race
+            document.getElementById('addDriverToRace').onclick = function () {
+                const selectedDrivers = Array.from(driverSelect.selectedOptions).map(opt => ({
+                    driverId: opt.value,
+                    carNumber: opt.textContent.match(/\(Car: (\d+)\)/)[1]
+                }));
+                addDriverToRace(raceId, selectedDrivers);
+                modal.style.display = "none";  // Close the modal
+            };
+        })
         .catch(error => {
-            console.error('Error deleting race session:', error);
-            alert('Failed to delete race session. Please try again.');
+            console.error('Error fetching available drivers:', error);
+            alert('Failed to load available drivers. Please try again later.');
         });
 }
+
+
+// Add drivers to the race session
+function addDriverToRace(raceId, selectedDrivers) {
+    const raceData = {
+        driverCarAssignments: selectedDrivers
+    };
+
+    fetch(`/api/races/${raceId}/add-driver`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(raceData)
+    })
+    .then(() => {
+        loadRaceSessions();  // Reload the race sessions after adding the driver
+    })
+    .catch(error => {
+        console.error('Error adding drivers to race:', error);
+        alert('Failed to add driver. Please try again later.');
+    });
+}
+
+
+
+// Attach event listener to the modal close button
+document.querySelector(".modal .close").onclick = function() {
+    document.getElementById("addDriverModal").style.display = "none";
+};
+
+// Handle the add driver button click to open the modal
+function handleAddDriver(event) {
+    const raceId = event.target.dataset.raceId;
+    openAddDriverModal(raceId);
+}
+
+// Handle deleting a race
+function handleDeleteRace(event) {
+    const raceId = event.target.dataset.raceId;
+    fetch(`/api/races/${raceId}`, { method: 'DELETE' })
+        .then(() => loadRaceSessions())
+        .catch(error => {
+            console.error('Error deleting race:', error);
+            alert('Failed to delete race. Please try again later.');
+        });
+}
+
+// Existing loadRaceSessions function modified to avoid duplication
+function loadRaceSessions() {
+    fetch('/api/races')
+        .then(response => response.json())
+        .then(raceSessions => {
+            if (!Array.isArray(raceSessions)) {
+                throw new Error('Expected an array of race sessions');
+            }
+
+            raceSessionList.innerHTML = '';  // Clear the list
+
+            const uniqueSessions = new Set();
+            raceSessions.forEach(session => {
+                if (!uniqueSessions.has(session.id)) {
+                    uniqueSessions.add(session.id);
+
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        Race on ${session.race_date} - Status: ${session.status}
+                        <ul id="drivers-in-race-${session.id}">
+                            <!-- Drivers will be listed here -->
+                        </ul>
+                        <button class="add-driver" data-race-id="${session.id}">Add Driver</button>
+                        <button class="delete-race" data-race-id="${session.id}">Delete</button>
+                    `;
+                    raceSessionList.appendChild(li);
+
+                    // Only add drivers that are valid
+                    raceSessions.filter(s => s.id === session.id && s.first_name && s.last_name).forEach(driver => {
+                        const driverLi = document.createElement('li');
+                        driverLi.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.carNumber})`;
+                        document.getElementById(`drivers-in-race-${session.id}`).appendChild(driverLi);
+                    });
+                }
+            });
+
+            // Attach event listeners to buttons
+            document.querySelectorAll('.add-driver').forEach(button => {
+                button.addEventListener('click', handleAddDriver);
+            });
+            document.querySelectorAll('.delete-race').forEach(button => {
+                button.addEventListener('click', handleDeleteRace);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading race sessions:', error);
+            alert('Failed to load race sessions. Please try again later.');
+        });
+}
+
 
 // Initial load of race sessions and other data
 loadDrivers();
 loadAvailableCars();
 loadRaceSessions();
+

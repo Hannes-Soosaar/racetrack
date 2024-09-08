@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS races (
 -- Race slots: assign drivers and cars to specific race sessions
 CREATE TABLE IF NOT EXISTS race_slots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    race_id INTEGER,  -- The race session ID
-    driver_id INTEGER,  -- The driver ID
-    car_number INTEGER,  -- The car number
+    race_id INTEGER NOT NULL,  -- The race session ID
+    driver_id INTEGER NOT NULL,  -- The driver ID
+    car_number INTEGER NOT NULL,  -- The car number
     FOREIGN KEY (race_id) REFERENCES races(id) ON DELETE CASCADE,
     FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE
 );
