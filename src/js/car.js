@@ -14,8 +14,16 @@ console.log(myCar);
 
 
 // Takes race object and returns an array with all the cars in the race.
-function getCarById(raceId){
-
+function getCarById(carId){
+    db.get("SELECT * FROM cars WHERE  id=?", carId, (err, row) => {
+        if (err) {
+            console.log(`Somethings up with the db or query`)
+        } else {
+            console.log('The result is' + row)
+            const car = new Car(row);
+            return car;
+        }
+    });
 }
 
 function setCarLapNumber(carId){
@@ -23,10 +31,12 @@ function setCarLapNumber(carId){
 }
 
 function setCarLapTime(carId){
+    
 
 }
 
-function addDriverToCar(carId,driver){
+function addDriverToCar(carId, driverId){
+
 
 }
 
