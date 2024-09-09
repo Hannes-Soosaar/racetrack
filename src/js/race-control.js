@@ -3,10 +3,6 @@ const Race = require('../models/race.js');
 let currentRace = null
 let nextRace = null
 
-function getCurrentRace() {
-    return currentRace
-}
-
 module.exports = (io, socket) => {
     console.log('Setting up race control');
 
@@ -92,4 +88,3 @@ function changeFlag(flagID) {
         }
     })
 }
-

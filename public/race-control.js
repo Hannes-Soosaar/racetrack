@@ -33,18 +33,22 @@ socket.on('key-validation', function (response) {
     }
 });
 
-//TODO: currently just shows the race info, needs to be changed to show driver and what car they drive
-socket.on('display-race', (race) => {
 
+socket.on('display-race', (race) => {
+    //TODO shows only cars, needs to display cars and drivers. Will implement once the database and front desk is implemented
     contentDiv.style.display = 'block'
     newSessionDiv.style.display = 'none'
 
     raceInformationDiv.innerHTML = '';
 
+    let i = 0
     for (const [key, value] of Object.entries(race)) {
-        const paragraph = document.createElement('p');
-        paragraph.textContent = `${key}: ${value}`;
-        raceInformationDiv.appendChild(paragraph);
+        if (key.includes('car_')) {
+            i++
+            const paragraph = document.createElement('p');
+            paragraph.textContent = `Car: ${value}`;
+            raceInformationDiv.appendChild(paragraph);
+        }
     }
 })
 
