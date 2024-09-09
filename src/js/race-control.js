@@ -3,6 +3,10 @@ const Race = require('../models/race.js');
 let currentRace = null
 let nextRace = null
 
+function getCurrentRace() {
+    return currentRace
+}
+
 module.exports = (io, socket) => {
     console.log('Setting up race control');
 
@@ -57,6 +61,13 @@ module.exports = (io, socket) => {
                 changeFlag(null)
         }
     });
+
+    socket.on('request-flags-update', () => {
+        console.log('Request for flags update received');
+        if (currentRace) {
+            io.emit('race-flags-update', currentRace.flag)
+        }
+    })
 
     // Handle ending the race
     socket.on('end-race', () => {

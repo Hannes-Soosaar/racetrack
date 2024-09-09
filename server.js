@@ -59,6 +59,7 @@ app.get('/race-flags', (req, res) => {
 const raceControl = require('./src/js/race-control'); // Import race control
 const frontDesk = require('./src/js/front-desk'); // Import front desk
 const lapLineTracker = require('./src/js/lap-line-tracker'); // Import lap line tracker
+const raceFlags = require('./src/js/race-flags')
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
@@ -86,6 +87,13 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    socket.on('public-view', (page) => {
+        if (page === 'race-flags') {
+            raceFlags(io, socket)
+            console.log('Connected to race flags')
+        }
+    })
 });
 
 const PORT = process.env.PORT || 8000;
