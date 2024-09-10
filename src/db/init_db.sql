@@ -67,3 +67,8 @@ CREATE TABLE IF NOT EXISTS races_test (
     status INTEGER,
     flag INTEGER   --split the flags to this integer
 );
+
+CREATE TABLE IF NOT EXISTS race_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sessionName TEXT NOT NULL
+);

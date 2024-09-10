@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Front Desk</title>
+    <title>Front Desk - Racing Session</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
-
 <body>
     <h1>Front Desk Access</h1>
-    
+
     <form id="access-form">
         <label for="access-key">Enter Access Key:</label>
         <input type="password" id="access-key" required>
@@ -19,30 +17,36 @@
     </form>
 
     <div id="content" style="display:none;">
-        <h2>Manage Drivers</h2>
-
-        <!-- Form to create or update a driver -->
-        <form id="driver-form">
-            <input type="hidden" id="driver-id" value="">
-            <label for="first-name">First Name:</label>
-            <input type="text" id="first-name" required>
-            <label for="last-name">Last Name:</label>
-            <input type="text" id="last-name" required>
-            <label for="car-number">Car Number:</label>
-            <select id="car-number" required>
-                <!-- Options will be populated dynamically -->
-            </select>
-            <label for="status">Status:</label>
-            <input type="number" id="status" value="8" required>
-            <button type="submit">Save Driver</button>
+        <h2>Create New Race Session</h2>
+        <form id="session-form">
+            <label for="session-name">Session Name:</label>
+            <input type="text" id="session-name" required>
+            <button type="submit">Create Session</button>
         </form>
-        <!-- List of drivers -->
-        <h3>Driver List</h3>
-        <ul id="driver-list"></ul>
+
+        <h3>Available Sessions</h3>
+        <ul id="session-list"></ul>
+
+        <div id="session-details" style="display:none;">
+            <h2>Manage Drivers and Cars for Session: <span id="selected-session-name"></span></h2>
+
+            <form id="driver-form">
+                <input type="hidden" id="driver-id">
+                <label for="driver-name">Driver Name:</label>
+                <input type="text" id="driver-name" required>
+
+                <label for="car-number">Car Number:</label>
+                <select id="car-number" required></select>
+
+                <button type="submit">Add/Update Driver</button>
+            </form>
+
+            <h3>Driver List</h3>
+            <ul id="driver-list"></ul>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/front-desk.js"></script>
 </body>
-
 </html>

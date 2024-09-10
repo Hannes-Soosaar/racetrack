@@ -3,13 +3,19 @@ const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
 const errorMessage = document.getElementById('error-message');
+
+const sessionForm = document.getElementById('session-form');
+const sessionNameInput = document.getElementById('session-name');
+const sessionList = document.getElementById('session-list');
+const sessionDetails = document.getElementById('session-details');
+const selectedSessionName = document.getElementById('selected-session-name');
+
 const driverForm = document.getElementById('driver-form');
-const driverIdInput = document.getElementById('driver-id');
-const firstNameInput = document.getElementById('first-name');
-const lastNameInput = document.getElementById('last-name');
-const statusInput = document.getElementById('status');
-const driverList = document.getElementById('driver-list');
+const driverNameInput = document.getElementById('driver-name');
 const carNumberSelect = document.getElementById('car-number');
+const driverList = document.getElementById('driver-list');
+
+let currentSessionId = null;
 
 // Handle access key submission
 accessForm.addEventListener('submit', function(event) {
@@ -23,129 +29,109 @@ socket.on('key-validation', function(response) {
     if (response.success) {
         accessForm.style.display = 'none';
         contentDiv.style.display = 'block';
-        loadDrivers();
-        loadAvailableCars();
+        loadSessions(); // Load available race sessions
     } else {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
 });
 
-// Load drivers from the server
-function loadDrivers() {
-    fetch('/api/drivers')
-        .then(response => response.json())
-        .then(drivers => {
-            if (!Array.isArray(drivers)) {
-                throw new Error('Expected an array of drivers');
-            }
-            driverList.innerHTML = '';
-            drivers.forEach(driver => {
-                const li = document.createElement('li');
-                li.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.carNumber}, Status: ${driver.status})`;
-                li.dataset.id = driver.id;
-                const editButton = document.createElement('button');
-                editButton.textContent = 'Edit';
-                editButton.addEventListener('click', () => editDriver(driver));
-                li.appendChild(editButton);
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => deleteDriver(driver.id));
-                li.appendChild(deleteButton);
-                driverList.appendChild(li);
-            });
-        })
-        .catch(error => {
-            console.error('Error processing drivers:', error);
-            alert('Failed to load drivers. Please try again later.');
-        });
-}
-
-
-// Load available cars for selection
-function loadAvailableCars() {
-    fetch('/api/cars')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(cars => {
-            carNumberSelect.innerHTML = ''; // Clear existing options
-            cars.forEach(car => {
-                if (car.driver_id === null) { // Only show cars without assigned drivers
-                    const option = document.createElement('option');
-                    option.value = car.number;
-                    option.textContent = `Car ${car.number} - ${car.name}`;
-                    carNumberSelect.appendChild(option);
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error loading cars:', error);
-            alert('Failed to load cars. Please check the console for more details.');
-        });
-}
-
-
-
-
-
-
-// Handle form submission for creating/updating a driver
-driverForm.addEventListener('submit', function(event) {
+// Handle race session creation
+sessionForm.addEventListener('submit', function(event) {
     event.preventDefault();
-    const id = driverIdInput.value;
-    const firstName = firstNameInput.value;
-    const lastName = lastNameInput.value;
-    const carNumber = carNumberSelect.value;
-    const status = statusInput.value;
-    const method = id ? 'PUT' : 'POST';
-    const url = id ? `/api/drivers/${id}` : '/api/drivers';
-    const data = { firstName, lastName, carNumber, status };
+    const sessionName = sessionNameInput.value;
 
-    fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(() => {
-        driverForm.reset();
-        loadDrivers();       // Reload the list of drivers
-        loadAvailableCars(); // Reload the list of available cars
-    })
-    .catch(error => {
-        console.error('Error processing driver:', error);
-        alert('Failed to save driver. Please try again.');
-    });
+    // Emit socket event to create a new session
+    socket.emit('create-session', { sessionName });
+    sessionNameInput.value = ''; // Clear the input after submission
+});
+
+// Handle session list updates
+socket.on('session-list', function(sessions) {
+    console.log('Received sessions:', sessions);  // Check if the data is being logged correctly
+    if (Array.isArray(sessions)) {
+        sessionList.innerHTML = ''; // Clear session list
+        sessions.forEach(session => {
+            const li = document.createElement('li');
+            li.textContent = session.sessionName;
+            li.addEventListener('click', () => selectSession(session.id, session.sessionName));
+            sessionList.appendChild(li);
+        });
+    } else {
+        console.error('Expected an array, but got:', sessions);
+    }
 });
 
 
-// Populate the form with driver data for editing
-function editDriver(driver) {
-    driverIdInput.value = driver.id;
-    firstNameInput.value = driver.first_name;
-    lastNameInput.value = driver.last_name;
-    carNumberSelect.value = driver.carNumber;
-    statusInput.value = driver.status;
+
+// Select a session to manage drivers and cars
+function selectSession(sessionId, sessionName) {
+    currentSessionId = sessionId;
+    selectedSessionName.textContent = sessionName;
+    sessionDetails.style.display = 'block';
+    loadDriversForSession(sessionId);
+    loadAvailableCars(sessionId);
 }
 
-// Delete a driver
-function deleteDriver(id) {
-    fetch(`/api/drivers/${id}`, { method: 'DELETE' })
+// Load drivers for the selected session
+function loadDriversForSession(sessionId) {
+    fetch(`/api/sessions/${sessionId}/drivers`)
         .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert('Failed to delete driver: ' + data.error);
-            } else {
-                loadDrivers();       // Reload the list of drivers
-                loadAvailableCars(); // Reload the list of available cars
-            }
+        .then(drivers => {
+            driverList.innerHTML = ''; // Clear the driver list
+            drivers.forEach(driver => {
+                const li = document.createElement('li');
+                li.textContent = `${driver.name} (Car: ${driver.carNumber})`;
+                driverList.appendChild(li);
+            });
+        })
+        .catch(error => console.error('Failed to load drivers:', error));
+}
+
+// Load available cars for the session (max 8)
+function loadAvailableCars(sessionId) {
+    fetch(`/api/sessions/${sessionId}/available-cars`)
+        .then(response => response.json())
+        .then(cars => {
+            carNumberSelect.innerHTML = ''; // Clear car options
+            cars.forEach(car => {
+                const option = document.createElement('option');
+                option.value = car.number;
+                option.textContent = `Car ${car.number}`;
+                carNumberSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Failed to load available cars:', error));
+}
+
+// Handle adding/updating drivers within the selected session
+driverForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    const driverName = driverNameInput.value;
+    const carNumber = carNumberSelect.value;
+
+    // Emit socket event to add a new driver to the session
+    socket.emit('add-driver', { sessionId: currentSessionId, driverName, carNumber });
+    
+    driverNameInput.value = ''; // Clear inputs
+    carNumberSelect.value = ''; 
+    loadDriversForSession(currentSessionId); // Reload drivers
+});
+
+// Function to load available sessions and display them
+function loadSessions() {
+    fetch('/api/sessions')
+        .then(response => response.json())
+        .then(sessions => {
+            const sessionList = document.getElementById('session-list');
+            sessionList.innerHTML = '';  // Clear the session list
+
+            sessions.forEach(session => {
+                const li = document.createElement('li');
+                li.textContent = session.sessionName;  // Display session name
+                sessionList.appendChild(li);
+            });
         })
         .catch(error => {
-            console.error('Error deleting driver:', error);
-            alert('Failed to delete driver. Please try again.');
+            console.error('Error loading sessions:', error);
         });
 }
-

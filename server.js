@@ -6,6 +6,8 @@ const dotenv = require('dotenv');
 const db = require('./config/db');
 const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
 const carRoutes = require('./src/routes/carRoutes'); // Import car routes
+const sessionRoutes = require('./src/routes/sessionRoutes');
+const socketHandler = require('./src/ws/socket');
 
 dotenv.config();
 
@@ -13,6 +15,7 @@ const app = express(); // Initialize app here
 const server = http.createServer(app);
 const io = socketIo(server);
 
+socketHandler(io);
 
 const raceControl = require('./src/js/race-control'); // Import race control
 const frontDesk = require('./src/js/front-desk'); // Import front desk
@@ -25,6 +28,7 @@ app.use(express.static('public'));
 // Register the API routes
 app.use('/api', driverRoutes);
 app.use('/api', carRoutes);
+app.use('/api', sessionRoutes);
 
 // Route to serve the main page
 app.get('/', (req, res) => {
