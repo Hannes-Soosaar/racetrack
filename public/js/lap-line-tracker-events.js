@@ -4,27 +4,11 @@ const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
 
-// This creates a new connection to the io stream. 
-socket.on('connect', () => {
-    console.log('Connected to WebSocket server');
-    displayMessage("Connected to WebSocket server") // reaches and works
-});
-
 import { sendMessageFromValue, displayMessage } from './lap-line-tracker-functions.js';
 
-socket.on('lets-peak',(message) => {
-    console.log("AFTER lets-peak")
-    displayMessage(message)
-} ); // test to see if we can get some data from the backend, does not work!
-
-document.querySelectorAll('.button').forEach(button => {
-    button.addEventListener('click', function () {
-        const buttonValue = this.value;
-        socket.emit('lets-peak', buttonValue) // does not work.
-        console.log("AFTER lets-peak")
-        const newValue = sendMessageFromValue(buttonValue);
-        displayMessage(newValue);
-    });
+// connects
+socket.on('connect', () => {
+    console.log('Connected to WebSocket server'); // reaches and works
 });
 
 accessForm.addEventListener('submit', function (event) {
@@ -42,4 +26,25 @@ socket.on('key-validation', function (response) {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
 });
+
+// button click does start the lets-peak 
+socket.on('lets-peak', (message) => {
+    console.log("AFTER lets-peak")
+    displayMessage(message)
+}); 
+
+socket.on('peak',(value) => {
+ console.log(value);
+ displayMessage(value)
+})
+
+document.querySelectorAll('.button').forEach(button => {
+    button.addEventListener('click', function () {
+        const buttonValue = this.value;
+        socket.emit('lets-peak', buttonValue) 
+        sendMessageFromValue(buttonValue);
+        displayMessage(buttonValue);
+    });
+});
+
 
