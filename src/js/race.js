@@ -45,7 +45,6 @@ function getRacesFlagByRaceID(raceID) {
 
 //Sets the Race Status
 function setRaceStatusByRaceId(raceId) {
-	db.
 
 }
 

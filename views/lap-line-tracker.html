@@ -7,24 +7,37 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+
     <div id="page-flex "></div>
     <h1>Lap Line Tracker</h1>
+
+    <form id="access-form">
+        <label for="access-key">Enter Access Key:</label>
+        <input type="password" id="access-key" required>
+        <button type="submit">Submit</button>
+        <p id="error-message"></p>
+    </form>
+
     <p>This is the Lap Line Tracker page.</p>
-    <script></script>
-<!-- The the page consists of 10 buttons each with a car_id = if pressed, it will set the lap time  and increment the lap count-->
-    <!-- displays the leaderboard It is to be switched off before launch -->
+    <div id="content" style="display:none;">
+
         <div id="current Race-container"></div>
         <div id ="cars-container">
-        <button id="slot_1">
-        <button id="slot_2">
-        <button id="slot_3">
-        <button id="slot_4">
-        <button id="slot_5">
-        <button id="slot_6">
-        <button id="slot_7">
-        <button id="slot_8">+
+        <button class="button" id="slot_1" value="1" >Car 1</button>
+        <button class="button" id="slot_2" value="2" >Car 2</button>
+        <button class="button" id="slot_3" value="3" >Car 3</button>
+        <button class="button" id="slot_4" value="4" >Car 4</button>
+        <button class="button" id="slot_5" value="5" >Car 5</button>
+        <button class="button" id="slot_6" value="6" >Car 6</button>
+        <button class="button" id="slot_7" value="7" >Car 7</button>
+        <button class="button" id="slot_8" value="8" >Car 8</button>
         </div>
-    <p>this is the footer</p>
+    <div id="peak"></div>
+
     </div>
+</div>
+    <p>this is the footer</p>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module"  src="/js/lap-line-tracker-events.js"></script>
 </body>
 </html>

@@ -13,6 +13,12 @@ const app = express(); // Initialize app here
 const server = http.createServer(app);
 const io = socketIo(server);
 
+
+const raceControl = require('./src/js/race-control'); // Import race control
+const frontDesk = require('./src/js/front-desk'); // Import front desk
+const lapLineTracker = require('./src/ws/socket.js'); // Import lap line tracker
+const raceFlags = require('./src/js/race-flags')
+
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -56,10 +62,6 @@ app.get('/race-flags', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'race-flags.html'));
 });
 
-const raceControl = require('./src/js/race-control'); // Import race control
-const frontDesk = require('./src/js/front-desk'); // Import front desk
-const lapLineTracker = require('./src/js/lap-line-tracker'); // Import lap line tracker
-const raceFlags = require('./src/js/race-flags')
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
@@ -80,10 +82,13 @@ io.on('connection', (socket) => {
         if (validKey) {
             if (role === 'receptionist') {
                 frontDesk(io, socket)
+                console.log("validated as Reception ")
             } else if (role === 'safety') {
                 raceControl(io, socket)
+                console.log("validated as Safety ")
             } else if (role === 'observer') {
                 lapLineTracker(io, socket)
+                console.log("validated as observer ")
             }
         }
     });

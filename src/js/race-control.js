@@ -80,6 +80,8 @@ module.exports = (io, socket) => {
     });
 };
 
+
+
 function changeFlag(flagID) {
     const sql = `UPDATE races SET flag = ? WHERE id = ?`
     db.run(sql, [flagID, currentRace.id], function (err) {

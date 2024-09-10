@@ -30,8 +30,12 @@ function setCarLapNumber(carId){
 
 }
 
-function setCarLapTime(carId){
+function setCarLapTime(carId, lapTime){
     
+
+}
+
+function setBestLapTime(carId, time){
 
 }
 
