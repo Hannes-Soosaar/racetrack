@@ -1,6 +1,8 @@
 const data = require('../config/const');
 const db = require('../../config/db');
 
+const { startTimer } = require('../js/timer.js');
+
 module.exports = (io) => {
     // When a client connects
     io.on('connection', (socket) => {
@@ -10,12 +12,13 @@ module.exports = (io) => {
         socket.on('start-session', () => {
             io.emit('peak', "Text to display");
         });
-
+        
         socket.on('lets-peak', (value) => {
             console.log("Received value on backend:", value);
             io.emit('peak', "You sent: " + value);
+            startTimer(99990);  // Запуск таймера только в одном месте
         });
-
+        
         // Handle session creation
         socket.on('create-session', ({ sessionName }) => {
             const query = `INSERT INTO race_sessions (sessionName) VALUES (?)`;
@@ -65,6 +68,15 @@ module.exports = (io) => {
         socket.on('error', (error) => {
             console.error(`Error occurred on socket ${socket.id}:`, error.message);
         });
+
+        // Custom error handlers for WebSocket issues
+        socket.onclose = () => {
+            console.log('Disconnected from the server.');
+        };
+
+        socket.onerror = (error) => {
+            console.error(`WebSocket Error: ${error.message}`);
+        };
     });
 };
 
