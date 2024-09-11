@@ -1,17 +1,11 @@
-// USING GLOBAL VARIABLES
+// VARIABLES
 const socket = io();
 const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
 const messageContainer = document.getElementById('peak');
 
-
-socket.on('connect', () => {
-    console.log('Connected to WebSocket server'); // reaches and works
-});
-
-
-
+// DOM FUNCTIONALITY
 document.querySelectorAll('.button').forEach(button => {
     button.addEventListener('click', function () {
         const buttonValue = this.value;
@@ -49,7 +43,13 @@ accessForm.addEventListener('submit', function (event) {
     socket.emit('validate-key', { key: accessKey, role: 'observer' });
 });
 
-socket.on('update-time', (timeElapsed) => {
+// SOCKETS
+
+socket.on('connect', () => {
+    console.log('Connected to WebSocket server'); // reaches and works
+});
+
+socket.on('time-update', (timeElapsed) => {
     console.log(timeElapsed);
     displayMessage(timeElapsed);
 });
@@ -63,7 +63,6 @@ socket.on('key-validation', function (response) {
     }
 });
 
-// button click does start the lets-peak 
 socket.on('lets-peak', (message) => {
     console.log("AFTER lets-peak")
     displayMessage(message)
@@ -73,6 +72,8 @@ socket.on('peak', (value) => {
     console.log(value);
     displayMessage(value)
 })
+
+// FUNCTIONS
 
 function sendMessageFromValue(value) {
     console.log("send message! " + value);

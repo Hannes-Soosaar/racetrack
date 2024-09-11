@@ -13,10 +13,9 @@ function startTimer(io, raceDurationMs) {
         const elapsedTime = Date.now() - startTime - pauseDuration;
         remainingRaceTime = raceDurationMs - elapsedTime;
 
-        console.log("the elapsed value " + elapsedTime);
-        console.log("the remaining race time " + remainingRaceTime);
-        console.log("the race duration" + raceDurationMs);
-
+        // console.log("the elapsed value " + elapsedTime);
+        // console.log("the remaining race time " + remainingRaceTime);
+        // console.log("the race duration" + raceDurationMs);
 
         if (remainingRaceTime <= 0) {
             remainingRaceTime = 0;
@@ -24,7 +23,7 @@ function startTimer(io, raceDurationMs) {
             raceInProgress = false;
         }
         // ! This is where the time get passade around
-        io.emit('time-update', remainingRaceTime);
+        io.emit('time-update', remainingRaceTime); // ! THIS IS THE REALTIME RACE UPDATE 
         console.log("the value" + remainingRaceTime)
         updateTime(remainingRaceTime);
     }, 100);
