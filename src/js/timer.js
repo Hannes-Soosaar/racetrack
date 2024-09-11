@@ -4,14 +4,20 @@ let raceInProgress = false;
 let pauseDuration = 0;
 let pauseStart = 0;
 
-function startTimer(io,raceDurationMs) {
+function startTimer(io, raceDurationMs) {
     let remainingRaceTime = raceDurationMs
     const startTime = Date.now();
-    raceInProgress=true;
+    raceInProgress = true;
     timerInterval = setInterval(() => {
         if (racePaused) return; // might not be needed!
         const elapsedTime = Date.now() - startTime - pauseDuration;
         remainingRaceTime = raceDurationMs - elapsedTime;
+
+        console.log("the elapsed value " + elapsedTime);
+        console.log("the remaining race time " + remainingRaceTime);
+        console.log("the race duration" + raceDurationMs);
+
+
         if (remainingRaceTime <= 0) {
             remainingRaceTime = 0;
             clearInterval(timerInterval);
@@ -19,6 +25,7 @@ function startTimer(io,raceDurationMs) {
         }
         // ! This is where the time get passade around
         io.emit('time-update', remainingRaceTime);
+        console.log("the value" + remainingRaceTime)
         updateTime(remainingRaceTime);
     }, 100);
 }
@@ -30,10 +37,10 @@ function pauseTimer() {
     }
 }
 
-function resumeTimer(){
-    if(raceInProgress && racePaused){
+function resumeTimer() {
+    if (raceInProgress && racePaused) {
         racePaused = false;
-        pauseDuration +=  Date.now()-pauseStart;
+        pauseDuration += Date.now() - pauseStart;
         console.log("Race resumed")
     }
 }
@@ -41,7 +48,7 @@ function resumeTimer(){
 function stopTimer() {
     clearInterval(timerInterval);
     raceInProgress = false;
-    racePaused =false;
+    racePaused = false;
     pauseDuration = 0;
     console.log("Race ended")
 }

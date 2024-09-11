@@ -31,6 +31,7 @@ module.exports = (io, socket) => {
     socket.on('start-timer', () => {
         console.log("Start-timer");
         io.emit('peak', "Race started");
+        console.log(data.RACE_DURATION);
         time.startTimer(io, data.RACE_DURATION);
     });
 

@@ -14,11 +14,8 @@ socket.on('connect', () => {
 
 document.querySelectorAll('.button').forEach(button => {
     button.addEventListener('click', function () {
-
         const buttonValue = this.value;
-
         console.log('buttonValue' + buttonValue);
-
         // TEMP logic for quick testing
         if (buttonValue === "1") {
             console.log("start-timer");
@@ -53,7 +50,8 @@ accessForm.addEventListener('submit', function (event) {
 });
 
 socket.on('update-time', (timeElapsed) => {
-    displayMessage(timeElapsed)
+    console.log(timeElapsed);
+    displayMessage(timeElapsed);
 });
 
 socket.on('key-validation', function (response) {

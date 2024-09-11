@@ -20,4 +20,6 @@ module.exports = {
 	INACTIVE,
 	ACTIVE,
 	WAIT,
+	RACE_DURATION,
+	PROD,
 };
