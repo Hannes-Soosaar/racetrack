@@ -3,19 +3,57 @@ const socket = io();
 const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
+const messageContainer = document.getElementById('peak');
 
-import { sendMessageFromValue, displayMessage } from './lap-line-tracker-functions.js';
 
-// connects
 socket.on('connect', () => {
     console.log('Connected to WebSocket server'); // reaches and works
 });
+
+
+
+document.querySelectorAll('.button').forEach(button => {
+    button.addEventListener('click', function () {
+
+        const buttonValue = this.value;
+
+        console.log('buttonValue' + buttonValue);
+
+        // TEMP logic for quick testing
+        if (buttonValue === "1") {
+            console.log("start-timer");
+            socket.emit('start-timer', "lap-line-tracker")
+        } else if (buttonValue === "2") {
+            console.log("pause-timer");
+            socket.emit('pause-timer', "lap-line-tracker")
+        } else if (buttonValue === "3") {
+            console.log("resume-timer");
+            socket.emit('resume-timer', "lap-line-tracker")
+        } else if (buttonValue === "4") {
+            console.log("stop-timer");
+            socket.emit('stop-timer', "lap-line-tracker")
+        } else if (buttonValue === "5") {
+            console.log("update the time");
+            socket.emit('update-time', "lap-line-tracker")
+        }
+        else {
+            socket.emit('lets-peak', buttonValue)
+            sendMessageFromValue(buttonValue);
+            displayMessage(buttonValue);
+        }
+    });
+});
+
 
 accessForm.addEventListener('submit', function (event) {
     console.log("made it to validation")
     event.preventDefault();
     const accessKey = accessKeyInput.value;
     socket.emit('validate-key', { key: accessKey, role: 'observer' });
+});
+
+socket.on('update-time', (timeElapsed) => {
+    displayMessage(timeElapsed)
 });
 
 socket.on('key-validation', function (response) {
@@ -31,20 +69,18 @@ socket.on('key-validation', function (response) {
 socket.on('lets-peak', (message) => {
     console.log("AFTER lets-peak")
     displayMessage(message)
-}); 
-
-socket.on('peak',(value) => {
- console.log(value);
- displayMessage(value)
-})
-
-document.querySelectorAll('.button').forEach(button => {
-    button.addEventListener('click', function () {
-        const buttonValue = this.value;
-        socket.emit('lets-peak', buttonValue) 
-        sendMessageFromValue(buttonValue);
-        displayMessage(buttonValue);
-    });
 });
 
+socket.on('peak', (value) => {
+    console.log(value);
+    displayMessage(value)
+})
 
+function sendMessageFromValue(value) {
+    console.log("send message! " + value);
+    displayMessage(value);
+}
+
+function displayMessage(value) {
+    messageContainer.innerHTML += `<p>${value}</p>`;
+}
