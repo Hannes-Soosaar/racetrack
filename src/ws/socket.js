@@ -8,14 +8,15 @@ module.exports = (io, socket) => {
 
     socket.on('start-session', () => {
         io.emit('peak', "Text to display");
-        
+
     });
 
+    // Trigger is FE lap line tracker.
     socket.on('lets-peak', (value) => {
         console.log("made it to the backend!" + value)
         io.emit('peak', " you sent the :" + value)
         console.log("passed in value" + value); // works 
-        startTimer(99990);
+        startTimer(data.RACE_DURATION);
         //TODO: add function to complete a lap and update the time.
     });
 
