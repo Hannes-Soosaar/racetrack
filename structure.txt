@@ -2,6 +2,7 @@
 ├── config
 │   └── db.js
 ├── controllers
+│   ├── carController.js
 │   ├── driverController.js
 │   └── raceController.js
 ├── makefile
@@ -13,7 +14,12 @@
 ├── package.json
 ├── public
 │   ├── front-desk.js
+│   ├── js
+│   │   ├── lap-line-tracker-events.js
+│   │   ├── lap-line-tracker-functions.js
+│   │   └── race-countdown.js
 │   ├── race-control.js
+│   ├── race-flags.js
 │   ├── read.me
 │   └── styles.css
 ├── readme.md
@@ -23,6 +29,7 @@
 │   │   └── const.js
 │   ├── db
 │   │   ├── clear_tables.sql
+│   │   ├── create_data.sql
 │   │   ├── init_db.sql
 │   │   └── racetrack.db
 │   ├── js
@@ -32,17 +39,20 @@
 │   │   ├── lap-line-tracker.js
 │   │   ├── leaderboard.js
 │   │   ├── race-control.js
+│   │   ├── race-flags.js
 │   │   ├── race-result.js
 │   │   ├── race.js
-│   │   └── read.me
+│   │   └── timer.js
 │   ├── models
 │   │   ├── car.js
 │   │   ├── driver.js
-│   │   ├── race-result.js
 │   │   └── race.js
-│   └── routes
-│       ├── driverRoutes.js
-│       └── raceRoutes.js
+│   ├── routes
+│   │   ├── carRoutes.js
+│   │   ├── driverRoutes.js
+│   │   └── raceRoutes.js
+│   └── ws
+│       └── socket.js
 ├── structure.txt
 ├── todo.txt
 └── views
@@ -55,4 +65,4 @@
     ├── race-countdown.html
     └── race-flags.html
 
-11 directories, 44 files
+13 directories, 52 files

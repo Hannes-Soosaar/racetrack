@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const db = require('./config/db');
 const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
 const carRoutes = require('./src/routes/carRoutes'); // Import car routes
-
+const raceRoutes = require('./src/routes/raceRoutes');
 dotenv.config();
 
 const app = express(); // Initialize app here
@@ -25,6 +25,7 @@ app.use(express.static('public'));
 // Register the API routes
 app.use('/api', driverRoutes);
 app.use('/api', carRoutes);
+app.use('/api', raceRoutes);
 
 // Route to serve the main page
 app.get('/', (req, res) => {

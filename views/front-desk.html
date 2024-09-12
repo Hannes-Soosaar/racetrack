@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Front Desk</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
-
 <body>
     <h1>Front Desk Access</h1>
     
@@ -19,30 +17,167 @@
     </form>
 
     <div id="content" style="display:none;">
-        <h2>Manage Drivers</h2>
+        <h2>Manage Races</h2>
+        <form id="race-form">
+            <input type="hidden" id="race-id">
+            <label for="session-name">Race Name:</label>
+            <input type="text" id="session-name" required>
+            <label for="date">Date:</label>
+            <input type="date" id="date" required>
+            <label for="time">Time:</label>
+            <input type="time" id="time" required>
+            <button type="submit">Save Race</button>
+        </form>
 
-        <!-- Form to create or update a driver -->
+        <h3>Race List</h3>
+        <div id="race-list"></div> 
+
+        <h2>Add Drivers to Races</h2>
         <form id="driver-form">
-            <input type="hidden" id="driver-id" value="">
             <label for="first-name">First Name:</label>
             <input type="text" id="first-name" required>
             <label for="last-name">Last Name:</label>
             <input type="text" id="last-name" required>
             <label for="car-number">Car Number:</label>
             <select id="car-number" required>
-                <!-- Options will be populated dynamically -->
+                <!-- Car options will be populated dynamically -->
             </select>
-            <label for="status">Status:</label>
-            <input type="number" id="status" value="8" required>
             <button type="submit">Save Driver</button>
         </form>
-        <!-- List of drivers -->
-        <h3>Driver List</h3>
+
+        <h3>Driver List for the Race</h3>
         <ul id="driver-list"></ul>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/front-desk.js"></script>
-</body>
 
+    <script>
+        // Function to delete a race
+        function deleteRace(raceId) {
+            if (!confirm('Are you sure you want to delete this race?')) {
+                return;
+            }
+
+            fetch(`/api/races/${raceId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete race');
+                }
+                loadRaces();  // Reload races after deletion
+            })
+            .catch(error => {
+                console.error(`Error deleting race ${raceId}:`, error);
+            });
+        }
+
+        // Function to edit a race and pre-fill the form
+        function editRace(raceId) {
+            fetch(`/api/races/${raceId}`)
+            .then(response => response.json())
+            .then(race => {
+                // Populate the form fields with the race data
+                document.getElementById('race-id').value = race.id;
+                document.getElementById('session-name').value = race.session_name;
+                document.getElementById('date').value = race.date;
+                document.getElementById('time').value = race.time;
+            })
+            .catch(error => console.error(`Error fetching race ${raceId}:`, error));
+        }
+
+        // Example function to load the races (you'll replace this with your actual function)
+        function loadRaces() {
+            fetch('/api/races')
+                .then(response => response.json())
+                .then(races => {
+                    const raceList = document.getElementById('race-list');
+                    raceList.innerHTML = '';  // Clear existing races
+
+                    races.forEach(race => {
+                        const raceItem = document.createElement('div');
+                        raceItem.innerHTML = `
+                            <strong>${race.session_name}</strong> - ${race.date} ${race.time}
+                            <button onclick="editRace(${race.id})">Edit Race</button>
+                            <button onclick="deleteRace(${race.id})">Delete Race</button>
+                            <h3>Add Drivers to ${race.session_name}</h3>
+                            <form onsubmit="addDriverToRace(event, ${race.id})">
+                                <label for="first-name-${race.id}">First Name:</label>
+                                <input type="text" id="first-name-${race.id}" required>
+                                <label for="last-name-${race.id}">Last Name:</label>
+                                <input type="text" id="last-name-${race.id}" required>
+                                <label for="car-number-${race.id}">Car Number:</label>
+                                <select id="car-number-${race.id}" required>
+                                    <!-- Populate cars here -->
+                                </select>
+                                <button type="submit">Save Driver</button>
+                            </form>
+                            <ul id="driver-list-${race.id}"></ul>
+                        `;
+
+                        raceList.appendChild(raceItem);
+
+                        // Load drivers for this race (if any exist)
+                        loadDriversForRace(race.id);  // Make sure this function is defined
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading races:', error);
+                });
+        }
+
+        // Function to load drivers for a specific race
+        function loadDriversForRace(raceId) {
+            fetch(`/api/races/${raceId}/drivers`)
+                .then(response => response.json())
+                .then(drivers => {
+                    const driverList = document.getElementById(`driver-list-${raceId}`);
+                    driverList.innerHTML = '';  // Clear existing drivers
+
+                    if (!Array.isArray(drivers)) {
+                        console.error('Expected an array of drivers, but got:', drivers);
+                        return;
+                    }
+
+                    drivers.forEach(driver => {
+                        const li = document.createElement('li');
+                        li.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.car_number})`;
+                        driverList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error(`Error loading drivers for race ${raceId}:`, error);
+                });
+        }
+
+        // Function to add a driver to a race
+        function addDriverToRace(event, raceId) {
+            event.preventDefault();
+
+            const firstName = document.getElementById(`first-name-${raceId}`).value;
+            const lastName = document.getElementById(`last-name-${raceId}`).value;
+            const carNumber = document.getElementById(`car-number-${raceId}`).value;
+
+            const data = { firstName, lastName, carNumber };
+
+            fetch(`/api/races/${raceId}/drivers`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                loadDriversForRace(raceId);  // Reload drivers for this race
+            })
+            .catch(error => {
+                console.error(`Error adding driver to race ${raceId}:`, error);
+            });
+        }
+
+        // Ensure this runs when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRaces();  // Call loadRaces when the page loads
+        });
+    </script>
+</body>
 </html>
