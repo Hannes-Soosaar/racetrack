@@ -8,20 +8,56 @@ module.exports = (io, socket) => {
 
     // Handle starting the race
     socket.on('start-session', () => {
-        db.get("SELECT * FROM races WHERE status = '4' LIMIT 1", (err, row) => {
-            if (err) {
-                console.error(err.message)
-                return
-            }
-            if (row) {
-                console.log('Session found');
-                currentRace = new Race(row)
-                console.log(currentRace)
-                io.emit('display-race', currentRace)
-            } else {
-                io.emit('race-status', 'No upcoming race found')
-            }
-        })
+        if (currentRace != null) {
+            const query = `SELECT * FROM races WHERE id = ?`
+            db.get(query, [currentRace.id], (err, row) => {
+                if (err) {
+                    console.log(err.message)
+                    return
+                }
+                if (row) {
+                    const deleteQuery = `DELETE FROM races WHERE id = ?`
+                    db.run(deleteQuery, [currentRace.id], (err) => {
+                        if (err) {
+                            console.log(err.message)
+                            return
+                        }
+
+                        db.get("SELECT * FROM races WHERE status = '8' LIMIT 1", (err, row) => {
+                            if (err) {
+                                console.error(err.message);
+                                return;
+                            }
+                            if (row) {
+                                console.log('Session found');
+                                currentRace = new Race(row);
+                                console.log(currentRace);
+                                io.emit('display-race', currentRace); // Emit race info to clients
+                            } else {
+                                io.emit('race-status', 'No upcoming race found');
+                            }
+                        })
+                    })
+                } else {
+                    console.log('currentRace Not found')
+                }
+            })
+        } else {
+            db.get("SELECT * FROM races WHERE status = '8' LIMIT 1", (err, row) => {
+                if (err) {
+                    console.error(err.message)
+                    return
+                }
+                if (row) {
+                    console.log('Session found');
+                    currentRace = new Race(row)
+                    console.log(currentRace)
+                    io.emit('display-race', currentRace)
+                } else {
+                    io.emit('race-status', 'No upcoming race found')
+                }
+            })
+        }
     });
 
     socket.on('start-race', () => {

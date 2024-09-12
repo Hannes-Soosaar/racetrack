@@ -41,10 +41,15 @@ socket.on('display-race', (race) => {
 
     raceInformationDiv.innerHTML = '';
 
-    let i = 0
     for (const [key, value] of Object.entries(race)) {
+        if (key.includes('created')) {
+            const paragraph = document.createElement('p');
+            paragraph.textContent = `Race number: ${value}`;
+            raceInformationDiv.appendChild(paragraph);
+        }
+
         if (key.includes('car_')) {
-            i++
+
             const paragraph = document.createElement('p');
             paragraph.textContent = `Car: ${value}`;
             raceInformationDiv.appendChild(paragraph);
