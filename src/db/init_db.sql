@@ -18,17 +18,20 @@ CREATE TABLE IF NOT EXISTS drivers (
 
 -- the car is the main data carrier. Each race will have unique Car/slot ID's
 CREATE TABLE IF NOT EXISTS cars (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     driver_id INTEGER, -- Allow this to be NULL so a car can exist without a driver
-    name TEXT,
-    number INTEGER UNIQUE, -- Ensure car numbers are unique
-    race_lap INTEGER DEFAULT 0,
-    current_lap_time NUMBER DEFAULT 0.0,
-    best_lap_time NUMBER DEFAULT 0.0,
-    race_elapse_time NUMBER DEFAULT 0.0,
-    status INTEGER,
-    FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE SET NULL -- Set driver_id to NULL if the driver is deleted
+    name TEXT, -- Optional: if you want to give cars a name
+    number INTEGER, -- Car number specific to the race (e.g., 1-8)
+    race_id INTEGER, -- Foreign key linking this car to a specific race
+    race_lap INTEGER DEFAULT 0, -- Track the number of laps
+    current_lap_time NUMBER DEFAULT 0.0, -- Current lap time for the car
+    best_lap_time NUMBER DEFAULT 0.0, -- Best lap time for the car
+    race_elapse_time NUMBER DEFAULT 0.0, -- Total elapsed race time
+    status INTEGER, -- Car status (active, finished, etc.)
+    FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE SET NULL, -- Set driver_id to NULL if the driver is deleted
+    FOREIGN KEY (race_id) REFERENCES races(id) ON DELETE CASCADE -- Ensure the car is tied to a specific race
 );
+
 
 -- This table is updated -- the car ID's must be unique 
 -- CREATE TABLE IF NOT EXISTS races (
