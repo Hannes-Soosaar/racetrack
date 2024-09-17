@@ -107,6 +107,7 @@ exports.addDriverToRace = (req, res) => {
 };
 
 // Get all drivers for a specific race
+// Get drivers for a specific race (in raceController.js)
 exports.getDriversForRace = (req, res) => {
     const { id } = req.params;  // The race session ID
 
@@ -123,6 +124,7 @@ exports.getDriversForRace = (req, res) => {
         res.status(200).json(rows);
     });
 };
+
 
 
 

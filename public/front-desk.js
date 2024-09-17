@@ -107,6 +107,9 @@ function loadAvailableCars(raceId) {
         .catch(error => console.error(`Error loading cars for race ${raceId}:`, error));
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    loadRaces();  // Load races when the page loads
+});
 
 
 // Load races and create their forms dynamically
@@ -118,40 +121,36 @@ function loadRaces() {
             raceList.innerHTML = '';  // Clear existing races
 
             races.forEach(race => {
-                console.log('Race ID:', race.id); // Debug log for each race ID
-                
-                if (race.id) {  // Only call loadAvailableCars if race.id is valid
-                    const raceItem = document.createElement('div');
-                    raceItem.innerHTML = `
-                        <strong>${race.session_name}</strong> - ${race.date} ${race.time}
-                        <button onclick="editRace(${race.id})">Edit Race</button>
-                        <button onclick="deleteRace(${race.id})">Delete Race</button>
-                        
-                        <h3>Add Drivers to ${race.session_name}</h3>
-                        <form onsubmit="addDriverToRace(event, ${race.id})">
-                            <label for="first-name-${race.id}">First Name:</label>
-                            <input type="text" id="first-name-${race.id}" required>
-                            <label for="last-name-${race.id}">Last Name:</label>
-                            <input type="text" id="last-name-${race.id}" required>
-                            <label for="car-number-${race.id}">Car Number:</label>
-                            <select id="car-number-${race.id}" required>
-                                <!-- Cars will be dynamically populated -->
-                            </select>
-                            <button type="submit">Save Driver</button>
-                        </form>
-                        <ul id="driver-list-${race.id}"></ul> <!-- Ensure this exists for every race -->
-                    `;
-                    raceList.appendChild(raceItem);
+                const raceItem = document.createElement('div');
+                raceItem.innerHTML = `
+                    <strong>${race.session_name}</strong> - ${race.date} ${race.time}
+                    <button onclick="editRace(${race.id})">Edit Race</button>
+                    <button onclick="deleteRace(${race.id})">Delete Race</button>
+                    
+                    <h3>Add Drivers to ${race.session_name}</h3>
+                    <form onsubmit="addDriverToRace(event, ${race.id})">
+                        <label for="first-name-${race.id}">First Name:</label>
+                        <input type="text" id="first-name-${race.id}" required>
+                        <label for="last-name-${race.id}">Last Name:</label>
+                        <input type="text" id="last-name-${race.id}" required>
+                        <label for="car-number-${race.id}">Car Number:</label>
+                        <select id="car-number-${race.id}" required>
+                            <!-- Cars will be dynamically populated -->
+                        </select>
+                        <button type="submit">Save Driver</button>
+                    </form>
+                    <ul id="driver-list-${race.id}"></ul> <!-- Ensure this exists for every race -->
+                `;
+                raceList.appendChild(raceItem);
 
-                    // Call loadAvailableCars after ensuring that the element exists
-                    loadAvailableCars(race.id);  // Pass the correct race ID here
-                } else {
-                    console.error('Race ID is missing for:', race); // Log error if race.id is undefined or null
-                }
+                // Load available cars and drivers for the race
+                loadAvailableCars(race.id);
+                loadDriversForRace(race.id);  // Load drivers for each race when the race is loaded
             });
         })
         .catch(error => console.error('Error loading races:', error));
 }
+
 
 // Fetch drivers for a specific race and display them
 function loadDriversForRace(raceId) {
@@ -178,6 +177,7 @@ function loadDriversForRace(raceId) {
             console.error(`Error loading drivers for race ${raceId}:`, error);
         });
 }
+
 
 // Add a driver to a specific race
 function addDriverToRace(event, raceId) {
