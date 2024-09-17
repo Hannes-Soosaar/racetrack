@@ -23,14 +23,14 @@ exports.getCarsForRace = (req, res) => {
     const query = `SELECT * FROM cars WHERE race_id = ?`;
     
     console.log('Fetching cars for race ID:', raceId);
-db.all(query, [raceId], (err, rows) => {
-    if (err) {
-        console.error('Database error:', err.message);
-        return res.status(500).json({ error: 'Failed to retrieve cars' });
-    }
-    console.log('Cars fetched:', rows); // Log fetched cars
-    res.status(200).json(rows);
-});
-
+    db.all(query, [raceId], (err, rows) => {
+        if (err) {
+            console.error('Database error:', err.message);
+            return res.status(500).json({ error: 'Failed to retrieve cars' });
+        }
+        console.log('Cars fetched:', rows);  // Log fetched cars to verify
+        res.status(200).json(rows);
+    });
 };
+
 

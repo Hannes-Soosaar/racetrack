@@ -33,17 +33,8 @@
         <div id="race-list"></div> 
 
         <h2>Add Drivers to Races</h2>
-        <form id="driver-form">
-            <label for="first-name">First Name:</label>
-            <input type="text" id="first-name" required>
-            <label for="last-name">Last Name:</label>
-            <input type="text" id="last-name" required>
-            <label for="car-number">Car Number:</label>
-            <select id="car-number-${race.id}" required>
-                <!-- Car options will be populated dynamically -->
-            </select>
-            <button type="submit">Save Driver</button>
-        </form>
+        <!-- Driver form will be created dynamically for each race via JavaScript -->
+        <div id="driver-form-container"></div>
 
         <h3>Driver List for the Race</h3>
         <ul id="driver-list"></ul>

@@ -65,27 +65,31 @@ socket.on('key-validation', function(response) {
     if (response.success) {
         accessForm.style.display = 'none';
         contentDiv.style.display = 'block';
+        
         loadRaces();  
-        loadAvailableCars();
         loadDrivers();
     } else {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
 });
 
+
 // Load available cars for the race
 function loadAvailableCars(raceId) {
-    console.log('Loading cars for race ID:', raceId);  // Debugging log
     if (!raceId) {
         console.error('No race ID provided to load cars.');
         return;
     }
 
+    console.log(`Loading cars for race ID: ${raceId}`);  // Debug log
+
     fetch(`/api/races/${raceId}/cars`)
         .then(response => response.json())
         .then(cars => {
-            console.log('Cars fetched for race', raceId, cars);
+            console.log(`Cars fetched for race ${raceId}`, cars);
+
             const carNumberSelect = document.getElementById(`car-number-${raceId}`);
+            
             if (!carNumberSelect) {
                 console.error(`Car select element for race ${raceId} not found.`);
                 return;
@@ -93,22 +97,20 @@ function loadAvailableCars(raceId) {
 
             carNumberSelect.innerHTML = '';  // Clear previous options
 
-            if (!Array.isArray(cars)) {
-                console.error('Expected an array of cars, but got:', cars);
-                return;
-            }
-
+            // Dynamically add the car options
             cars.forEach(car => {
                 const option = document.createElement('option');
-                option.value = car.number;
-                option.textContent = `Car ${car.number}`;
+                option.value = car.number;  // Set the car number as the option value
+                option.textContent = `Car ${car.number}`;  // Display the car number
                 carNumberSelect.appendChild(option);
             });
         })
-        .catch(error => console.error('Error loading cars:', error));
+        .catch(error => console.error(`Error loading cars for race ${raceId}:`, error));
 }
 
-// Load races and their cars
+
+
+// Load races and create their forms dynamically
 function loadRaces() {
     fetch('/api/races')
         .then(response => response.json())
@@ -117,31 +119,36 @@ function loadRaces() {
             raceList.innerHTML = '';  // Clear existing races
 
             races.forEach(race => {
-                const raceItem = document.createElement('div');
-                raceItem.innerHTML = `
-                    <strong>${race.session_name}</strong> - ${race.date} ${race.time}
-                    <button onclick="editRace(${race.id})">Edit Race</button>
-                    <button onclick="deleteRace(${race.id})">Delete Race</button>
+                console.log('Race ID:', race.id); // Debug log for each race ID
+                
+                if (race.id) {  // Only call loadAvailableCars if race.id is valid
+                    const raceItem = document.createElement('div');
+                    raceItem.innerHTML = `
+                        <strong>${race.session_name}</strong> - ${race.date} ${race.time}
+                        <button onclick="editRace(${race.id})">Edit Race</button>
+                        <button onclick="deleteRace(${race.id})">Delete Race</button>
+                        
+                        <h3>Add Drivers to ${race.session_name}</h3>
+                        <form onsubmit="addDriverToRace(event, ${race.id})">
+                            <label for="first-name-${race.id}">First Name:</label>
+                            <input type="text" id="first-name-${race.id}" required>
+                            <label for="last-name-${race.id}">Last Name:</label>
+                            <input type="text" id="last-name-${race.id}" required>
+                            <label for="car-number-${race.id}">Car Number:</label>
+                            <select id="car-number-${race.id}" required>
+                                <!-- Cars will be dynamically populated -->
+                            </select>
+                            <button type="submit">Save Driver</button>
+                        </form>
+                        <ul id="driver-list-${race.id}"></ul> <!-- Ensure this exists for every race -->
+                    `;
+                    raceList.appendChild(raceItem);
 
-                    <h3>Add Drivers to ${race.session_name}</h3>
-                    <form onsubmit="addDriverToRace(event, ${race.id})">
-                        <label for="first-name-${race.id}">First Name:</label>
-                        <input type="text" id="first-name-${race.id}" required>
-                        <label for="last-name-${race.id}">Last Name:</label>
-                        <input type="text" id="last-name-${race.id}" required>
-                        <label for="car-number-${race.id}">Car Number:</label>
-                        <select id="car-number-${race.id}" required>
-                            <!-- Cars will be dynamically populated -->
-                        </select>
-                        <button type="submit">Save Driver</button>
-                    </form>
-                    <ul id="driver-list-${race.id}"></ul>
-                `;
-
-                raceList.appendChild(raceItem);
-
-                // Load cars for this specific race
-                loadAvailableCars(race.id);  // Pass the correct race ID
+                    // Call loadAvailableCars after ensuring that the element exists
+                    loadAvailableCars(race.id);  // Pass the correct race ID here
+                } else {
+                    console.error('Race ID is missing for:', race); // Log error if race.id is undefined or null
+                }
             });
         })
         .catch(error => console.error('Error loading races:', error));
@@ -149,15 +156,22 @@ function loadRaces() {
 
 // Fetch drivers for a specific race and display them
 function loadDriversForRace(raceId) {
-    fetch(`/api/races/${raceId}/drivers`)  
+    fetch(`/api/races/${raceId}/drivers`)
         .then(response => response.json())
         .then(drivers => {
             const driverList = document.getElementById(`driver-list-${raceId}`);
-            driverList.innerHTML = '';  
+            
+            // Ensure the driver list element exists
+            if (!driverList) {
+                console.error(`Driver list element for race ${raceId} not found.`);
+                return;
+            }
+
+            driverList.innerHTML = '';  // Clear the list before appending new items
 
             drivers.forEach(driver => {
                 const li = document.createElement('li');
-                li.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.carNumber})`;
+                li.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.car_number})`;
                 driverList.appendChild(li);
             });
         })
@@ -172,11 +186,15 @@ function addDriverToRace(event, raceId) {
 
     const firstName = document.getElementById(`first-name-${raceId}`).value;
     const lastName = document.getElementById(`last-name-${raceId}`).value;
-    const carNumber = document.getElementById(`car-number-${raceId}`).value;
-    if (!carNumber) {
-        console.error(`Car number is not selected for race ${raceId}`);
+    const carNumber = document.getElementById(`car-number-${raceId}`).value;  // Get the selected car number
+
+    console.log(`Adding driver to race ${raceId}`, { firstName, lastName, carNumber });
+
+    if (!firstName || !lastName || !carNumber) {
+        console.error('Missing required driver details.');
         return;
     }
+
     const data = { firstName, lastName, carNumber };
 
     fetch(`/api/races/${raceId}/drivers`, {
@@ -184,8 +202,14 @@ function addDriverToRace(event, raceId) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to add driver');
+        }
+        return response.json();
+    })
     .then(() => {
-        loadDriversForRace(raceId);  
+        loadDriversForRace(raceId);  // Reload drivers for the race
     })
     .catch(error => {
         console.error(`Error adding driver to race ${raceId}:`, error);
@@ -229,12 +253,11 @@ function deleteRace(raceId) {
 }
 
 function editRace(raceId) {
-    // You can fetch the details of the race you want to edit here and pre-fill the form.
     fetch(`/api/races/${raceId}`)
     .then(response => response.json())
     .then(race => {
         // Populate the form fields with the race data
-        document.getElementById('race-id').value = race.id;
+        document.getElementById('race-id').value = race.id;  // Ensure race ID is populated
         document.getElementById('session-name').value = race.session_name;
         document.getElementById('date').value = race.date;
         document.getElementById('time').value = race.time;

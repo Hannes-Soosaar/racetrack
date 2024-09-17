@@ -11,13 +11,13 @@ exports.createRaceSession = (req, res) => {
             return res.status(500).json({ error: 'Could not create race session', details: err });
         }
 
-        const raceId = this.lastID;
-        carController.createCarsForRace(raceId);  // Generate 8 virtual cars for the race
+        const raceId = this.lastID;  // Capture the race ID
+        carController.createCarsForRace(raceId);  // Generate cars for this race
+
+        // Return the newly created race along with its ID
         res.status(201).json({ id: raceId, session_name, date, time, status });
     });
 };
-
-
 
 // Get all race sessions
 exports.getRaceSessions = (req, res) => {
@@ -33,8 +33,9 @@ exports.getRaceSessions = (req, res) => {
 
 // Update a race session
 exports.updateRaceSession = (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params;  // Race ID from the URL
     const { session_name, date, time, status } = req.body;
+    
     const query = `UPDATE races SET session_name = ?, date = ?, time = ?, status = ? WHERE id = ?`;
 
     db.run(query, [session_name, date, time, status, id], function(err) {
@@ -45,9 +46,10 @@ exports.updateRaceSession = (req, res) => {
     });
 };
 
+
 // Delete a race session
 exports.deleteRaceSession = (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params;  // Race ID from the URL
     const query = `DELETE FROM races WHERE id = ?`;
 
     db.run(query, [id], function(err) {
@@ -58,35 +60,43 @@ exports.deleteRaceSession = (req, res) => {
     });
 };
 
+
 // Add a driver to a race
 exports.addDriverToRace = (req, res) => {
-    const { id } = req.params;  // The race session ID
+    const { id } = req.params;  // Race session ID
     const { firstName, lastName, carNumber } = req.body;
 
+    console.log('Incoming driver data:', { firstName, lastName, carNumber });
+
+    // Ensure that firstName, lastName, and carNumber are passed
+    if (!firstName || !lastName || !carNumber) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Check if the car number is already assigned in the race
     const checkCarNumberQuery = `SELECT COUNT(*) AS count FROM race_drivers WHERE race_id = ? AND car_number = ?`;
     db.get(checkCarNumberQuery, [id, carNumber], function(err, row) {
         if (err) {
             return res.status(500).json({ error: 'Could not verify car number', details: err });
         }
-        
+
         if (row.count > 0) {
             return res.status(400).json({ error: `Car number ${carNumber} is already assigned in this race.` });
         }
 
-        // Proceed to add the driver if the car number is not already in use
+        // Insert the driver into the drivers table
         const insertDriverQuery = `INSERT INTO drivers (first_name, last_name) VALUES (?, ?)`;
-
         db.run(insertDriverQuery, [firstName, lastName], function(err) {
             if (err) {
                 return res.status(500).json({ error: 'Could not add driver', details: err });
             }
 
-            const driverId = this.lastID;  // Get the last inserted driver ID
-            const insertRaceDriverQuery = `INSERT INTO race_drivers (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
+            const driverId = this.lastID;  // Get the newly inserted driver ID
 
+            // Assign the driver to the race with the car number
+            const insertRaceDriverQuery = `INSERT INTO race_drivers (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
             db.run(insertRaceDriverQuery, [id, driverId, carNumber], function(err) {
                 if (err) {
-                    console.error('Error in adding driver to race:', err);
                     return res.status(500).json({ error: 'Could not assign driver to race', details: err });
                 }
 
@@ -95,8 +105,6 @@ exports.addDriverToRace = (req, res) => {
         });
     });
 };
-
-
 
 // Get all drivers for a specific race
 exports.getDriversForRace = (req, res) => {
@@ -112,13 +120,10 @@ exports.getDriversForRace = (req, res) => {
             return res.status(500).json({ error: 'Failed to retrieve drivers for this race', details: err });
         }
 
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'No drivers found for this race' });
-        }
-
         res.status(200).json(rows);
     });
 };
+
 
 
 
