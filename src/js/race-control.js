@@ -1,11 +1,10 @@
 const db = require('../../config/db.js');
 const Race = require('../models/race.js');
 let currentRace = null
-let nextRace = null
 
 module.exports = (io, socket) => {
     console.log('Setting up race control');
-
+    currentRace = null
     // Handle starting the race
     socket.on('start-session', () => {
         if (currentRace != null) {
@@ -16,14 +15,21 @@ module.exports = (io, socket) => {
                     return
                 }
                 if (row) {
-                    const deleteQuery = `DELETE FROM races WHERE id = ?`
+                    const deleteQuery = `
+                    DELETE FROM races WHERE id = ?`
+                    //add queries to delete drivers and cars as well? (if the database structure stays as is)
                     db.run(deleteQuery, [currentRace.id], (err) => {
                         if (err) {
                             console.log(err.message)
                             return
                         }
 
-                        db.get("SELECT * FROM races WHERE status = '8' LIMIT 1", (err, row) => {
+                        const query = `
+                        SELECT * FROM races
+                        WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
+                        ORDER BY DATETIME(date || ' ' || time) ASC
+                        LIMIT 1`
+                        db.get(query, (err, row) => {
                             if (err) {
                                 console.error(err.message);
                                 return;
@@ -38,12 +44,15 @@ module.exports = (io, socket) => {
                             }
                         })
                     })
-                } else {
-                    console.log('currentRace Not found')
                 }
             })
         } else {
-            db.get("SELECT * FROM races WHERE status = '8' LIMIT 1", (err, row) => {
+            const query = `
+                        SELECT * FROM races
+                        WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
+                        ORDER BY DATETIME(date || ' ' || time) ASC
+                        LIMIT 1`
+            db.get(query, (err, row) => {
                 if (err) {
                     console.error(err.message)
                     return
@@ -119,7 +128,7 @@ module.exports = (io, socket) => {
 
 
 function changeFlag(flagID) {
-    const sql = `UPDATE races SET flag = ? WHERE id = ?`
+    const sql = `UPDATE races SET status = ? WHERE id = ?`
     db.run(sql, [flagID, currentRace.id], function (err) {
         if (err) {
             return console.log(err.message)

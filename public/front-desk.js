@@ -65,7 +65,6 @@ socket.on('key-validation', function(response) {
     if (response.success) {
         accessForm.style.display = 'none';
         contentDiv.style.display = 'block';
-        
         loadRaces();  
         loadDrivers();
     } else {
