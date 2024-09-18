@@ -1,85 +1,79 @@
 const db = require('../../config/db.js');
 const Race = require('../models/race.js');
-let currentRace = null
+let currentRace = null;
 
 module.exports = (io, socket) => {
     console.log('Setting up race control');
     currentRace = null
     // Handle starting the race
-    socket.on('start-session', () => {
+    socket.on('start-session', async () => {
         if (currentRace != null) {
-            const query = `SELECT * FROM races WHERE id = ?`
-            db.get(query, [currentRace.id], (err, row) => {
-                if (err) {
-                    console.log(err.message)
-                    return
-                }
-                if (row) {
-                    const deleteQuery = `
-                    DELETE FROM races WHERE id = ?`
-                    //add queries to delete drivers and cars as well? (if the database structure stays as is)
-                    db.run(deleteQuery, [currentRace.id], (err) => {
-                        if (err) {
-                            console.log(err.message)
-                            return
-                        }
+            try {
+                const raceRow = await dbGet(`SELECT * FROM races WHERE id = ?`, [currentRace.id]);
 
-                        const query = `
+                if (raceRow) {
+                    await dbRun(`DELETE FROM races WHERE id = ?`, [currentRace.id]);
+
+                    const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
+                    const driverIds = driverRows.map(row => row.driver_id);
+
+                    await dbRun(`DELETE FROM cars WHERE race_id = ?`, [currentRace.id]);
+                    await dbRun(`DELETE FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
+
+                    if (driverIds.length > 0) {
+                        const deleteDriversQuery = `
+                            DELETE FROM drivers WHERE id IN (${driverIds.map(() => '?').join(', ')})`;
+                        await dbRun(deleteDriversQuery, driverIds);
+                    }
+
+                    const nextRaceRow = await dbGet(`
                         SELECT * FROM races
                         WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
                         ORDER BY DATETIME(date || ' ' || time) ASC
-                        LIMIT 1`
-                        db.get(query, (err, row) => {
-                            if (err) {
-                                console.error(err.message);
-                                return;
-                            }
-                            if (row) {
-                                console.log('Session found');
-                                currentRace = new Race(row);
-                                console.log(currentRace);
-                                io.emit('display-race', currentRace); // Emit race info to clients
-                            } else {
-                                io.emit('race-status', 'No upcoming race found');
-                            }
-                        })
-                    })
+                        LIMIT 1`);
+
+                    if (nextRaceRow) {
+                        console.log('Session found');
+                        currentRace = new Race(nextRaceRow);
+                        io.emit('display-race', currentRace); // Emit race info to clients
+                    } else {
+                        io.emit('race-status', 'No upcoming race found');
+                    }
                 }
-            })
+            } catch (err) {
+                console.error(err.message);
+            }
         } else {
-            const query = `
-                        SELECT * FROM races
-                        WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
-                        ORDER BY DATETIME(date || ' ' || time) ASC
-                        LIMIT 1`
-            db.get(query, (err, row) => {
-                if (err) {
-                    console.error(err.message)
-                    return
-                }
-                if (row) {
+            try {
+                const nextRaceRow = await dbGet(`
+                    SELECT * FROM races
+                    WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
+                    ORDER BY DATETIME(date || ' ' || time) ASC
+                    LIMIT 1`);
+
+                if (nextRaceRow) {
                     console.log('Session found');
-                    currentRace = new Race(row)
-                    console.log(currentRace)
-                    io.emit('display-race', currentRace)
+                    currentRace = new Race(nextRaceRow);
+                    io.emit('display-race', currentRace);
                 } else {
-                    io.emit('race-status', 'No upcoming race found')
+                    io.emit('race-status', 'No upcoming race found');
                 }
-            })
+            } catch (err) {
+                console.error(err.message);
+            }
         }
     });
 
     socket.on('start-race', () => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
-        changeFlag(1)
-        io.emit('race-flags-update', 1)
-    })
+        changeFlag(1);
+        io.emit('race-flags-update', 1);
+    });
 
     socket.on('end-session', () => {
-        //TODO: if this is called, prepare the next session. Set the previous race to inactive in DB, set the next race status to 8, set the next queued race status to 4. 
-        io.emit('race-status', 'Session ended')
-    })
+        io.emit('race-status', 'Session ended');
+    });
 
     // Handle changing race mode
     socket.on('change-mode', (mode) => {
@@ -87,51 +81,83 @@ module.exports = (io, socket) => {
         io.emit('race-mode', mode);
         switch (mode) {
             case 'Safe':
-                changeFlag(1)
-                io.emit('race-flags-update', 1)
-                break
+                changeFlag(1);
+                io.emit('race-flags-update', 1);
+                break;
             case 'Hazard':
-                changeFlag(5)
-                io.emit('race-flags-update', 5)
-                break
+                changeFlag(5);
+                io.emit('race-flags-update', 5);
+                break;
             case 'Danger':
-                changeFlag(2)
-                io.emit('race-flags-update', 2)
-                break
+                changeFlag(2);
+                io.emit('race-flags-update', 2);
+                break;
             default:
-                changeFlag(null)
+                changeFlag(null);
         }
     });
 
     socket.on('request-flags-update', () => {
         console.log('Request for flags update received');
         if (currentRace) {
-            io.emit('race-flags-update', currentRace.flag)
+            io.emit('race-flags-update', currentRace.flag);
         }
-    })
+    });
 
-    // Handle ending the race
     socket.on('end-race', () => {
         console.log('Race ended');
         io.emit('race-status', 'Race ended');
         io.emit('race-mode', 'Finished');
-        changeFlag(3)
-        io.emit('race-flags-update', 3)
+        changeFlag(3);
+        io.emit('race-flags-update', 3);
     });
 
-    // Handle disconnection
     socket.on('disconnect', () => {
         console.log('Client disconnected from race control');
     });
 };
 
+async function dbGet(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
+        });
+    });
+}
 
+async function dbAll(query, params) {
+    return new Promise((resolve, reject) => {
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+async function dbRun(query, params) {
+    return new Promise((resolve, reject) => {
+        db.run(query, params, function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this);
+            }
+        });
+    });
+}
 
 function changeFlag(flagID) {
-    const sql = `UPDATE races SET status = ? WHERE id = ?`
+    const sql = `UPDATE races SET status = ? WHERE id = ?`;
     db.run(sql, [flagID, currentRace.id], function (err) {
         if (err) {
-            return console.log(err.message)
+            console.log(err.message);
         }
-    })
+    });
 }

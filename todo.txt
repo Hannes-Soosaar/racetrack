@@ -55,7 +55,7 @@ The receptionist can delete an upcoming race.
 The README.md file at the root of the project describes how to launch the project.
 The receptionist can add new race sessions.
 The receptionist can add/edit/remove drivers from a race.
-It is not possible to have two drivers with the same name. name is uniqe 
+It is not possible to have two drivers with the same name. name is unique 
 Race sessions disappear from the Front Desk interface once it is safe to start. // who can make it safe if safe remove fr
 The race drivers cannot be edited after the race is safe to start.
 The upcoming race session, is displayed on the Next Race display.
