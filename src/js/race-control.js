@@ -47,6 +47,7 @@ module.exports = (io, socket) => {
                         })()
                     } else {
                         io.emit('race-status', 'No upcoming race found');
+
                     }
                 }
             } catch (err) {
@@ -87,6 +88,14 @@ module.exports = (io, socket) => {
         io.emit('race-mode', 'Safe');
         changeFlag(1);
         io.emit('race-flags-update', 1);
+        //get next race and display on next race page
+        const nextRaceData = getNextRace()
+        if (nextRaceData === null) {
+            //If no next race, send a message "No races queued!"
+            //Build next race back and front end to display status 
+        } else {
+            io.emit('update-next-race', nextRaceData)
+        }
     });
 
     socket.on('end-session', () => {
@@ -180,6 +189,36 @@ function changeFlag(flagID) {
             console.log(err.message);
         }
     });
+}
+
+async function getNextRace() {
+    try {
+        const racesQuery = `
+        SELECT * FROM races
+        WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
+        ORDER BY DATETIME(date || ' ' || time) ASC
+        LIMIT 2
+        `
+
+        const races = await new Promise((resolve, reject) => {
+            db.all(racesQuery, [], (err, rows) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(rows)
+                }
+            })
+        })
+
+        if (races.length < 2) {
+            return null
+        }
+
+        return races[1]
+    } catch (err) {
+        console.log('Error fetching races:', err)
+        return null
+    }
 }
 
 async function getDriverDetails(raceId) {
