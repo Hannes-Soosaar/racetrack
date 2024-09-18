@@ -34,27 +34,17 @@ socket.on('key-validation', function (response) {
 });
 
 
-socket.on('display-race', (race) => {
-    //TODO shows only cars, needs to display cars and drivers. Will implement once the database and front desk is implemented
+socket.on('display-race', (driverInfo) => {
     contentDiv.style.display = 'block'
     newSessionDiv.style.display = 'none'
 
     raceInformationDiv.innerHTML = '';
 
-    for (const [key, value] of Object.entries(race)) {
-        if (key.includes('created')) {
-            const paragraph = document.createElement('p');
-            paragraph.textContent = `Race number: ${value}`;
-            raceInformationDiv.appendChild(paragraph);
-        }
-
-        if (key.includes('car_')) {
-
-            const paragraph = document.createElement('p');
-            paragraph.textContent = `Car: ${value}`;
-            raceInformationDiv.appendChild(paragraph);
-        }
-    }
+    driverInfo.forEach(driver => {
+        const paragraph = document.createElement('p');
+        paragraph.textContent = `Driver: ${driver.driver_name}, Car Number: ${driver.car_number}`;
+        raceInformationDiv.appendChild(paragraph);
+    })
 })
 
 newSessionButton.addEventListener('click', () => {

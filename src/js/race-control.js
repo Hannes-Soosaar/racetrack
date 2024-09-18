@@ -35,7 +35,16 @@ module.exports = (io, socket) => {
                     if (nextRaceRow) {
                         console.log('Session found');
                         currentRace = new Race(nextRaceRow);
-                        io.emit('display-race', currentRace); // Emit race info to clients
+                        (async () => {
+                            try {
+                                const raceId = currentRace.id
+                                const driverInfo = await getDriverDetails(raceId)
+                                console.log(driverInfo)
+                                io.emit('display-race', driverInfo)
+                            } catch (err) {
+                                console.log('Error:', err)
+                            }
+                        })()
                     } else {
                         io.emit('race-status', 'No upcoming race found');
                     }
@@ -54,7 +63,16 @@ module.exports = (io, socket) => {
                 if (nextRaceRow) {
                     console.log('Session found');
                     currentRace = new Race(nextRaceRow);
-                    io.emit('display-race', currentRace);
+                    (async () => {
+                        try {
+                            const raceId = currentRace.id
+                            const driverInfo = await getDriverDetails(raceId)
+                            console.log(driverInfo)
+                            io.emit('display-race', driverInfo)
+                        } catch (err) {
+                            console.log('Error:', err)
+                        }
+                    })()
                 } else {
                     io.emit('race-status', 'No upcoming race found');
                 }
@@ -72,6 +90,8 @@ module.exports = (io, socket) => {
     });
 
     socket.on('end-session', () => {
+        changeFlag(2);
+        io.emit('race-flags-update', 2);
         io.emit('race-status', 'Session ended');
     });
 
@@ -160,4 +180,29 @@ function changeFlag(flagID) {
             console.log(err.message);
         }
     });
+}
+
+async function getDriverDetails(raceId) {
+    const query = `
+    SELECT 
+        (drivers.first_name || ' ' || drivers.last_name) AS driver_name,
+        race_drivers.car_number
+    FROM race_drivers
+    JOIN drivers ON race_drivers.driver_id = drivers.id
+    WHERE race_drivers.race_id = ?
+    `
+    try {
+        const rows = await new Promise((resolve, reject) => {
+            db.all(query, [raceId], (err, rows) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(rows)
+                }
+            })
+        })
+        return rows
+    } catch (err) {
+        console.log('Error fetching driver details:', err)
+    }
 }
