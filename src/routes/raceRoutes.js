@@ -8,5 +8,6 @@ router.put('/races/:id', raceController.updateRaceSession);
 router.delete('/races/:id', raceController.deleteRaceSession);
 router.post('/races/:id/drivers', raceController.addDriverToRace);
 router.get('/races/:id/drivers', raceController.getDriversForRace);
+router.delete('/races/:raceId/drivers/:driverId', raceController.deleteDriverFromRace);
 
 module.exports = router;

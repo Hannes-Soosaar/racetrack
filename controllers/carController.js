@@ -17,20 +17,25 @@ exports.createCarsForRace = (raceId) => {
 
 
 
-// Get available cars for a race
 exports.getCarsForRace = (req, res) => {
     const { raceId } = req.params;
-    const query = `SELECT * FROM cars WHERE race_id = ?`;
-    
-    console.log('Fetching cars for race ID:', raceId);
+
+    // Query to fetch only unassigned cars where driver_id is NULL
+    const query = `SELECT * FROM cars WHERE race_id = ? AND driver_id IS NULL`;
+
     db.all(query, [raceId], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: 'Failed to retrieve cars' });
         }
-        console.log('Cars fetched:', rows);  // Log fetched cars to verify
+
+        console.log('Available cars:', rows);  // Debugging: log what is being returned
         res.status(200).json(rows);
     });
 };
+
+
+
+
 
 

@@ -80,13 +80,10 @@ function loadAvailableCars(raceId) {
         return;
     }
 
-    console.log(`Loading cars for race ID: ${raceId}`);  // Debug log
-
-    fetch(`/api/races/${raceId}/cars`)
+    // Adding timestamp to the fetch URL to prevent caching
+    fetch(`/api/races/${raceId}/cars?timestamp=${new Date().getTime()}`)
         .then(response => response.json())
         .then(cars => {
-            console.log(`Cars fetched for race ${raceId}`, cars);
-
             const carNumberSelect = document.getElementById(`car-number-${raceId}`);
             
             if (!carNumberSelect) {
@@ -96,7 +93,15 @@ function loadAvailableCars(raceId) {
 
             carNumberSelect.innerHTML = '';  // Clear previous options
 
-            // Dynamically add the car options
+            if (cars.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No available cars';  // Handle case when no cars are available
+                carNumberSelect.appendChild(option);
+                return;
+            }
+
+            // Populate the dropdown with available cars
             cars.forEach(car => {
                 const option = document.createElement('option');
                 option.value = car.number;  // Set the car number as the option value
@@ -106,6 +111,7 @@ function loadAvailableCars(raceId) {
         })
         .catch(error => console.error(`Error loading cars for race ${raceId}:`, error));
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
     loadRaces();  // Load races when the page loads
@@ -168,14 +174,42 @@ function loadDriversForRace(raceId) {
             driverList.innerHTML = '';  // Clear the list before appending new items
 
             drivers.forEach(driver => {
+                console.log(driver);  // Log the driver object to ensure ID is present
                 const li = document.createElement('li');
-                li.textContent = `${driver.first_name} ${driver.last_name} (Car: ${driver.car_number})`;
+                li.innerHTML = `
+                    ${driver.first_name} ${driver.last_name} (Car: ${driver.car_number})
+                    <button onclick="deleteDriver(${raceId}, ${driver.id})">Delete</button>
+                `;
                 driverList.appendChild(li);
             });
         })
         .catch(error => {
             console.error(`Error loading drivers for race ${raceId}:`, error);
         });
+}
+
+
+// Delete a driver from a specific race
+function deleteDriver(raceId, driverId) {
+    console.log('Deleting driver:', driverId, 'from race:', raceId);  // Debugging
+    
+    if (!confirm('Are you sure you want to delete this driver from the race?')) {
+        return;
+    }
+
+    fetch(`/api/races/${raceId}/drivers/${driverId}`, {
+        method: 'DELETE',
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(error => { throw new Error(error.error); });
+        }
+        loadDriversForRace(raceId);  // Reload drivers after deletion
+    })
+    .catch(error => {
+        console.error(`Error deleting driver from race ${raceId}:`, error.message);
+        alert(`Error: ${error.message}`);
+    });
 }
 
 
@@ -203,7 +237,7 @@ function addDriverToRace(event, raceId) {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Failed to add driver');
+            return response.json().then(error => { throw new Error(error.error); });
         }
         return response.json();
     })
@@ -211,9 +245,13 @@ function addDriverToRace(event, raceId) {
         loadDriversForRace(raceId);  // Reload drivers for the race
     })
     .catch(error => {
-        console.error(`Error adding driver to race ${raceId}:`, error);
+        // Show a pop-up with the custom error message
+        alert(error.message);  // Displays an alert pop-up with the error message
+        console.error(`Error adding driver to race ${raceId}:`, error.message);
     });
 }
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
     loadRaces();  // Call loadRaces when the page loads
@@ -267,3 +305,25 @@ function editRace(raceId) {
 document.addEventListener('DOMContentLoaded', function() {
     loadRaces();  // Call loadRaces when the page loads
 });
+
+// Delete a driver from a specific race
+function deleteDriver(raceId, driverId) {
+    if (!confirm('Are you sure you want to delete this driver from the race?')) {
+        return;
+    }
+
+    fetch(`/api/races/${raceId}/drivers/${driverId}`, {
+        method: 'DELETE',
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(error => { throw new Error(error.error); });
+        }
+        loadDriversForRace(raceId);  // Reload drivers after deletion
+    })
+    .catch(error => {
+        console.error(`Error deleting driver from race ${raceId}:`, error.message);
+        alert(`Error: ${error.message}`);
+    });
+}
+
