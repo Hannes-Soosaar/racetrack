@@ -14,6 +14,6 @@ console.log(NewDriver);
 
 // The Input and Event needs to give the following info: Car, Driver details and RaceId
 // Creates a driver and returns the ID that was created so it could be added to the slot
-function createNewDriver(name,lastName,status){
+function createNewDriver(name, lastName, status) {
 	return driverId;
 }

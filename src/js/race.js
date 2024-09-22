@@ -67,3 +67,6 @@ function updateRaceSlotBySlotId(RaceId, SlotId) {
 	//Add car to slot if empty
 	return success;
 }
+
+
+///TEST 
