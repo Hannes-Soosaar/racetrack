@@ -4,20 +4,35 @@ const carController = require('./carController');
 // Create a new race session and generate cars
 exports.createRaceSession = (req, res) => {
     const { session_name, date, time, status } = req.body;
-    const query = `INSERT INTO races (session_name, date, time, status) VALUES (?, ?, ?, ?)`;
 
-    db.run(query, [session_name, date, time, status], function(err) {
+    // Check if a race with the same session name already exists
+    const checkDuplicateQuery = `SELECT COUNT(*) AS count FROM races WHERE session_name = ?`;
+    db.get(checkDuplicateQuery, [session_name], function(err, row) {
         if (err) {
-            return res.status(500).json({ error: 'Could not create race session', details: err });
+            return res.status(500).json({ error: 'Could not verify session name uniqueness', details: err });
         }
 
-        const raceId = this.lastID;  // Capture the race ID
-        carController.createCarsForRace(raceId);  // Generate cars for this race
+        if (row.count > 0) {
+            return res.status(400).json({ error: 'A race with this name already exists. Please choose a different name.' });
+        }
 
-        // Return the newly created race along with its ID
-        res.status(201).json({ id: raceId, session_name, date, time, status });
+        // Proceed to create the race session if the name is unique
+        const query = `INSERT INTO races (session_name, date, time, status) VALUES (?, ?, ?, ?)`;
+
+        db.run(query, [session_name, date, time, status], function(err) {
+            if (err) {
+                return res.status(500).json({ error: 'Could not create race session', details: err });
+            }
+
+            const raceId = this.lastID;  // Capture the race ID
+            carController.createCarsForRace(raceId);  // Generate cars for this race
+
+            res.status(201).json({ id: raceId, session_name, date, time, status });
+        });
     });
 };
+
+
 
 // Get all race sessions
 exports.getRaceSessions = (req, res) => {
@@ -35,16 +50,30 @@ exports.getRaceSessions = (req, res) => {
 exports.updateRaceSession = (req, res) => {
     const { id } = req.params;  // Race ID from the URL
     const { session_name, date, time, status } = req.body;
-    
-    const query = `UPDATE races SET session_name = ?, date = ?, time = ?, status = ? WHERE id = ?`;
 
-    db.run(query, [session_name, date, time, status, id], function(err) {
+    // Check if a race with the same session name already exists (excluding the current race being updated)
+    const checkDuplicateQuery = `SELECT COUNT(*) AS count FROM races WHERE session_name = ? AND id != ?`;
+    db.get(checkDuplicateQuery, [session_name, id], function(err, row) {
         if (err) {
-            return res.status(500).json({ error: 'Could not update race', details: err });
+            return res.status(500).json({ error: 'Could not verify session name uniqueness', details: err });
         }
-        res.status(200).json({ message: 'Race updated successfully' });
+
+        if (row.count > 0) {
+            return res.status(400).json({ error: 'A race with this name already exists. Please choose a different name.' });
+        }
+
+        // Proceed to update the race session if the name is unique
+        const query = `UPDATE races SET session_name = ?, date = ?, time = ?, status = ? WHERE id = ?`;
+
+        db.run(query, [session_name, date, time, status, id], function(err) {
+            if (err) {
+                return res.status(500).json({ error: 'Could not update race', details: err });
+            }
+            res.status(200).json({ message: 'Race updated successfully' });
+        });
     });
 };
+
 
 
 // Delete a race session

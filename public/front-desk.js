@@ -40,7 +40,7 @@ raceForm.addEventListener('submit', function(event) {
     const status = 'upcoming';  // Assuming default status for a new race
 
     const method = id ? 'PUT' : 'POST';  
-    const url = id ? `/api/races/${id}` : '/api/races';
+    const url = id ? `/api/races/${id}` : `/api/races`;
     const data = { session_name, date, time, status };
 
     fetch(url, {
@@ -48,16 +48,23 @@ raceForm.addEventListener('submit', function(event) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(error => { throw new Error(error.error); });
+        }
+        return response.json();
+    })
     .then(race => {
         raceForm.reset();  // Clear the form after submission
         loadRaces();  // Reload the list of races
         loadAvailableCars(race.id);  // Load cars for the newly created race
     })
     .catch(error => {
+        alert(error.message);  // Show an alert with the error (e.g., duplicate race name)
         console.error('Error saving race session:', error);
     });
 });
+
 
 
 // Handle key validation response
@@ -66,7 +73,7 @@ socket.on('key-validation', function(response) {
         accessForm.style.display = 'none';
         contentDiv.style.display = 'block';
         loadRaces();  
-        loadDrivers();
+        // loadDrivers();
     } else {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
@@ -189,30 +196,6 @@ function loadDriversForRace(raceId) {
 }
 
 
-// Delete a driver from a specific race
-function deleteDriver(raceId, driverId) {
-    console.log('Deleting driver:', driverId, 'from race:', raceId);  // Debugging
-    
-    if (!confirm('Are you sure you want to delete this driver from the race?')) {
-        return;
-    }
-
-    fetch(`/api/races/${raceId}/drivers/${driverId}`, {
-        method: 'DELETE',
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(error => { throw new Error(error.error); });
-        }
-        loadDriversForRace(raceId);  // Reload drivers after deletion
-    })
-    .catch(error => {
-        console.error(`Error deleting driver from race ${raceId}:`, error.message);
-        alert(`Error: ${error.message}`);
-    });
-}
-
-
 // Add a driver to a specific race
 function addDriverToRace(event, raceId) {
     event.preventDefault();
@@ -257,18 +240,18 @@ document.addEventListener('DOMContentLoaded', function() {
     loadRaces();  // Call loadRaces when the page loads
 });
 
-function loadDrivers() {
-    // Add logic to load drivers
-    fetch('/api/drivers')
-        .then(response => response.json())
-        .then(drivers => {
-            console.log('Drivers loaded:', drivers);
-            // You can populate driver details here
-        })
-        .catch(error => {
-            console.error('Error loading drivers:', error);
-        });
-}
+// function loadDrivers() {
+//     // Add logic to load drivers
+//     fetch('/api/drivers')
+//         .then(response => response.json())
+//         .then(drivers => {
+//             console.log('Drivers loaded:', drivers);
+//             // You can populate driver details here
+//         })
+//         .catch(error => {
+//             console.error('Error loading drivers:', error);
+//         });
+// }
 
 function deleteRace(raceId) {
     if (!confirm('Are you sure you want to delete this race?')) {
@@ -307,7 +290,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Delete a driver from a specific race
+// Delete a driver from a specific race
 function deleteDriver(raceId, driverId) {
+    console.log('Deleting driver:', driverId, 'from race:', raceId);  // Debugging
+    
     if (!confirm('Are you sure you want to delete this driver from the race?')) {
         return;
     }
@@ -326,4 +312,5 @@ function deleteDriver(raceId, driverId) {
         alert(`Error: ${error.message}`);
     });
 }
+
 
