@@ -25,13 +25,11 @@ module.exports = (io, socket) => {
         displayMessage(`Error: ${error.message}`);
     };
 
-    //!TIMER OPERATIONS
-
     socket.on('start-timer', () => {
         console.log("Start-timer");
         io.emit('peak', "Race started");
         console.log(data.RACE_DURATION);
-        time.startTimer(io, data.RACE_DURATION); //! passes in the IO
+        time.startTimer(io, data.RACE_DURATION);
     });
 
     socket.on('pause-timer', () => {
@@ -51,5 +49,4 @@ module.exports = (io, socket) => {
         io.emit('peak', "Timer Stopped")
         time.stopTimer();
     })
-
 }
