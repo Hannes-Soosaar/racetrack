@@ -2,7 +2,7 @@ const db = require('../../config/db.js');
 const Race = require('../models/race.js');
 let currentRace = null;
 
-module.exports = (io, socket) => {
+const raceControl = (io, socket) => {
     console.log('Setting up race control');
     currentRace = null
     // Handle starting the race
@@ -33,21 +33,19 @@ module.exports = (io, socket) => {
                         LIMIT 1`);
 
                     if (nextRaceRow) {
-                        console.log('Session found');
                         currentRace = new Race(nextRaceRow);
                         (async () => {
                             try {
                                 const raceId = currentRace.id
                                 const driverInfo = await getDriverDetails(raceId)
-                                console.log(driverInfo)
                                 io.emit('display-race', driverInfo)
                             } catch (err) {
                                 console.log('Error:', err)
                             }
                         })()
+                        io.emit('trigger-next-race-message')
                     } else {
                         io.emit('race-status', 'No upcoming race found');
-
                     }
                 }
             } catch (err) {
@@ -68,12 +66,12 @@ module.exports = (io, socket) => {
                         try {
                             const raceId = currentRace.id
                             const driverInfo = await getDriverDetails(raceId)
-                            console.log(driverInfo)
                             io.emit('display-race', driverInfo)
                         } catch (err) {
                             console.log('Error:', err)
                         }
                     })()
+                    io.emit('trigger-next-race-message')
                 } else {
                     io.emit('race-status', 'No upcoming race found');
                 }
@@ -83,19 +81,19 @@ module.exports = (io, socket) => {
         }
     });
 
-    socket.on('start-race', () => {
+    socket.on('start-race', async () => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
-        changeFlag(1);
-        io.emit('race-flags-update', 1);
+
+        await new Promise((resolve) => {
+            changeFlag(1);
+            io.emit('race-flags-update', 1);
+            resolve();
+        });
+
         //get next race and display on next race page
-        const nextRaceData = getNextRace()
-        if (nextRaceData === null) {
-            //If no next race, send a message "No races queued!"
-            //Build next race back and front end to display status 
-        } else {
-            io.emit('update-next-race', nextRaceData)
-        }
+        console.log('Requesting next race status...')
+        io.emit('trigger-get-next-race-status')
     });
 
     socket.on('end-session', () => {
@@ -191,36 +189,6 @@ function changeFlag(flagID) {
     });
 }
 
-async function getNextRace() {
-    try {
-        const racesQuery = `
-        SELECT * FROM races
-        WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
-        ORDER BY DATETIME(date || ' ' || time) ASC
-        LIMIT 2
-        `
-
-        const races = await new Promise((resolve, reject) => {
-            db.all(racesQuery, [], (err, rows) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve(rows)
-                }
-            })
-        })
-
-        if (races.length < 2) {
-            return null
-        }
-
-        return races[1]
-    } catch (err) {
-        console.log('Error fetching races:', err)
-        return null
-    }
-}
-
 async function getDriverDetails(raceId) {
     const query = `
     SELECT 
@@ -244,4 +212,9 @@ async function getDriverDetails(raceId) {
     } catch (err) {
         console.log('Error fetching driver details:', err)
     }
+}
+
+module.exports = {
+    raceControl,
+    getDriverDetails,
 }

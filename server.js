@@ -4,7 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 const dotenv = require('dotenv');
 const db = require('./config/db');
-    // const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
+// const driverRoutes = require('./src/routes/driverRoutes'); // Import driver routes
 const carRoutes = require('./src/routes/carRoutes'); // Import car routes
 const raceRoutes = require('./src/routes/raceRoutes');
 dotenv.config();
@@ -14,10 +14,11 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 
-const raceControl = require('./src/js/race-control'); // Import race control
+const { raceControl } = require('./src/js/race-control'); // Import race control
 const frontDesk = require('./src/js/front-desk'); // Import front desk
 const lapLineTracker = require('./src/ws/socket.js'); // Import lap line tracker
 const raceFlags = require('./src/js/race-flags')
+const nextRace = require('./src/js/next-race')
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -98,6 +99,9 @@ io.on('connection', (socket) => {
         if (page === 'race-flags') {
             raceFlags(io, socket)
             console.log('Connected to race flags')
+        } else if (page === 'next-race') {
+            nextRace(io, socket)
+            console.log('Connected to next race')
         }
     })
 });
