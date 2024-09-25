@@ -7,10 +7,9 @@ let remainingRaceTime = 0;
 
 function startTimer(io, raceDurationMs) {
     if (raceInProgress) {
-        console.log("No no no, it already started!");
+        console.log("Race already started!");
         return;
     }
-
     console.log("The race duration is:" + raceDurationMs);
     let remainingRaceTime = raceDurationMs;
     const startTime = Date.now();
@@ -19,7 +18,6 @@ function startTimer(io, raceDurationMs) {
         if (racePaused) return; // might not be needed!
         const elapsedTime = Date.now() - startTime - pauseDuration;
         remainingRaceTime = raceDurationMs - elapsedTime;
-
         if (remainingRaceTime <= 0) {
             remainingRaceTime = 0;
             clearInterval(timerInterval);
@@ -62,6 +60,7 @@ function updateTime(remainingRaceTime) {
     return remainingRaceTime;
 }
 
+
 function displayMinutesAndSeconds(remainingRaceTime) {
     const totalSeconds = Math.floor(remainingRaceTime / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -74,5 +73,6 @@ module.exports = {
     stopTimer,
     updateTime,
     resumeTimer,
-    pauseTimer
+    pauseTimer,
+    displayMinutesAndSeconds
 };

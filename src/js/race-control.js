@@ -83,6 +83,7 @@ module.exports = (io, socket) => {
         }
     });
 
+    //TODO: add the start timer.
     socket.on('start-race', () => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
@@ -110,15 +111,18 @@ module.exports = (io, socket) => {
         io.emit('race-mode', mode);
         switch (mode) {
             case 'Safe':
+                //TODO: add the un-pause
                 changeFlag(1);
                 io.emit('race-flags-update', 1);
                 break;
             case 'Hazard':
+                //TODO: add the pause
                 changeFlag(5);
                 io.emit('race-flags-update', 5);
                 break;
             case 'Danger':
                 changeFlag(2);
+                //TODO: add the pause
                 io.emit('race-flags-update', 2);
                 break;
             default:
@@ -132,7 +136,7 @@ module.exports = (io, socket) => {
             io.emit('race-flags-update', currentRace.flag);
         }
     });
-
+    //TODO: add the stop timer
     socket.on('end-race', () => {
         console.log('Race ended');
         io.emit('race-status', 'Race ended');

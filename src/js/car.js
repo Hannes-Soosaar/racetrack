@@ -26,7 +26,22 @@ function getCarById(carId){
     });
 }
 
+
+function getCarsByRaceId(RaceId){
+    db.get("SELECT * FROM cars WHERE  RaceId=?", RaceId, (err, row) => {
+        if (err) {
+            console.log(`Somethings up with the db or query`)
+        } else {
+            console.log('The result is' + row)
+            const car = new Car(row);
+            return car;
+        }
+    });
+}
+
 function setCarLapNumber(carId){
+
+
 
 }
 

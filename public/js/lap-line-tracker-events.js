@@ -9,29 +9,32 @@ const messageContainer = document.getElementById('peak');
 document.querySelectorAll('.button').forEach(button => {
     button.addEventListener('click', function () {
         const buttonValue = this.value;
+
+        socket.emit(`set-lap`, buttonValue);
+
         console.log('buttonValue' + buttonValue);
         // TEMP logic for quick testing
-        if (buttonValue === "1") {
-            console.log("start-timer");
-            socket.emit('start-timer', "lap-line-tracker")
-        } else if (buttonValue === "2") {
-            console.log("pause-timer");
-            socket.emit('pause-timer', "lap-line-tracker")
-        } else if (buttonValue === "3") {
-            console.log("resume-timer");
-            socket.emit('resume-timer', "lap-line-tracker")
-        } else if (buttonValue === "4") {
-            console.log("stop-timer");
-            socket.emit('stop-timer', "lap-line-tracker")
-        } else if (buttonValue === "5") {
-            console.log("update the time");
-            socket.emit('update-time', "lap-line-tracker")
-        }
-        else {
-            socket.emit('lets-peak', buttonValue)
-            sendMessageFromValue(buttonValue);
-            displayMessage(buttonValue);
-        }
+        // if (buttonValue === "1") {
+        //     console.log("start-timer");
+        //     socket.emit('start-timer', "lap-line-tracker")
+        // } else if (buttonValue === "2") {
+        //     console.log("pause-timer");
+        //     socket.emit('pause-timer', "lap-line-tracker")
+        // } else if (buttonValue === "3") {
+        //     console.log("resume-timer");
+        //     socket.emit('resume-timer', "lap-line-tracker")
+        // } else if (buttonValue === "4") {
+        //     console.log("stop-timer");
+        //     socket.emit('stop-timer', "lap-line-tracker")
+        // } else if (buttonValue === "5") {
+        //     console.log("update the time");
+        //     socket.emit('update-time', "lap-line-tracker")
+        // }
+        // else {
+        //     socket.emit('lets-peak', buttonValue)
+        //     sendMessageFromValue(buttonValue);
+        //     displayMessage(buttonValue);
+        // }
     });
 });
 
@@ -44,6 +47,7 @@ accessForm.addEventListener('submit', function (event) {
 });
 
 // SOCKETS
+
 socket.on('connect', () => {
     console.log('Connected to WebSocket server'); // reaches and works
 });
