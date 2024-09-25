@@ -9,12 +9,10 @@ const messageContainer = document.getElementById('peak');
 document.querySelectorAll('.button').forEach(button => {
     button.addEventListener('click', function () {
         const buttonValue = this.value;
-
         socket.emit(`set-lap`, buttonValue);
-
         console.log('buttonValue' + buttonValue);
 
-        
+
         // TEMP logic for quick testing
         // if (buttonValue === "1") {
         //     console.log("start-timer");

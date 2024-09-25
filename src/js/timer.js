@@ -15,7 +15,7 @@ function startTimer(io, raceDurationMs) {
     const startTime = Date.now();
     raceInProgress = true;
     timerInterval = setInterval(() => {
-        if (racePaused) return; // might not be needed!
+        if (racePaused) return; 
         const elapsedTime = Date.now() - startTime - pauseDuration;
         remainingRaceTime = raceDurationMs - elapsedTime;
         if (remainingRaceTime <= 0) {
@@ -59,7 +59,6 @@ function getUpdateTimerValue() {
     console.log("there are ms left in the race", remainingRaceTime)
     return remainingRaceTime;
 }
-
 
 function displayMinutesAndSeconds(remainingRaceTime) {
     const totalSeconds = Math.floor(remainingRaceTime / 1000);

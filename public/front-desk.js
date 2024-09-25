@@ -38,7 +38,7 @@ raceForm.addEventListener('submit', function(event) {
     const date = dateInput.value;
     const time = timeInput.value;
     const status = 'upcoming';  // Assuming default status for a new race
-
+    //! NOT WS
     const method = id ? 'PUT' : 'POST';  
     const url = id ? `/api/races/${id}` : `/api/races`;
     const data = { session_name, date, time, status };
@@ -86,7 +86,7 @@ function loadAvailableCars(raceId) {
         console.error('No race ID provided to load cars.');
         return;
     }
-
+    //! NOT WS
     // Adding timestamp to the fetch URL to prevent caching
     fetch(`/api/races/${raceId}/cars?timestamp=${new Date().getTime()}`)
         .then(response => response.json())
@@ -127,12 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Load races and create their forms dynamically
 function loadRaces() {
+    //! NOT WS
     fetch('/api/races')
         .then(response => response.json())
         .then(races => {
             const raceList = document.getElementById('race-list');
             raceList.innerHTML = '';  // Clear existing races
-
             races.forEach(race => {
                 const raceItem = document.createElement('div');
                 raceItem.innerHTML = `
@@ -167,6 +167,7 @@ function loadRaces() {
 
 // Fetch drivers for a specific race and display them
 function loadDriversForRace(raceId) {
+    //! NOT WS
     fetch(`/api/races/${raceId}/drivers`)
         .then(response => response.json())
         .then(drivers => {
@@ -212,7 +213,7 @@ function addDriverToRace(event, raceId) {
     }
 
     const data = { firstName, lastName, carNumber };
-
+    //! NOT WS
     fetch(`/api/races/${raceId}/drivers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -257,7 +258,7 @@ function deleteRace(raceId) {
     if (!confirm('Are you sure you want to delete this race?')) {
         return;
     }
-
+    //! NOT WS
     fetch(`/api/races/${raceId}`, {
         method: 'DELETE',
     })
@@ -271,8 +272,9 @@ function deleteRace(raceId) {
         console.error(`Error deleting race ${raceId}:`, error);
     });
 }
-
 function editRace(raceId) {
+
+    //! NOT WS
     fetch(`/api/races/${raceId}`)
     .then(response => response.json())
     .then(race => {
@@ -297,7 +299,7 @@ function deleteDriver(raceId, driverId) {
     if (!confirm('Are you sure you want to delete this driver from the race?')) {
         return;
     }
-
+    //! NOT WS
     fetch(`/api/races/${raceId}/drivers/${driverId}`, {
         method: 'DELETE',
     })
