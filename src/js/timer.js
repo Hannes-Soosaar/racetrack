@@ -26,7 +26,7 @@ function startTimer(io, raceDurationMs) {
         raceTimeElapse = displayMinutesAndSeconds(remainingRaceTime);
         io.emit('time-update', raceTimeElapse);
         console.log("the value" + raceTimeElapse)
-        updateTime(remainingRaceTime);
+        getUpdateTimerValue(remainingRaceTime);
     }, 100);
 }
 
@@ -55,7 +55,7 @@ function stopTimer() {
     console.log("Race ended")
 }
 
-function updateTime(remainingRaceTime) {
+function getUpdateTimerValue() {
     console.log("there are ms left in the race", remainingRaceTime)
     return remainingRaceTime;
 }
@@ -71,7 +71,7 @@ function displayMinutesAndSeconds(remainingRaceTime) {
 module.exports = {
     startTimer,
     stopTimer,
-    updateTime,
+    updateTime: getUpdateTimerValue,
     resumeTimer,
     pauseTimer,
     displayMinutesAndSeconds

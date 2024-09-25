@@ -13,6 +13,8 @@ document.querySelectorAll('.button').forEach(button => {
         socket.emit(`set-lap`, buttonValue);
 
         console.log('buttonValue' + buttonValue);
+
+        
         // TEMP logic for quick testing
         // if (buttonValue === "1") {
         //     console.log("start-timer");
