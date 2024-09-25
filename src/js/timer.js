@@ -5,8 +5,6 @@ let pauseDuration = 0;
 let pauseStart = 0;
 let remainingRaceTime = 0;
 
-
-// Bug we can hit start more than once.
 function startTimer(io, raceDurationMs) {
     if (raceInProgress) {
         console.log("No no no, it already started!");
@@ -27,14 +25,13 @@ function startTimer(io, raceDurationMs) {
             clearInterval(timerInterval);
             raceInProgress = false;
         }
-        io.emit('time-update', remainingRaceTime);
-        console.log("the value" + remainingRaceTime)
+        raceTimeElapse = displayMinutesAndSeconds(remainingRaceTime);
+        io.emit('time-update', raceTimeElapse);
+        console.log("the value" + raceTimeElapse)
         updateTime(remainingRaceTime);
     }, 100);
 }
 
-
-// Does not start the pause for the race time
 function pauseTimer() {
     if (raceInProgress && !racePaused) {
         racePaused = true;
@@ -42,8 +39,6 @@ function pauseTimer() {
         pauseStart = Date.now();
     }
 }
-
-
 function resumeTimer() {
     if (raceInProgress && racePaused) {
         racePaused = false;
@@ -52,8 +47,6 @@ function resumeTimer() {
     }
 }
 
-
-// Clears global variable.
 function stopTimer() {
     clearInterval(timerInterval);
     raceInProgress = false;
@@ -67,6 +60,13 @@ function stopTimer() {
 function updateTime(remainingRaceTime) {
     console.log("there are ms left in the race", remainingRaceTime)
     return remainingRaceTime;
+}
+
+function displayMinutesAndSeconds(remainingRaceTime) {
+    const totalSeconds = Math.floor(remainingRaceTime / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds}`;
 }
 
 module.exports = {

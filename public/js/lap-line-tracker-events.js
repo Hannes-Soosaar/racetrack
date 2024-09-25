@@ -44,7 +44,6 @@ accessForm.addEventListener('submit', function (event) {
 });
 
 // SOCKETS
-
 socket.on('connect', () => {
     console.log('Connected to WebSocket server'); // reaches and works
 });
@@ -81,5 +80,5 @@ function sendMessageFromValue(value) {
 }
 
 function displayMessage(value) {
-    messageContainer.innerHTML += `<p>${value}</p>`;
+    messageContainer.innerHTML = `<p>${value}</p>`;
 }
