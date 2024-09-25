@@ -17,6 +17,15 @@ module.exports = (io, socket) => {
         console.log("passed in value" + value); // works 
     });
 
+    socket.on('set-lap', (value) => {
+        console.log('setting lapp for car number' + value);
+        // Get the CarNumber
+        // Get the active Race
+        // update the lap Time 
+        // update the Time when the lap was completed
+        // update the leader board
+    });
+
     socket.onclose = () => {
         displayMessage('Disconnected from the server. from the WS folder');
     };
