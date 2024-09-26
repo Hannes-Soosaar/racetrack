@@ -43,7 +43,7 @@ const raceControl = (io, socket) => {
                                 const raceId = currentRace.id
                                 const driverInfo = await getDriverDetails(raceId)
                                 io.emit('display-race', driverInfo)
-                                io.emit('set-up-race',raceId)   //! HS added
+                                io.emit('set-up-race', raceId)   //! HS added
                             } catch (err) {
                                 console.log('Error:', err)
                             }
@@ -110,18 +110,18 @@ const raceControl = (io, socket) => {
     });
 
     // Handle changing race mode 
-  
+
     socket.on('change-mode', (mode) => {
         console.log(`Race mode changed to ${mode}`);
         io.emit('race-mode', mode);
         switch (mode) {
-            case 'Safe':   
+            case 'Safe':
                 changeFlag(status.SAFE);
                 io.emit('race-flags-update', status.SAFE);
                 io.emit('resume-timer');
                 break;
             case 'Hazard':
-                
+
                 changeFlag(status.HAZARD);
                 io.emit('race-flags-update', status.HAZARD);
                 io.emit('pause-timer');
@@ -229,4 +229,5 @@ async function getDriverDetails(raceId) {
 module.exports = {
     raceControl,
     getDriverDetails,
+    dbGet,
 }
