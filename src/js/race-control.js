@@ -1,12 +1,16 @@
 const db = require('../../config/db.js');
 const Race = require('../models/race.js');
+const status = require('../config/const.js')
 let currentRace = null;
+
+
 
 const raceControl = (io, socket) => {
     console.log('Setting up race control');
     currentRace = null
     // Handle starting the race
     socket.on('start-session', async () => {
+        // ? I suppose this is where we delete the races.
         if (currentRace != null) {
             try {
                 const raceRow = await dbGet(`SELECT * FROM races WHERE id = ?`, [currentRace.id]);
@@ -39,6 +43,7 @@ const raceControl = (io, socket) => {
                                 const raceId = currentRace.id
                                 const driverInfo = await getDriverDetails(raceId)
                                 io.emit('display-race', driverInfo)
+                                io.emit('set-up-race',raceId)   //! HS added
                             } catch (err) {
                                 console.log('Error:', err)
                             }
@@ -65,6 +70,7 @@ const raceControl = (io, socket) => {
                     (async () => {
                         try {
                             const raceId = currentRace.id
+                            io.emit('set-up-race', raceId);
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
                         } catch (err) {
@@ -82,6 +88,7 @@ const raceControl = (io, socket) => {
     });
 
     socket.on('start-race', async () => {
+        io.emit('start-timer'); // HS added timer
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
 
@@ -102,25 +109,27 @@ const raceControl = (io, socket) => {
         io.emit('race-status', 'Session ended');
     });
 
-    // Handle changing race mode
+    // Handle changing race mode 
+  
     socket.on('change-mode', (mode) => {
         console.log(`Race mode changed to ${mode}`);
         io.emit('race-mode', mode);
         switch (mode) {
-            case 'Safe':
-                //TODO: add the un-pause
-                changeFlag(1);
-                io.emit('race-flags-update', 1);
+            case 'Safe':   
+                changeFlag(status.SAFE);
+                io.emit('race-flags-update', status.SAFE);
+                io.emit('resume-timer');
                 break;
             case 'Hazard':
-                //TODO: add the pause
-                changeFlag(5);
-                io.emit('race-flags-update', 5);
+                
+                changeFlag(status.HAZARD);
+                io.emit('race-flags-update', status.HAZARD);
+                io.emit('pause-timer');
                 break;
             case 'Danger':
-                changeFlag(2);
-                //TODO: add the pause
-                io.emit('race-flags-update', 2);
+                changeFlag(status.DANGER);
+                io.emit('pause-timer');
+                io.emit('race-flags-update', status.DANGER);
                 break;
             default:
                 changeFlag(null);
@@ -133,13 +142,13 @@ const raceControl = (io, socket) => {
             io.emit('race-flags-update', currentRace.flag);
         }
     });
-    //TODO: add the stop timer
     socket.on('end-race', () => {
         console.log('Race ended');
         io.emit('race-status', 'Race ended');
         io.emit('race-mode', 'Finished');
-        changeFlag(3);
-        io.emit('race-flags-update', 3);
+        changeFlag(status.FINISHED);
+        io.emit('race-flags-update', status.FINISHED);
+        io.emit('stop-timer');
     });
 
     socket.on('disconnect', () => {

@@ -1,30 +1,36 @@
-const data = require('../config/const');
+const status = require('../config/const');
 const time = require('../js/timer.js');
 
 
 module.exports = (io, socket) => {
     console.log("Client connected!");
-
     socket.on('start-session', () => {
         io.emit('peak', "Text to display");
-
     });
 
-    // Trigger is FE lap line tracker.
+    // Trigger is FE lap line tracker. change value to something with more meaning.
     socket.on('lets-peak', (value) => {
         console.log("made it to the backend!" + value)
         io.emit('peak', " you sent the :" + value)
         console.log("passed in value" + value); // works 
     });
 
-    socket.on('set-lap', (value) => {
-        console.log('setting lapp for car number' + value);
+
+
+    socket.on('set-up-race', (raceId) => {
+        console.log("you want to start the race", raceId);
+        //TODO
+    });
+
+    socket.on('set-lap', (carNumber) => {
+        console.log('setting lapp for car number' + carNumber);
         // Get the CarNumber
         // Get the active Race
         // update the lap Time 
         // update the Time when the lap was completed
         // update the leader board
     });
+
 
     socket.onclose = () => {
         displayMessage('Disconnected from the server. from the WS folder');
@@ -37,8 +43,8 @@ module.exports = (io, socket) => {
     socket.on('start-timer', () => {
         console.log("Start-timer");
         io.emit('peak', "Race started");
-        console.log(data.RACE_DURATION);
-        time.startTimer(io, data.RACE_DURATION);
+        console.log(status.RACE_DURATION);
+        time.startTimer(io, status.RACE_DURATION);
     });
 
     socket.on('pause-timer', () => {

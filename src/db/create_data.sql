@@ -21,4 +21,5 @@ INSERT INTO cars (driver_id,race_id,name, number,race_lap,current_lap_time,best_
 (8,1,'eight',8,0,0,0,0,8);
 
 INSERT INTO races (session_name,date,time,status) VALUES
-('test1','today',6000,'active');
+('test1','2024-10-02',21:16,'active'),
+('test1','2024-10-02',22:16,'active');
