@@ -24,6 +24,7 @@ function startTimer(io, raceDurationMs) {
             raceInProgress = false;
         }
         raceTimeElapse = displayMinutesAndSeconds(remainingRaceTime);
+        console.log("before the emit",raceTimeElapse);
         io.emit('time-update', raceTimeElapse);
         getUpdateTimerValue(remainingRaceTime);
     }, 100);

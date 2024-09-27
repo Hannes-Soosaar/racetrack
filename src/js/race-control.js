@@ -43,7 +43,7 @@ const raceControl = (io, socket) => {
                                 const raceId = currentRace.id
                                 const driverInfo = await getDriverDetails(raceId)
                                 io.emit('display-race', driverInfo)
-                                io.emit('set-up-race', raceId)   //! HS added
+                                io.emit('set-raceId', raceId)   //! HS added
                             } catch (err) {
                                 console.log('Error:', err)
                             }
@@ -70,7 +70,7 @@ const raceControl = (io, socket) => {
                     (async () => {
                         try {
                             const raceId = currentRace.id
-                            io.emit('set-up-race', raceId);
+                            io.emit('set-raceId', raceId);
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
                         } catch (err) {
@@ -88,7 +88,6 @@ const raceControl = (io, socket) => {
     });
 
     socket.on('start-race', async () => {
-        io.emit('start-timer'); // HS added timer
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
 

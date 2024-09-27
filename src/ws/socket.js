@@ -7,24 +7,21 @@ module.exports = (io, socket) => {
     socket.on('start-session', () => {
         io.emit('peak', "Text to display");
     });
-
-    // Trigger is FE lap line tracker. change value to something with more meaning.
-    socket.on('lets-peak', (value) => {
-        console.log("made it to the backend!" + value)
-        io.emit('peak', " you sent the :" + value)
-        console.log("passed in value" + value); // works 
-    });
-
-
+//! Delete this 
+    // socket.on('lets-peak', (value) => {
+    //     console.log("made it to the backend!" + value)
+    //     io.emit('peak', " you sent the :" + value)
+    //     console.log("passed in value" + value); // works 
+    // });
 
     socket.on('set-up-race', (raceId) => {
         console.log("you want to start the race", raceId);
         //TODO
     });
-
+//TODO: entry point for
     socket.on('set-lap', (carNumber) => {
         console.log('setting lapp for car number' + carNumber);
-        // Get the CarNumber
+         socket.emit('get-race-id');   // Get the CarNumber
         // Get the active Race
         // update the lap Time 
         // update the Time when the lap was completed
