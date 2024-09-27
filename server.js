@@ -67,6 +67,10 @@ app.get('/race-flags', (req, res) => {
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
+
+    lapLineTracker(io, socket); //! it needs to linked before you can start giving commands
+    //TODO: connect the other backend pages  to the server that do not require authentication.
+
     console.log("New client connected again:", socket.id);     // ADDEd for debug
     // Handle key validation
     socket.on('validate-key', ({ key, role }) => {

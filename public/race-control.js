@@ -49,35 +49,46 @@ socket.on('display-race', (driverInfo) => {
 
 newSessionButton.addEventListener('click', () => {
     socket.emit('start-session');
+    // socket.emit('get-race-id');
+});
+
+// reply to get-race-id
+socket.on('set-race-id', (raceId) => {
+    // socket.emit('race-id', raceId);
 });
 
 startRaceButton.addEventListener('click', () => {
     console.log('Start Race button clicked');
     socket.emit('start-race');
+    socket.emit('start-timer',"stuff");
 });
 
 modeSafeButton.addEventListener('click', () => {
     raceModeDisplay.textContent = 'Safe'
     console.log('Race mode: Safe');
-    socket.emit('change-mode', 'Safe')
+    socket.emit('change-mode', 'Safe');
+    socket.emit('resume-timer');
 })
 
 modeHazardButton.addEventListener('click', () => {
     raceModeDisplay.textContent = 'Hazard'
     console.log('Race mode: Hazard');
-    socket.emit('change-mode', 'Hazard')
+    socket.emit('change-mode', 'Hazard');
+    socket.emit('pause-timer');
 })
 
 modeDangerButton.addEventListener('click', () => {
     raceModeDisplay.textContent = 'Danger'
     console.log('Race mode: Danger');
-    socket.emit('change-mode', 'Danger')
+    socket.emit('change-mode', 'Danger');
+    socket.emit('pause-timer');
 })
 
 endRaceButton.addEventListener('click', () => {
     raceModeDisplay.textContent = 'Finish'
     console.log('End Race button clicked');
     socket.emit('end-race');
+    socket.emit('stop-timer');
 });
 
 finishSessionButton.addEventListener('click', () => {
@@ -108,6 +119,8 @@ socket.on('race-status', (status) => {
         enableButtons()
     }
 });
+
+
 
 function disableButtons() {
     document.getElementById('mode-safe').disabled = true
