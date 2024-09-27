@@ -51,7 +51,6 @@ newSessionButton.addEventListener('click', () => {
     socket.emit('start-session');
 });
 
-// Start race
 startRaceButton.addEventListener('click', () => {
     console.log('Start Race button clicked');
     socket.emit('start-race');
@@ -75,7 +74,6 @@ modeDangerButton.addEventListener('click', () => {
     socket.emit('change-mode', 'Danger')
 })
 
-// End race
 endRaceButton.addEventListener('click', () => {
     raceModeDisplay.textContent = 'Finish'
     console.log('End Race button clicked');
@@ -88,7 +86,6 @@ finishSessionButton.addEventListener('click', () => {
 
 socket.on('race-status', (status) => {
     console.log('Received race status:', status);
-    // Update the UI with the new race status
     document.getElementById('race-status-display').innerText = status;
     if (status === 'No upcoming race found') {
         contentDiv.style.display = 'none'
