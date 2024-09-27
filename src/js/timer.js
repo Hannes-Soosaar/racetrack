@@ -25,7 +25,6 @@ function startTimer(io, raceDurationMs) {
         }
         raceTimeElapse = displayMinutesAndSeconds(remainingRaceTime);
         io.emit('time-update', raceTimeElapse);
-        console.log("the value" + raceTimeElapse)
         getUpdateTimerValue(remainingRaceTime);
     }, 100);
 }
