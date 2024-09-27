@@ -17,19 +17,15 @@ const raceControl = (io, socket) => {
 
                 if (raceRow) {
                     await dbRun(`DELETE FROM races WHERE id = ?`, [currentRace.id]);
-
                     const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
                     const driverIds = driverRows.map(row => row.driver_id);
-
                     await dbRun(`DELETE FROM cars WHERE race_id = ?`, [currentRace.id]);
                     await dbRun(`DELETE FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
-
                     if (driverIds.length > 0) {
                         const deleteDriversQuery = `
                             DELETE FROM drivers WHERE id IN (${driverIds.map(() => '?').join(', ')})`;
                         await dbRun(deleteDriversQuery, driverIds);
                     }
-
                     const nextRaceRow = await dbGet(`
                         SELECT * FROM races
                         WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
