@@ -1,3 +1,5 @@
+//TODO: Given the new update to the DB this probably will not get any use.
+
 const Race = require("../models/race");
 const status = require("../config/const");
 const Car = require("../models/car");

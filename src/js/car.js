@@ -5,6 +5,7 @@ const Car = require("../models/car");
 const Driver = require("../models/driver");
 const status = require("../config/const"); //TODO Rename all constant exports to status 
 const { getCarsForRace } = require("../../controllers/carController");
+const db = require("../../config/db.js");
 let cars = null;
 let carIDs = null;
 
@@ -47,7 +48,6 @@ async function setCarLapNumber(byCarNumber) {
         console.error("there is no race")
     }
     let racingCarId = cars[byCarNumber]
-
     try {
 
     } catch {

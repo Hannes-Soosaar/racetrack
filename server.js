@@ -68,7 +68,10 @@ app.get('/race-flags', (req, res) => {
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
 
+    // Will start all pages.
     lapLineTracker(io, socket); //! it needs to linked before you can start giving commands
+    raceControl(io, socket);
+    frontDesk(io, socket);
     //TODO: connect the other backend pages  to the server that do not require authentication.
 
     console.log("New client connected again:", socket.id);     // ADDEd for debug
@@ -76,7 +79,7 @@ io.on('connection', (socket) => {
     socket.on('validate-key', ({ key, role }) => {
         let validKey = false;
         if (role === 'receptionist' && key === process.env.RECEPTIONIST_KEY) {
-            validKey = true;
+            validKey = true; // should be able to just pass around
         } else if (role === 'safety' && key === process.env.SAFETY_KEY) {
             validKey = true;
         } else if (role === 'observer' && key === process.env.OBSERVER_KEY) {
@@ -84,7 +87,8 @@ io.on('connection', (socket) => {
         }
         console.log(`Key validation result: ${validKey}`);
         socket.emit('key-validation', { success: validKey });
-
+        
+        // Will toggle functionality
         if (validKey) {
             if (role === 'receptionist') {
                 frontDesk(io, socket)

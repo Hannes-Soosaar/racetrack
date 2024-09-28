@@ -1,4 +1,6 @@
 
+There is an issue with having to have a connection open to get the 
+
 
 1) Data structure. DB and structure -  Task 1 - Hannes
 

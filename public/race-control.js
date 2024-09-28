@@ -37,9 +37,7 @@ socket.on('key-validation', function (response) {
 socket.on('display-race', (driverInfo) => {
     contentDiv.style.display = 'block'
     newSessionDiv.style.display = 'none'
-
     raceInformationDiv.innerHTML = '';
-
     driverInfo.forEach(driver => {
         const paragraph = document.createElement('p');
         paragraph.textContent = `Driver: ${driver.driver_name}, Car Number: ${driver.car_number}`;
@@ -49,18 +47,12 @@ socket.on('display-race', (driverInfo) => {
 
 newSessionButton.addEventListener('click', () => {
     socket.emit('start-session');
-    // socket.emit('get-race-id');
-});
-
-// reply to get-race-id
-socket.on('set-race-id', (raceId) => {
-    // socket.emit('race-id', raceId);
 });
 
 startRaceButton.addEventListener('click', () => {
     console.log('Start Race button clicked');
     socket.emit('start-race');
-    socket.emit('start-timer',"stuff");
+    socket.emit('start-timer');
 });
 
 modeSafeButton.addEventListener('click', () => {
@@ -119,8 +111,6 @@ socket.on('race-status', (status) => {
         enableButtons()
     }
 });
-
-
 
 function disableButtons() {
     document.getElementById('mode-safe').disabled = true

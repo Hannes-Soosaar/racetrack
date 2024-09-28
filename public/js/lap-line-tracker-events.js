@@ -6,20 +6,19 @@ const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
 const messageContainer = document.getElementById('peak');
 const IdContainer = document.getElementById('raceId');
-let raceID;
+let raceID = null;
 
 
 document.querySelectorAll('.button').forEach(button => {
     button.addEventListener('click', function () {
-        const buttonValue = this.value;
-        socket.emit('set-lap', buttonValue);
-        console.log('buttonValue' + buttonValue);
+        const buttonValue = parseInt(this.value);
+        let raceIdCarNumber = [raceID, buttonValue];
+        socket.emit('set-lap', raceIdCarNumber);
     });
 });
 
-
+//OK
 accessForm.addEventListener('submit', function (event) {
-    console.log("made it to validation")
     event.preventDefault();
     const accessKey = accessKeyInput.value;
     socket.emit('validate-key', { key: accessKey, role: 'observer' });
@@ -29,6 +28,10 @@ accessForm.addEventListener('submit', function (event) {
 
 socket.on('connect', () => {
     console.log('Connected to WebSocket server lap-line-tracker'); // reaches and works
+    if (raceID === null) {
+        console.log("logic passed!")
+        socket.emit('get-raceId');
+    };
 });
 
 socket.on('time-update', (timeElapsed) => {
@@ -37,14 +40,16 @@ socket.on('time-update', (timeElapsed) => {
 
 
 //TODO: might want to redo this
-socket.on('set-raceId', (raceId) =>{
+socket.on('set-raceId', (raceId) => {
     raceID = raceId;
-    socket.emit('raceId-set',raceID)
+    socket.emit('raceId-set', raceID)
     displayRaceId(raceID);
 });
 
-socket.on('stop-timer',()=> {
-raceID = null;
+
+// When the race finishes it sends out null
+socket.on('stop-timer', () => {
+    raceID = null;
 });
 
 socket.on('key-validation', function (response) {

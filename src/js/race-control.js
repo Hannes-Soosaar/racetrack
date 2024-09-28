@@ -2,8 +2,8 @@ const db = require('../../config/db.js');
 const Race = require('../models/race.js');
 const status = require('../config/const.js')
 let currentRace = null;
-
-
+let raceID = null;
+// The order of the races that will be taken is the the earliest first that is not in the past.
 
 const raceControl = (io, socket) => {
     console.log('Setting up race control');
@@ -14,7 +14,6 @@ const raceControl = (io, socket) => {
         if (currentRace != null) {
             try {
                 const raceRow = await dbGet(`SELECT * FROM races WHERE id = ?`, [currentRace.id]);
-
                 if (raceRow) {
                     await dbRun(`DELETE FROM races WHERE id = ?`, [currentRace.id]);
                     const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
@@ -31,15 +30,15 @@ const raceControl = (io, socket) => {
                         WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
                         ORDER BY DATETIME(date || ' ' || time) ASC
                         LIMIT 1`);
-
                     if (nextRaceRow) {
                         currentRace = new Race(nextRaceRow);
                         (async () => {
                             try {
                                 const raceId = currentRace.id
+                                raceID = raceId;
                                 const driverInfo = await getDriverDetails(raceId)
                                 io.emit('display-race', driverInfo)
-                                io.emit('set-raceId', raceId)   //! HS added
+                                // io.emit('set-raceId', raceId)   //! this could be handled directly within the backend, but lets do the IO for practice
                             } catch (err) {
                                 console.log('Error:', err)
                             }
@@ -59,14 +58,14 @@ const raceControl = (io, socket) => {
                     WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
-
                 if (nextRaceRow) {
                     console.log('Session found');
                     currentRace = new Race(nextRaceRow);
                     (async () => {
                         try {
                             const raceId = currentRace.id
-                            io.emit('set-raceId', raceId);
+                            raceID = currentRace.id;
+                            // io.emit('set-raceId', raceId);
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
                         } catch (err) {
@@ -86,7 +85,7 @@ const raceControl = (io, socket) => {
     socket.on('start-race', async () => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
-
+        io.emit('set-raceId',raceID);
         await new Promise((resolve) => {
             changeFlag(1);
             io.emit('race-flags-update', 1);
@@ -100,6 +99,8 @@ const raceControl = (io, socket) => {
 
     socket.on('end-session', () => {
         changeFlag(2);
+        raceID = null;
+        io.emit('set-raceId', raceID);
         io.emit('race-flags-update', 2);
         io.emit('race-status', 'Session ended');
     });
@@ -131,6 +132,10 @@ const raceControl = (io, socket) => {
         }
     });
 
+    socket.on('get-raceId', () => {
+        socket.emit('set-raceId', (raceID))
+    });
+
     socket.on('request-flags-update', () => {
         console.log('Request for flags update received');
         if (currentRace) {
@@ -141,14 +146,20 @@ const raceControl = (io, socket) => {
         console.log('Race ended');
         io.emit('race-status', 'Race ended');
         io.emit('race-mode', 'Finished');
+        raceID = null;
+        io.emit('set-raceId', raceID);
         changeFlag(status.FINISHED);
         io.emit('race-flags-update', status.FINISHED);
         io.emit('stop-timer');
     });
 
+
     socket.on('disconnect', () => {
         console.log('Client disconnected from race control');
     });
+
+
+
 };
 
 async function dbGet(query, params) {
@@ -173,7 +184,7 @@ async function dbAll(query, params) {
             }
         });
     });
-}
+};
 
 async function dbRun(query, params) {
     return new Promise((resolve, reject) => {
@@ -185,7 +196,7 @@ async function dbRun(query, params) {
             }
         });
     });
-}
+};
 
 function changeFlag(flagID) {
     const sql = `UPDATE races SET status = ? WHERE id = ?`;
