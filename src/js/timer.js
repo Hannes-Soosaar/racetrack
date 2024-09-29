@@ -4,7 +4,7 @@ let raceInProgress = false;
 let pauseDuration = 0;
 let pauseStart = 0;
 let remainingRaceTime = 0;
-
+let startTime=0;
 function startTimer(io, raceDurationMs) {
     if (raceInProgress) {
         console.log("Race already started!");
@@ -12,7 +12,7 @@ function startTimer(io, raceDurationMs) {
     }
     console.log("The race duration is:" + raceDurationMs);
     let remainingRaceTime = raceDurationMs;
-    const startTime = Date.now();
+    startTime = Date.now();
     raceInProgress = true;
     timerInterval = setInterval(() => {
         if (racePaused) return; 
@@ -51,6 +51,7 @@ function stopTimer() {
     pauseDuration = 0;
     pauseStart = 0;
     remainingRaceTime = 0;
+    startTime=0;
     console.log("Race ended")
 }
 
@@ -58,7 +59,7 @@ function getUpdateTimerValue() {
     return remainingRaceTime;
 }
 
-function getRaceStartTime(startTime){
+function getRaceStartTime(){
     return startTime;
 }
 

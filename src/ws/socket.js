@@ -4,7 +4,7 @@ const lineTracker = require("../js/lap-line-tracker.js");
 const car = require("../js/car.js");
 
 module.exports = (io, socket) => {
-    
+
     console.log("Sever extended to socket.js");
     socket.on('start-session', () => {
         io.emit('peak', "Text to display");
@@ -58,6 +58,8 @@ module.exports = (io, socket) => {
         } catch (error) {
             console.log("error during set-lap event", errror);
         }
+        car.setLapTime(carIds[carNumber]);
+
     });
 
 
@@ -68,14 +70,16 @@ module.exports = (io, socket) => {
             raceId = raceIdCarNumber[0];
             carNumber = raceIdCarNumber[1];
             carIds = await car.getCarIdsByRaceId(raceId);
-            console.log("carIds are:", carIds);
             if (carIds) {
-                console.log("the Cars Id in the race are", carIds);
+                console.log("set time for ", carNumber);
+                console.log("set time for ", carIds);
+                console.log("set time for ", carIds[carNumber-1].id);
+                await car.setLapTime(carIds[carNumber-1].id);
             } else {
                 console.log("No cars");
             }
         } catch (error) {
-            console.log("error during set-lap event", errror);
+            console.log("error during set-lap event", error);
         }
     });
 

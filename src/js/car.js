@@ -7,6 +7,7 @@ const status = require("../config/const"); //TODO Rename all constant exports to
 const db = require("../../config/db.js");
 const time = require("../js/timer.js");
 const { QueryTypes } = require("sequelize");
+const { set } = require("express/lib/application.js");
 let carIDs = null;
 
 
@@ -25,78 +26,75 @@ async function getCarsByRaceId(raceId) {
     const cars = carRows.map(row => new Car(row));
     console.log("All Cars int", cars);
     return cars;
-};
-
-// updates the raceTimer and updates the individual timer on the car.
-async function setLapCompleted(byCarNumber) {
-
-    remainingRaceTime = time.G
-    if (carIDs === null) {
-        console.error("there is no race/carId's")
-    }
-    try {
-
-    } catch {
-        console.error("unable to set the");
-    }
-};
+}
 
 // ? Will be using race_elapsed_time temp.
 //! store start time here
 
-async function getPreviousLapTime(carId){
-    const previousLapTime= await dbGet('SELECT race_elapse_time FROM cars WHERE id= ?', carId);
+async function setLapTime(carId) {
+    setLapNumber(carId);
+    console.log("We ar trying to set the lap! for Car id ", carId);
+    let lapTime;
+    const previousLapTime = await getPreviousLapTime(carId);
+    if (previousLapTime === 0) {
+        await setFirstLapStartTime(carId)
+        lapTime = await getCarLapTime(carId);
+    } else {
+        lapTime = await getCarLapTime(carId);
+        await setNewLapStartTime(carId);
+        const query = 'UPDATE cars SET current_lap_time = ? where id= ?'
+        try {
+            await dbRun(query, lapTime, query);
+        } catch {
+            console.log('Error updating current lap time', err);
+        }
+    }
+}
+
+async function getPreviousLapTime(carId) {
+    const previousLapTime = await dbGet('SELECT race_elapse_time FROM cars WHERE id= ?', carId);
     return previousLapTime;
 }
 
-
-async function setLapStartTime(carId){
-    const previousLapTime = await getPreviousLapTime(carId);
-    if ( previousLapTime === 0 ){
-        lapStartTime = time.getRaceStartTime();
-    } else {
-        lapStartTime = Date.now();
-    }
+async function setFirstLapStartTime(carId) {
+    console.log("setFist Lap start Time for", carId );
+    lapStartTime = time.getRaceStartTime();
     const query = 'UPDATE cars SET race_elapse_time = ? where id= ?';
-    try{
+    try {
         await dbRun(query, lapStartTime, carId);
-    } catch (err){
-        console.log('Error updating lap start time',err);
+    } catch (err) {
+        console.log('Error updating lap start time', err);
     }
-    setLapTime(carId);
 }
+
+async function setNewLapStartTime(carId) {
+    lapStartTime = Date.now();
+    console.log("set Lap start Time for", carId);
+    const query = 'UPDATE cars SET race_elapse_time = ? where id= ?';
+    try {
+        await dbRun(query, lapStartTime, carId);
+    } catch (err) {
+        console.log('Error updating lap start time', err);
+    }
+};
 
 //This should be OK
-async function getCarLapTime(carId){
+async function getCarLapTime(carId) {
     const previousLapTime = await getPreviousLapTime(carId);
-    const newLapTime = previousLapTime- Date.now();
+    const newLapTime = previousLapTime - Date.now();
     return newLapTime;
-}
-
-
-async function setLapTime(carId){
-    const lapTime= await getCarLapTime(carId);
-    const query = 'UPDATE cars SET current_lap_time = ? where id= ?'
-    try{
-        await dbRun(query,lapTime, query);
-    }catch{
-        console.log('Error updating current lap time', err);
-    }
-}
-
+};
 
 // This should be OK
-async function setLapNumber(carId){
+async function setLapNumber(carId) {
     const query = 'UPDATE cars SET race_lap = race_lap+1 where id= ?';
-    try{
+    try {
         await dbRun(query, carId);
         console.log("lap number increased for car ID", carId);
-    }catch(err){
+    } catch (err) {
         console.log(' Error updating the lap number');
     }
-}
-    
-
+};
 
 function getCarIdByCarNumber(carNumber) {
     if (carIDs === null) {
@@ -105,11 +103,7 @@ function getCarIdByCarNumber(carNumber) {
     } else {
         return carIDs[carNumber];
     }
-}
-
-async function setBestLap(carId, LapTime) {
-
-}
+};
 
 async function dbGet(query, params) {
     return new Promise((resolve, reject) => {
@@ -121,7 +115,7 @@ async function dbGet(query, params) {
             }
         });
     });
-}
+};
 
 async function dbAll(query, params) {
     return new Promise((resolve, reject) => {
@@ -148,9 +142,8 @@ async function dbRun(query, params) {
 };
 
 
-
-
 module.exports = {
     getCarsByRaceId,
     getCarIdsByRaceId,
+    setLapTime,
 }
