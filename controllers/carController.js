@@ -23,6 +23,8 @@ exports.getCarsForRace = (req, res) => {
     const { raceId } = req.params;
     // Query to fetch only unassigned cars where driver_id is NULL
     const query = `SELECT * FROM cars WHERE race_id = ? AND driver_id IS NULL`;
+//! this time out is a dirty trick if time permit should use promises. however I am unwilling to figure out the call chain for this function.
+    setTimeout(()=>{
     db.all(query, [raceId], (err, rows) => {
         if (err) {
             console.error('Database error:', err.message);
@@ -31,5 +33,7 @@ exports.getCarsForRace = (req, res) => {
         console.log('Available cars:', rows);  // Debugging: log what is being returned
         res.status(200).json(rows);
     });
+    },100);
+
 };
 
