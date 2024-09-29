@@ -13,7 +13,9 @@ document.querySelectorAll('.button').forEach(button => {
     button.addEventListener('click', function () {
         const buttonValue = parseInt(this.value);
         let raceIdCarNumber = [raceID, buttonValue];
-        socket.emit('set-lap', raceIdCarNumber);
+        console.log("this is called twice at the backend!");
+        // socket.emit('set-lap', raceIdCarNumber);
+        socket.emit('set-car-lap', raceIdCarNumber);
     });
 });
 

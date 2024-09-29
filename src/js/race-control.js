@@ -10,13 +10,14 @@ const raceControl = (io, socket) => {
     currentRace = null
     // Handle starting the race
     socket.on('start-session', async () => {
-        // ? I suppose this is where we delete the races.
         if (currentRace != null) {
             try {
                 const raceRow = await dbGet(`SELECT * FROM races WHERE id = ?`, [currentRace.id]);
                 if (raceRow) {
                     await dbRun(`DELETE FROM races WHERE id = ?`, [currentRace.id]);
                     const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
+                    // const racingCarIds = await dbAll(`SELECT id FROM cars WHERE  race_id=?`, [currentRace.id]);
+                    // console.log("the participant carIDs are", racingCarIds);
                     const driverIds = driverRows.map(row => row.driver_id);
                     await dbRun(`DELETE FROM cars WHERE race_id = ?`, [currentRace.id]);
                     await dbRun(`DELETE FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
@@ -68,6 +69,9 @@ const raceControl = (io, socket) => {
                             // io.emit('set-raceId', raceId);
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
+                            // console.log("this is the Current Id ", currentRace.id);
+                            // const racingCarIds = await dbAll(`SELECT id FROM cars WHERE  race_id=?`, [currentRace.id]);
+                            // console.log("the participant carIDs are", racingCarIds);
                         } catch (err) {
                             console.log('Error:', err)
                         }
@@ -88,7 +92,7 @@ const raceControl = (io, socket) => {
         io.emit('set-raceId',raceID);
         await new Promise((resolve) => {
             changeFlag(1);
-            io.emit('race-flags-update', 1);
+            io.emit('race-flags-update', status.SAFE);
             resolve();
         });
 
@@ -117,7 +121,6 @@ const raceControl = (io, socket) => {
                 io.emit('resume-timer');
                 break;
             case 'Hazard':
-
                 changeFlag(status.HAZARD);
                 io.emit('race-flags-update', status.HAZARD);
                 io.emit('pause-timer');
@@ -142,26 +145,25 @@ const raceControl = (io, socket) => {
             io.emit('race-flags-update', currentRace.flag);
         }
     });
+
     socket.on('end-race', () => {
+        raceID = null;
         console.log('Race ended');
         io.emit('race-status', 'Race ended');
         io.emit('race-mode', 'Finished');
-        raceID = null;
-        io.emit('set-raceId', raceID);
         changeFlag(status.FINISHED);
         io.emit('race-flags-update', status.FINISHED);
         io.emit('stop-timer');
+        io.emit('set-raceId', raceID);
     });
-
 
     socket.on('disconnect', () => {
         console.log('Client disconnected from race control');
     });
-
-
-
 };
 
+
+// DB functions!
 async function dbGet(query, params) {
     return new Promise((resolve, reject) => {
         db.get(query, params, (err, row) => {
@@ -201,7 +203,7 @@ async function dbRun(query, params) {
 function changeFlag(flagID) {
     const sql = `UPDATE races SET status = ? WHERE id = ?`;
     db.run(sql, [flagID, currentRace.id], function (err) {
-        if (err) {
+        if (err) {``
             console.log(err.message);
         }
     });
@@ -231,6 +233,8 @@ async function getDriverDetails(raceId) {
         console.log('Error fetching driver details:', err)
     }
 }
+
+
 
 module.exports = {
     raceControl,

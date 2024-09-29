@@ -89,18 +89,18 @@ io.on('connection', (socket) => {
         socket.emit('key-validation', { success: validKey });
         
         // Will toggle functionality
-        if (validKey) {
-            if (role === 'receptionist') {
-                frontDesk(io, socket)
-                console.log("validated as Reception ")
-            } else if (role === 'safety') {
-                raceControl(io, socket)
-                console.log("validated as Safety ")
-            } else if (role === 'observer') {
-                lapLineTracker(io, socket)
-                console.log("validated as observer ")
-            }
-        }
+        // if (validKey) {
+        //     if (role === 'receptionist') {
+        //         // frontDesk(io, socket) 
+        //         console.log("validated as Reception ")
+        //     } else if (role === 'safety') {
+        //         // raceControl(io, socket)
+        //         console.log("validated as Safety ")
+        //     } else if (role === 'observer') {
+        //         // lapLineTracker(io, socket)
+        //         console.log("validated as observer ")
+        //     }
+        // }
     });
 
     socket.on('public-view', (page) => {

@@ -4,7 +4,6 @@
 const Car = require("../models/car");
 const Driver = require("../models/driver");
 const status = require("../config/const"); //TODO Rename all constant exports to status 
-const { getCarsForRace } = require("../../controllers/carController");
 const db = require("../../config/db.js");
 let cars = null;
 let carIDs = null;
@@ -17,34 +16,22 @@ let carIDs = null;
 //TODO: Test the DB connection to create a new Car object.
 
 
-// Takes race object and returns an array with all the cars in the race.
+// // Takes race object and returns an array with all the cars in the race.
 async function getCarIdsByRaceId(raceId) {
-    try {
-        const rows = await db.all("SELECT id FROM cars WHERE  RaceId=?", [raceId]);
-        carIDs = rows.map(row => row.id);
-        return carIDs;
-    } catch (error) {
-        console.error('Error getting carsIDs from race', error);
-        return null;
-    }
+    carIDs = await dbAll(`SELECT id FROM cars WHERE  race_id=?`,raceId);
+    return carIDs;
 };
 
 // Get all the carIds form the race and sets the global variable. ! this can be used in the score board.
 async function getCarsByRaceId(raceId) {
-    try {
-        const rows = await db.all("SELECT * FROM cars WHERE  RaceId=?", [raceId]);
-        cars = rows.map(row => new Car(row));
-        return cars;
-    } catch (error) {
-        console.error('Error getting cars from race', error);
-        return null;
-    }
+    console.log("Id's from the race",)
 };
+
 
 
 // It find the car that in the by the "carNumber" that is the slot number and 
 async function setCarLapNumber(byCarNumber) {
-    if (cars === null) {
+    if (carIDs === null) {
         console.error("there is no race")
     }
     let racingCarId = cars[byCarNumber]
@@ -53,43 +40,44 @@ async function setCarLapNumber(byCarNumber) {
     } catch {
         console.error("unable to set the");
     }
-
 };
 
-
-async function getCarLapNumberByID(carId) {
-    try {
-
-    } catch{
-        
-    }
-
-    
+async function dbGet(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
+        });
+    });
 }
 
-function setCarLapTime(carId, lapTime) {
-
-
+async function dbAll(query, params) {
+    return new Promise((resolve, reject) => {
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
 };
 
-function setBestLapTime(carId, time) {
-
+async function dbRun(query, params) {
+    return new Promise((resolve, reject) => {
+        db.run(query, params, function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this);
+            }
+        });
+    });
 };
 
-function addDriverToCar(carId, driverId) {
-
-
-};
-
-function getDriverByCarId(carId) {
-    return Driver;
-};
-
-
-//TODO: Find carID's by Car number and RaceID
-//TODO: Update lapTime by CarID
-//TODO: Get Best LapTime
-//TODO: Set Best LapTime
 
 module.exports = {
     getCarsByRaceId,
