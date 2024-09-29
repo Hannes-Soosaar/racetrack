@@ -11,11 +11,6 @@ let carIDs = null;
 // The logic for updating cars is hard-coded. Each race has 8 cars always, each car has a slot in the race, so the first in the first
 // slot will always have an index of 0. and the eight car will be the car ID with the index of 7 in the carIDs Array.
 
-
-
-//TODO: Test the DB connection to create a new Car object.
-
-
 // // Takes race object and returns an array with all the cars in the race.
 async function getCarIdsByRaceId(raceId) {
     carIDs = await dbAll(`SELECT id FROM cars WHERE  race_id=?`,raceId);
@@ -26,8 +21,6 @@ async function getCarIdsByRaceId(raceId) {
 async function getCarsByRaceId(raceId) {
     console.log("Id's from the race",)
 };
-
-
 
 // It find the car that in the by the "carNumber" that is the slot number and 
 async function setCarLapNumber(byCarNumber) {

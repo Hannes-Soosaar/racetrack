@@ -68,27 +68,27 @@ app.get('/race-flags', (req, res) => {
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
 
-    // Will start all pages.
-    lapLineTracker(io, socket); //! it needs to linked before you can start giving commands
+    // Need to distribute  and start the socket to all of the backend!
+    lapLineTracker(io, socket);
     raceControl(io, socket);
     frontDesk(io, socket);
-    //TODO: connect the other backend pages  to the server that do not require authentication.
 
-    console.log("New client connected again:", socket.id);     // ADDEd for debug
+
+    console.log("New client connected:", socket.id);     // ADDEd for debug
     // Handle key validation
     socket.on('validate-key', ({ key, role }) => {
         let validKey = false;
         if (role === 'receptionist' && key === process.env.RECEPTIONIST_KEY) {
-            validKey = true; // should be able to just pass around
+            validKey = true; 
         } else if (role === 'safety' && key === process.env.SAFETY_KEY) {
             validKey = true;
         } else if (role === 'observer' && key === process.env.OBSERVER_KEY) {
             validKey = true;
         }
         console.log(`Key validation result: ${validKey}`);
-        socket.emit('key-validation', { success: validKey });
+        socket.emit('key-validation', { success: validKey }); // This will is what makes pages visible.
         
-        // Will toggle functionality
+        // ! Not needed for validation
         // if (validKey) {
         //     if (role === 'receptionist') {
         //         // frontDesk(io, socket) 
@@ -115,7 +115,6 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 8000;
-// Start the server
 server.listen(PORT, () => {
     //TODO: implement check keys last!
     console.log(`Server is running on port ${PORT}`);
