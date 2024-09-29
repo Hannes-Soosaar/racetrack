@@ -58,6 +58,10 @@ function getUpdateTimerValue() {
     return remainingRaceTime;
 }
 
+function getRaceStartTime(startTime){
+    return startTime;
+}
+
 function displayMinutesAndSeconds(remainingRaceTime) {
     const totalSeconds = Math.floor(remainingRaceTime / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -71,5 +75,7 @@ module.exports = {
     updateTime: getUpdateTimerValue,
     resumeTimer,
     pauseTimer,
-    displayMinutesAndSeconds
+    displayMinutesAndSeconds,
+    getUpdateTimerValue,
+    getRaceStartTime,
 };

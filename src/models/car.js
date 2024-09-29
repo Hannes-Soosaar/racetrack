@@ -4,6 +4,10 @@ class Car {
 		Object.assign(this, row)
 	}
 }
+
+module.exports = Car;
+
+
 // 	constructor(
 // 		id,
 // 		driver_id,
@@ -26,5 +30,3 @@ class Car {
 // 		this.status = status;
 // 	}
 // }
-
-module.exports = Car;
