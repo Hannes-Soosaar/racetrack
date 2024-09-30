@@ -32,36 +32,66 @@ async function getCarsByRaceId(raceId) {
 //! store start time here
 
 async function setLapTime(carId) {
-    setLapNumber(carId);
-    console.log("We ar trying to set the lap! for Car id ", carId);
+
+    console.log("Gotten car Id", carId);
+    setLapNumber(carId);//OK
     let lapTime;
-    const previousLapTime = await getPreviousLapTime(carId);
-    if (previousLapTime === 0) {
-        await setFirstLapStartTime(carId)
-        lapTime = await getCarLapTime(carId);
-    } else {
-        lapTime = await getCarLapTime(carId);
-        await setNewLapStartTime(carId);
+    const previousLapTime = await getPreviousLapTime(carId);// OK
+    console.log("The Preivouse lap time is:", previousLapTime.race_elapse_time)
+    if (previousLapTime.race_elapse_time === 0) {
+        console.log("Setup the first lap start time");
+        try {
+            await setFirstLapStartTime(carId)
+        } catch {
+            console.log("error setting the initial start time", err);
+        }
+        try {
+            console.log("Set up the first lap time");
+            lapTime = await getCarLapTime(carId);
+            console.log("Set up the first lap time", lapTime);
+        } catch {
+            console.log("error getting the first lap time", err);
+        }
         const query = 'UPDATE cars SET current_lap_time = ? where id= ?'
         try {
-            await dbRun(query, lapTime, query);
+            await dbRun(query, [lapTime, carId]);
         } catch {
             console.log('Error updating current lap time', err);
+        }
+
+    } else {
+        console.log("the Previouse lap time IS NOT 0");
+        lapTime = await getCarLapTime(carId);
+        console.log(lapTime)
+        const query = 'UPDATE cars SET current_lap_time = ? where id= ?'
+        try {
+            await dbRun(query, [lapTime, carId]);
+        } catch {
+            console.log('Error updating current lap time', err);
+        }
+        try {
+            await setNewLapStartTime(carId);
+        } catch {
+            console.log('Error setting new lap Start Time', err);
         }
     }
 }
 
+// TODO: add try and catch.
 async function getPreviousLapTime(carId) {
+    console.log("Started to get previous lap time",)
     const previousLapTime = await dbGet('SELECT race_elapse_time FROM cars WHERE id= ?', carId);
+    console.log("Started to get previous lap time", previousLapTime.race_elapse_time)
     return previousLapTime;
 }
 
 async function setFirstLapStartTime(carId) {
-    console.log("setFist Lap start Time for", carId );
+    console.log("setFist Lap start Time for", carId);
     lapStartTime = time.getRaceStartTime();
-    const query = 'UPDATE cars SET race_elapse_time = ? where id= ?';
+    console.log("lap start time from race Timer", lapStartTime);
+    const query = `UPDATE cars SET race_elapse_time = ? where id= ?`;
     try {
-        await dbRun(query, lapStartTime, carId);
+        await dbRun(query, [lapStartTime, carId]);
     } catch (err) {
         console.log('Error updating lap start time', err);
     }
@@ -69,10 +99,11 @@ async function setFirstLapStartTime(carId) {
 
 async function setNewLapStartTime(carId) {
     lapStartTime = Date.now();
+    console.log(lapStartTime);
     console.log("set Lap start Time for", carId);
     const query = 'UPDATE cars SET race_elapse_time = ? where id= ?';
     try {
-        await dbRun(query, lapStartTime, carId);
+        await dbRun(query, [lapStartTime, carId]);
     } catch (err) {
         console.log('Error updating lap start time', err);
     }
@@ -81,7 +112,10 @@ async function setNewLapStartTime(carId) {
 //This should be OK
 async function getCarLapTime(carId) {
     const previousLapTime = await getPreviousLapTime(carId);
-    const newLapTime = previousLapTime - Date.now();
+    console.log("Previous lap time ", previousLapTime);
+    let currentTime = Date.now();
+    console.log("The time now!", currentTime);
+    const newLapTime = currentTime - previousLapTime.race_elapse_time;
     return newLapTime;
 };
 
@@ -89,7 +123,7 @@ async function getCarLapTime(carId) {
 async function setLapNumber(carId) {
     const query = 'UPDATE cars SET race_lap = race_lap+1 where id= ?';
     try {
-        await dbRun(query, carId);
+        await dbRun(query, [carId]);
         console.log("lap number increased for car ID", carId);
     } catch (err) {
         console.log(' Error updating the lap number');
@@ -130,6 +164,7 @@ async function dbAll(query, params) {
 };
 
 async function dbRun(query, params) {
+    console.log(" the query and parameters are ", query, params);
     return new Promise((resolve, reject) => {
         db.run(query, params, function (err) {
             if (err) {

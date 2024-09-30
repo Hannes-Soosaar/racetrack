@@ -64,16 +64,11 @@ module.exports = (io, socket) => {
 
 
     socket.on('set-car-lap', async (raceIdCarNumber) => {
-        console.log("setting car lap");
         try {
-            console.log('We need to modify the car in slot1 for the Race with the ID', raceIdCarNumber);
             raceId = raceIdCarNumber[0];
             carNumber = raceIdCarNumber[1];
             carIds = await car.getCarIdsByRaceId(raceId);
             if (carIds) {
-                console.log("set time for ", carNumber);
-                console.log("set time for ", carIds);
-                console.log("set time for ", carIds[carNumber-1].id);
                 await car.setLapTime(carIds[carNumber-1].id);
             } else {
                 console.log("No cars");
