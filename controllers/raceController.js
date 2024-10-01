@@ -1,4 +1,4 @@
-const db = require('../config/db');
+const db = require('../config/db.js');
 const carController = require('./carController');
 
 // Create a new race session and generate cars
@@ -25,6 +25,8 @@ exports.createRaceSession = (req, res) => {
         });
     });
 };
+
+
 // Get all race sessions
 exports.getRaceSessions = (req, res) => {
     const query = `SELECT * FROM races`;
@@ -32,9 +34,11 @@ exports.getRaceSessions = (req, res) => {
         if (err) {
             return res.status(500).json({ error: 'Could not retrieve races', details: err });
         }
-        res.status(200).json(rows);
+        res.status(200).json(rows);  // Return the rows, which should be an array of races
     });
 };
+
+
 // Update a race session
 exports.updateRaceSession = (req, res) => {
     const { id } = req.params;  // Race ID from the URL
