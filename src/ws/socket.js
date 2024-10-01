@@ -59,9 +59,7 @@ module.exports = (io, socket) => {
             console.log("error during set-lap event", errror);
         }
         car.setLapTime(carIds[carNumber]);
-
     });
-
 
     socket.on('set-car-lap', async (raceIdCarNumber) => {
         try {
@@ -77,5 +75,4 @@ module.exports = (io, socket) => {
             console.log("error during set-lap event", error);
         }
     });
-
 }

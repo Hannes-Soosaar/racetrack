@@ -213,7 +213,6 @@ function deleteRace(raceId) {
     if (!confirm('Are you sure you want to delete this race?')) {
         return;
     }
-
     socket.emit('delete-race', raceId, (response) => {
         if (response.error) {
             alert('Error deleting race: ' + response.error);

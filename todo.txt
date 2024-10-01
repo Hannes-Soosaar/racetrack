@@ -48,27 +48,27 @@ Use SQLite for data persistance (do we want to use anything else) ?
 Mandatory
 
 The README.md file at the root of the project has a user guide, describing the core functionality of the user interfaces
-
+The README.md file at the root of the project describes how to launch the project.
 
 RECEPTIONIST
 
 The receptionist can see a list of upcoming races.
 The receptionist can delete an upcoming race.
-The README.md file at the root of the project describes how to launch the project.
 The receptionist can add new race sessions.
 The receptionist can add/edit/remove drivers from a race.
-It is not possible to have two drivers with the same name. name is unique 
+It is not possible to have two drivers with the same name. name is unique // This does not imply it needs to check all the names just the names in the race.
 Race sessions disappear from the Front Desk interface once it is safe to start. // who can make it safe if safe remove fr
 The race drivers cannot be edited after the race is safe to start.
 The upcoming race session, is displayed on the Next Race display.
 The Next Race display switches to the subsequent race, once the current race is safe to start.
 The Next Race display shows the drivers names, and the cars they're assigned to.
 If there are no upcoming races, no sessions are displayed.
-If there is no upcoming race after the last session is ended, the Safety Official sees no upcoming races message.
+
 
 
 SAFETY OFFICIAL - AP KARL-HENDRIK
 
+If there is no upcoming race after the last session is ended, the Safety Official sees no upcoming races message.
 
 The safety official has one active button, which starts the race when pressed.
 When the race is started, the following happens:
@@ -94,23 +94,25 @@ When the race session is ended, the race mode changes to "Danger".
 
 LAP-LINE OBSERVER
 
-When the race session starts, the Lap-Line Observer sees a button for each car.
-The lap button for each car has a large tappable area.
+When the race session starts, the Lap-Line Observer sees a button for each car. // DONE
+The lap button for each car has a large tappable area. 
 The Lap-line Tracker is designed for a tablet, featuring large tappable buttons for each car.
 It should work in Landscape or Portrait
 
 
 -LEADER BOARD
 
-The leaderboard shows the remaining time on the timer.
+The leaderboard shows the remaining time on the timer.  
 The leaderboard shows the flag color for the current race mode.
 When the lap button is pressed for a car, the leader board is updated.
-The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- do the timer logic in the backend. what happens if the race is started and the 
+The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- USES the constant at the beggining of the race. only affecting the new races created. meaning anything created in regular mode will not change
 
 The leaderboard is ordered by fastest lap times
-The leaderboard shows the drivers name and car number.
-The leaderboard shows the fastest lap time for each car.
-The leaderboard shows the current lap for each car.
+
+The leaderboard shows the drivers name and car number. // get_driver_car_number
+The leaderboard shows the fastest lap time for each car. //best_lap_time
+The leaderboard shows the current lap for each car. // race_lap +1
+
 The first lap starts when the car crosses the leader board for the first time.
 
 

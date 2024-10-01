@@ -116,17 +116,47 @@ async function getCarLapTime(carId) {
     let currentTime = Date.now();
     console.log("The time now!", currentTime);
     const newLapTime = currentTime - previousLapTime.race_elapse_time;
+    console.log("BEFORE Update Best Lap Time");
+    updateBestLapTime(carId, newLapTime);
     return newLapTime;
 };
+
+async function getBestLapTime(carId) {
+    const query = 'SELECT best_lap_time FROM cars WHERE id = ?'
+    try {
+        bestLapTime = await dbGet(query, carId);
+        console.log('Got the best lap time', bestLapTime.best_lap_time);
+    } catch {
+        console.log('error getting best time');
+    }
+    return bestLapTime.best_lap_time;
+}
+
+async function setBestLapTime(bestLapTime, carId) {
+    const query = 'UPDATE cars SET best_lap_time = ? where id= ?'
+    try {
+        await dbRun(query, [bestLapTime, carId]);
+        console.log('updated Car with id:', carId, 'best time to:', bestLapTime);
+    } catch {
+        console.log('error updating the lap number', err);
+    }
+}
+
+async function updateBestLapTime(carId, lapTime) {
+    const bestLapTime = await getBestLapTime(carId);
+    if (lapTime < bestLapTime || bestLapTime === 0) {
+        await setBestLapTime(lapTime, carId);
+    }
+}
 
 // This should be OK
 async function setLapNumber(carId) {
     const query = 'UPDATE cars SET race_lap = race_lap+1 where id= ?';
     try {
         await dbRun(query, [carId]);
-        console.log("lap number increased for car ID", carId);
+        console.log('lap number increased for car ID', carId);
     } catch (err) {
-        console.log(' Error updating the lap number');
+        console.log('error updating the lap number', err);
     }
 };
 
