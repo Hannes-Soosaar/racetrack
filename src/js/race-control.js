@@ -89,7 +89,7 @@ const raceControl = (io, socket) => {
     socket.on('start-race', async () => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
-        io.emit('set-raceId',raceID);
+        io.emit('set-raceId', raceID);
         await new Promise((resolve) => {
             changeFlag(1);
             io.emit('race-flags-update', status.SAFE);
@@ -130,8 +130,6 @@ const raceControl = (io, socket) => {
                 io.emit('pause-timer');
                 io.emit('race-flags-update', status.DANGER);
                 break;
-            default:
-                changeFlag(null);
         }
     });
 
@@ -203,7 +201,8 @@ async function dbRun(query, params) {
 function changeFlag(flagID) {
     const sql = `UPDATE races SET status = ? WHERE id = ?`;
     db.run(sql, [flagID, currentRace.id], function (err) {
-        if (err) {``
+        if (err) {
+            ``
             console.log(err.message);
         }
     });

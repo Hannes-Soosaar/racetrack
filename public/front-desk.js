@@ -107,17 +107,17 @@ function loadRaces() {
 function loadDriversForRace(raceId) {
     socket.emit('get-drivers', raceId, (response) => {
         const driverList = document.getElementById(`driver-list-${raceId}`);
-        
+
         console.log("Drivers response:", response);  // Debugging to check the response
-        
+
         // Ensure the driver list element exists
         if (!driverList) {
             console.error(`Driver list element for race ${raceId} not found.`);
             return;
         }
-        
+
         driverList.innerHTML = '';  // Clear the list before appending new items
-        
+
         // Ensure that drivers is an array before using .forEach()
         if (Array.isArray(response.drivers)) {
             response.drivers.forEach(driver => {
@@ -152,6 +152,8 @@ function addDriverToRace(event, raceId) {
             loadDriversForRace(raceId);  // Reload drivers after adding
         }
     });
+
+    socket.emit('g-n-r-s')
 }
 
 
