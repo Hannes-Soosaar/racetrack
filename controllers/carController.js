@@ -2,23 +2,29 @@ const { response } = require('express');
 const db = require('../config/db');
 
 // Generate new cars for a race
-exports.createCarsForRace = async (raceId) => {
-    const carInsertQuery = `INSERT INTO cars (number, race_id, name) VALUES (?, ?, ?)`;
-    for (let i = 1; i <= 8; i++) {  // Assuming 8 cars per race
-        console.log(" this is the car added i", i);
-        await new Promise((resolve, reject) => {
-            db.run(carInsertQuery, [i, raceId, `Car ${i}`], function (err) {
-                if (err) {
-                    console.error(`Error creating car ${i} for race ${raceId}:`, err);
-                    reject(err);
-                } else {
-                    console.log(`Car ${i} created for race ${raceId}`);
-                    resolve();
-                }
-            });
-        });
-    }
-}
+exports.createCarsForRace = (raceId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const carInsertQuery = `INSERT INTO cars (number, race_id, name) VALUES (?, ?, ?)`;
+
+            for (let i = 1; i <= 8; i++) {  // Assuming 8 cars per race
+                await new Promise((resolve, reject) => {
+                    db.run(carInsertQuery, [i, raceId, `Car ${i}`], function (err) {
+                        if (err) {
+                            console.error(`Error creating car ${i} for race ${raceId}:`, err);
+                            return reject(err);
+                        }
+                        console.log(`Car ${i} created for race ${raceId}`);
+                        resolve();
+                    });
+                });
+            }
+            resolve();  // All cars created successfully
+        } catch (err) {
+            reject(new Error('Error creating cars for race'));
+        }
+    });
+};
 
 
 exports.getCarsForRace = (req, res) => {

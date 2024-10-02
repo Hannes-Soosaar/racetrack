@@ -32,8 +32,24 @@
 
         <h3>Race List</h3>
         <div id="race-list"></div> 
+    </div>
 
-        
+    <!-- Modal for editing race -->
+    <div id="edit-race-modal" style="display:none;">
+        <h2>Edit Race</h2>
+        <form id="edit-race-form" onsubmit="updateRace(event)">
+            <input type="hidden" id="edit-race-id">
+            <label for="edit-session-name">Race Name:</label>
+            <input type="text" id="edit-session-name" required>
+            <label for="edit-date">Date:</label>
+            <input type="date" id="edit-date" required>
+            <label for="edit-time">Time:</label>
+            <input type="time" id="edit-time" required>
+            <button type="submit">Save Changes</button>
+            <button type="button" onclick="closeEditModal()">Cancel</button>
+        </form>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="/front-desk.js"></script>
 </body>

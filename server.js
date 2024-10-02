@@ -19,7 +19,8 @@ const nextRace = require('./src/js/next-race');
 const carController = require('./controllers/carController');
 
 // Import race controller functions
-const { createRaceSession, addDriverToRace, updateRaceSession, deleteRaceSession, deleteDriverFromRace, getDriversForRace, getRaceSessions } = require('./controllers/raceController');
+const { createRaceSession, addDriverToRace, updateRaceSession, deleteRaceSession, deleteDriverFromRace, getDriversForRace, getRaceSessions, getRaceById } = require('./controllers/raceController');
+const { createCarsForRace } = require('./controllers/carController');
 
 
 app.use(express.json());
@@ -54,34 +55,37 @@ io.on('connection', (socket) => {
     });
 
     // Handle race creation via Socket.IO
-    socket.on('create-race', (raceData, callback) => {
-        createRaceSession({ body: raceData }, {
-            status: (code) => ({
-                json: (response) => {
-                    if (code === 201) {
-                        callback({ success: true, race: response });
-                    } else {
-                        callback({ error: response.error });
-                    }
-                },
-            }),
-        });
+    socket.on('create-race', async (raceData, callback) => {
+        try {
+            const race = await createRaceSession(raceData);
+            await createCarsForRace(race.id);  // Ensure all cars are created before sending a callback
+            callback({ success: true, race });
+        } catch (error) {
+            callback({ error: 'Race creation failed: ' + error.message });
+        }
     });
+    
 
-    // Edit Race via Socket.IO
-    socket.on('edit-race', (raceId, raceData, callback) => {
-        updateRaceSession({ params: { id: raceId }, body: raceData }, {
-            status: (code) => ({
-                json: (response) => {
-                    if (code === 200) {
-                        callback({ success: true, race: response });
-                    } else {
-                        callback({ error: response.error });
-                    }
-                },
-            }),
-        });
+
+    // Get race details
+socket.on('get-race-details', (raceId, callback) => {
+    getRaceById(raceId).then((race) => {
+        callback({ race });
+    }).catch((err) => {
+        callback({ error: 'Error fetching race details: ' + err.message });
     });
+});
+
+// Edit race
+socket.on('edit-race', async (raceId, raceData, callback) => {
+    try {
+        await updateRaceSession(raceId, raceData);
+        callback({ success: true, message: 'Race updated successfully' });
+    } catch (error) {
+        callback({ error: 'Error updating race: ' + error.message });
+    }
+});
+
 
     // Delete Race via Socket.IO
     socket.on('delete-race', (raceId, callback) => {

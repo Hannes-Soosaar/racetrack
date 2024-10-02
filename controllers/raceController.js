@@ -2,33 +2,38 @@ const db = require('../config/db.js');
 const carController = require('./carController');
 
 // Create a new race session and generate cars
-exports.createRaceSession = (req, res) => {
-    const { session_name, date, time, status } = req.body;
-    // Check if a race with the same session name already exists
-    const checkDuplicateQuery = `SELECT COUNT(*) AS count FROM races WHERE session_name = ?`;
-    db.get(checkDuplicateQuery, [session_name], function (err, row) {
-        if (err) {
-            return res.status(500).json({ error: 'Could not verify session name uniqueness', details: err });
-        }
-        if (row.count > 0) {
-            return res.status(400).json({ error: 'A race with this name already exists. Please choose a different name.' });
-        }
-        // Proceed to create the race session if the name is unique
-        const query = `INSERT INTO races (session_name, date, time, status) VALUES (?, ?, ?, ?)`;
-        db.run(query, [session_name, date, time, status], function (err) {
+const createRaceSession = (raceData) => {
+    return new Promise((resolve, reject) => {
+        const { session_name, date, time, status } = raceData;
+
+        // Check if a race with the same session name already exists
+        const checkDuplicateQuery = `SELECT COUNT(*) AS count FROM races WHERE session_name = ?`;
+        db.get(checkDuplicateQuery, [session_name], (err, row) => {
             if (err) {
-                return res.status(500).json({ error: 'Could not create race session', details: err });
+                return reject(new Error('Could not verify session name uniqueness'));
             }
-            const raceId = this.lastID;  // Capture the race ID
-            carController.createCarsForRace(raceId);  // Generate cars for this race
-            res.status(201).json({ id: raceId, session_name, date, time, status });
+
+            if (row.count > 0) {
+                return reject(new Error('A race with this name already exists. Please choose a different name.'));
+            }
+
+            // Proceed to create the race session if the name is unique
+            const query = `INSERT INTO races (session_name, date, time, status) VALUES (?, ?, ?, ?)`;
+            db.run(query, [session_name, date, time, status], function (err) {
+                if (err) {
+                    return reject(new Error('Could not create race session'));
+                }
+
+                const raceId = this.lastID;  // Capture the race ID
+                resolve({ id: raceId, session_name, date, time, status });
+            });
         });
     });
 };
 
 
 // Get all race sessions
-exports.getRaceSessions = (req, res) => {
+const getRaceSessions = (req, res) => {
     const query = `SELECT * FROM races`;
     db.all(query, [], (err, rows) => {
         if (err) {
@@ -40,33 +45,36 @@ exports.getRaceSessions = (req, res) => {
 
 
 // Update a race session
-exports.updateRaceSession = (req, res) => {
-    const { id } = req.params;  // Race ID from the URL
-    const { session_name, date, time, status } = req.body;
-    // Check if a race with the same session name already exists (excluding the current race being updated)
-    const checkDuplicateQuery = `SELECT COUNT(*) AS count FROM races WHERE session_name = ? AND id != ?`;
-    db.get(checkDuplicateQuery, [session_name, id], function (err, row) {
-        if (err) {
-            return res.status(500).json({ error: 'Could not verify session name uniqueness', details: err });
-        }
-        if (row.count > 0) {
-            return res.status(400).json({ error: 'A race with this name already exists. Please choose a different name.' });
-        }
-        // Proceed to update the race session if the name is unique
-        const query = `UPDATE races SET session_name = ?, date = ?, time = ?, status = ? WHERE id = ?`;
-        db.run(query, [session_name, date, time, status, id], function (err) {
+const updateRaceSession = (raceId, raceData) => {
+    return new Promise((resolve, reject) => {
+        const { session_name, date, time } = raceData;
+        const query = `UPDATE races SET session_name = ?, date = ?, time = ? WHERE id = ?`;
+
+        db.run(query, [session_name, date, time, raceId], function (err) {
             if (err) {
-                return res.status(500).json({ error: 'Could not update race', details: err });
+                return reject(new Error('Could not update race'));
             }
-            res.status(200).json({ message: 'Race updated successfully' });
+            resolve();
         });
     });
 };
 
 
+const getRaceById = (raceId) => {
+    return new Promise((resolve, reject) => {
+        const query = `SELECT * FROM races WHERE id = ?`;
+        db.get(query, [raceId], (err, row) => {
+            if (err) {
+                return reject(new Error('Could not retrieve race details'));
+            }
+            resolve(row);
+        });
+    });
+};
+
 
 // Delete a race session
-exports.deleteRaceSession = (req, res) => {
+const deleteRaceSession = (req, res) => {
     const { id } = req.params;  // Race ID from the URL
     const query = `DELETE FROM races WHERE id = ?`;
     db.run(query, [id], function (err) {
@@ -78,7 +86,7 @@ exports.deleteRaceSession = (req, res) => {
 };
 
 
-exports.addDriverToRace = (req, res) => {
+const addDriverToRace = (req, res) => {
     const { id } = req.params;  // Race session ID
     const { firstName, lastName, carNumber } = req.body;
     console.log('Incoming driver data:', { firstName, lastName, carNumber });
@@ -128,7 +136,7 @@ exports.addDriverToRace = (req, res) => {
 
 
 // Get drivers for a specific race
-exports.getDriversForRace = (req, res) => {
+const getDriversForRace = (req, res) => {
     const { id } = req.params;  // The race session ID
     const query = `SELECT d.id, d.first_name, d.last_name, rd.car_number
                    FROM race_drivers rd
@@ -143,31 +151,51 @@ exports.getDriversForRace = (req, res) => {
 };
 
 
-exports.deleteDriverFromRace = (req, res) => {
+const deleteDriverFromRace = (req, res) => {
     const { raceId, driverId } = req.params;
-    console.log(`Deleting driver with ID ${driverId} from race ${raceId}`);  // Log driverId and raceId
+
+    console.log(`Deleting driver with ID ${driverId} from race ${raceId}`);  // Log driverId and raceId for debugging
+
     if (!driverId || !raceId) {
         return res.status(400).json({ error: 'Invalid driver ID or race ID' });
     }
-    // First, remove the driver from the race_drivers table
+
+    // Remove the driver from the `race_drivers` table
     const deleteFromRaceDriversQuery = `DELETE FROM race_drivers WHERE race_id = ? AND driver_id = ?`;
     db.run(deleteFromRaceDriversQuery, [raceId, driverId], function (err) {
         if (err) {
             console.error('Error deleting driver from race_drivers:', err);
             return res.status(500).json({ error: 'Could not delete driver from the race', details: err });
         }
+
         console.log(`Driver with ID ${driverId} successfully deleted from race ${raceId}`);
-        // Optionally, delete the driver from the drivers table as well
+
+        // Optionally, delete the driver from the `drivers` table as well
         const deleteFromDriversQuery = `DELETE FROM drivers WHERE id = ?`;
         db.run(deleteFromDriversQuery, [driverId], function (err) {
             if (err) {
                 console.error('Error deleting driver from drivers table:', err);
                 return res.status(500).json({ error: 'Could not delete driver from database', details: err });
             }
+
             console.log(`Driver with ID ${driverId} successfully deleted from database`);
             res.status(200).json({ message: 'Driver deleted successfully' });
         });
     });
+};
+
+console.log('createRaceSession is', createRaceSession);
+
+ 
+module.exports = {
+    createRaceSession,
+    getRaceSessions,
+    updateRaceSession,
+    getRaceById, 
+    deleteRaceSession,
+    addDriverToRace,
+    getDriversForRace,
+    deleteDriverFromRace
 };
 
 

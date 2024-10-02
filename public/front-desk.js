@@ -164,14 +164,49 @@ function editRace(raceId) {
             console.error(`Error fetching race ${raceId}:`, response.error);
         } else {
             const race = response.race;
-            // Populate the form fields with the race data
-            document.getElementById('race-id').value = race.id;  // Ensure race ID is populated
-            document.getElementById('session-name').value = race.session_name;
-            document.getElementById('date').value = race.date;
-            document.getElementById('time').value = race.time;
+            // Populate modal form fields with the race data
+            document.getElementById('edit-race-id').value = race.id;  // Set hidden race ID field
+            document.getElementById('edit-session-name').value = race.session_name;
+            document.getElementById('edit-date').value = race.date;
+            document.getElementById('edit-time').value = race.time;
+
+            // Show the modal for editing
+            document.getElementById('edit-race-modal').style.display = 'block';
         }
     });
 }
+
+
+function updateRace(event) {
+    event.preventDefault();  // Prevent form submission
+
+    const raceId = document.getElementById('edit-race-id').value;
+    const sessionName = document.getElementById('edit-session-name').value;
+    const date = document.getElementById('edit-date').value;
+    const time = document.getElementById('edit-time').value;
+
+    const updatedRaceData = {
+        session_name: sessionName,
+        date: date,
+        time: time
+    };
+
+    socket.emit('edit-race', raceId, updatedRaceData, (response) => {
+        if (response.error) {
+            alert('Error updating race: ' + response.error);
+        } else {
+            alert('Race updated successfully!');
+            loadRaces();  // Reload the races
+            closeEditModal();  // Close the modal
+        }
+    });
+}
+
+function closeEditModal() {
+    document.getElementById('edit-race-modal').style.display = 'none';
+}
+
+
 
 // Delete a race via Socket.IO
 function deleteRace(raceId) {
@@ -194,7 +229,7 @@ function deleteDriver(raceId, driverId) {
         return;
     }
 
-    socket.emit('delete-driver', { raceId, driverId }, (response) => {
+    socket.emit('remove-driver', { raceId, driverId }, (response) => {
         if (response.error) {
             alert('Error deleting driver: ' + response.error);
         } else {
@@ -202,6 +237,7 @@ function deleteDriver(raceId, driverId) {
         }
     });
 }
+
 
 // Load available cars for a race
 function loadAvailableCars(raceId) {
