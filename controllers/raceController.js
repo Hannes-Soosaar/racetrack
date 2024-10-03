@@ -76,14 +76,49 @@ const getRaceById = (raceId) => {
 // Delete a race session
 const deleteRaceSession = (req, res) => {
     const { id } = req.params;  // Race ID from the URL
-    const query = `DELETE FROM races WHERE id = ?`;
-    db.run(query, [id], function (err) {
+
+    // Start with deleting the race from the races table (which will cascade delete entries in race_drivers and cars)
+    const deleteRaceQuery = `DELETE FROM races WHERE id = ?`;
+
+    db.run(deleteRaceQuery, [id], function (err) {
         if (err) {
             return res.status(500).json({ error: 'Could not delete race', details: err });
         }
-        res.status(200).json({ message: 'Race deleted successfully' });
+
+        console.log(`Race with ID ${id} deleted. Now checking for orphaned drivers...`);
+
+        // Now check if there are any drivers left with no races
+        const orphanedDriversQuery = `
+            SELECT d.id
+            FROM drivers d
+            LEFT JOIN race_drivers rd ON d.id = rd.driver_id
+            WHERE rd.driver_id IS NULL
+        `;
+
+        db.all(orphanedDriversQuery, [], (err, orphanedDrivers) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error checking for orphaned drivers', details: err });
+            }
+
+            if (orphanedDrivers.length > 0) {
+                const driverIds = orphanedDrivers.map(driver => driver.id);
+                const deleteDriversQuery = `DELETE FROM drivers WHERE id IN (${driverIds.join(',')})`;
+
+                db.run(deleteDriversQuery, function (err) {
+                    if (err) {
+                        return res.status(500).json({ error: 'Could not delete orphaned drivers', details: err });
+                    }
+
+                    console.log('Orphaned drivers deleted:', driverIds);
+                    res.status(200).json({ message: 'Race and related data deleted successfully, including orphaned drivers.' });
+                });
+            } else {
+                res.status(200).json({ message: 'Race and related data deleted successfully. No orphaned drivers found.' });
+            }
+        });
     });
 };
+
 
 
 const addDriverToRace = (req, res) => {
