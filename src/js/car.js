@@ -19,9 +19,8 @@ async function getCarIdsByRaceId(raceId) {
 
 // Get all the carIds form the race and sets the global variable. ! this can be used in the score board.
 async function getCarsByRaceId(raceId) {
-    const carRows = await dbAll(`SELECT * FROM cars WHERE race_id=?`, raceId);
+    const carRows = await dbAll(`SELECT * FROM cars  WHERE race_id=? ORDER BY best_lap_time ASC`, raceId);
     const cars = carRows.map(row => new Car(row));
-    console.log("All Cars int", cars);
     return cars;
 }
 
@@ -30,7 +29,7 @@ async function setLapTime(carId) {
     setLapNumber(carId);//OK
     let lapTime;
     const previousLapTime = await getPreviousLapTime(carId);// OK
-    console.log("The Preivouse lap time is:", previousLapTime.race_elapse_time)
+    console.log("The Previous lap time is:", previousLapTime.race_elapse_time)
     if (previousLapTime.race_elapse_time === 0) {
         console.log("Setup the first lap start time");
         try {
@@ -53,7 +52,7 @@ async function setLapTime(carId) {
         }
 
     } else {
-        console.log("the Previouse lap time IS NOT 0");
+        console.log("the Previous lap time IS NOT 0");
         lapTime = await getCarLapTime(carId);
         console.log(lapTime)
         const query = 'UPDATE cars SET current_lap_time = ? where id= ?'

@@ -49,18 +49,18 @@ socket.on('display-race', (driverInfo) => {
 
 newSessionButton.addEventListener('click', () => {
     socket.emit('start-session');
-    // socket.emit('get-race-id');
+    socket.emit('load-leaderboard'); //! do we want to trigger the load here ?
 });
 
 // reply to get-race-id
-socket.on('set-race-id', (raceId) => {
-    // socket.emit('race-id', raceId);
-});
+// socket.on('set-race-id', (raceId) => {
+//     // socket.emit('race-id', raceId);
+// });
 
 startRaceButton.addEventListener('click', () => {
     console.log('Start Race button clicked');
     socket.emit('start-race');
-    socket.emit('start-timer', "stuff");
+    socket.emit('start-timer');
 });
 
 modeSafeButton.addEventListener('click', () => {

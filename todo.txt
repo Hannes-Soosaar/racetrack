@@ -1,4 +1,9 @@
 
+BUGS:
+
+If a race is not started, but the flags page is loaded, the system crashes. Add if 0 null or undefined check!
+
+
 There is an issue with having to have a connection open to get the 
 
 
@@ -102,10 +107,12 @@ It should work in Landscape or Portrait
 
 -LEADER BOARD
 
-The leaderboard shows the remaining time on the timer.  
-The leaderboard shows the flag color for the current race mode.
-When the lap button is pressed for a car, the leader board is updated.
-The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- USES the constant at the beggining of the race. only affecting the new races created. meaning anything created in regular mode will not change
+DONE- The leaderboard shows the remaining time on the timer.  
+DONE- The leaderboard shows the flag color for the current race mode.
+
+
+When the lap button is pressed for a car, the leader board is updated. 
+
 
 The leaderboard is ordered by fastest lap times
 
@@ -113,18 +120,19 @@ The leaderboard shows the drivers name and car number. // get_driver_car_number
 The leaderboard shows the fastest lap time for each car. //best_lap_time
 The leaderboard shows the current lap for each car. // race_lap +1
 
-The first lap starts when the car crosses the leader board for the first time.
+Handle in the car section - The first lap starts when the car crosses the leader board for the first time.
 
 
 SERVER-
 
-The server is written in Node.JS
-Communication between interfaces is in real-time. API calls must not be used to send data.
-For example, when the race mode is changed by the Safety Official, the flag displays change in real time
-Communication between interfaces utilises messages sent via Socket.IO.
+TODO:The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- USES the constant at the beggining of the race. only affecting the new races created. meaning anything created in regular mode will not change
+
+DONE The server is written in Node.JS
+DONE Communication between interfaces is in real-time. API calls must not be used to send data. 
+DONE For example, when the race mode is changed by the Safety Official, the flag displays change in real time
+DONE Communication between interfaces utilises messages sent via Socket.IO.
 
 NPM START
-
 The server can be started with npm start
 The server can be started in developer mode with npm run dev. --The countdown timer runs for 1 minute instead on 10 minutes.
 

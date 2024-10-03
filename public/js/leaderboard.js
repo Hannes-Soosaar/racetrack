@@ -1,26 +1,41 @@
 const socket = io();
-const timerContainer = document.getElementById('race-timer');
-const leaderBoard = document.getElementById('leaderboard');
-const raceFlag = document.getElementById('race-flag');
-// This page only listens and displays.
 
+const timerContainer = document.getElementById('race-timer');
+const raceFlag = document.getElementById('race-flag');
+const leaderBoard = document.getElementById('leaderboard');
+// This page only listens and displays.
+let cars = "cars not set yet!"
 socket.on('connect', () => {
     console.log('Connected to WebSocket server leaderboard'); // reaches and works
-    socket.emit('leaderboard-connecter','leaderboard-connected');
+    socket.emit('leaderboard-connecter', 'leaderboard-connected');
 });
 
 // This is to display 
-socket.on('time-update', (timeElapsed) => {
-    displayMessage(timeElapsed);
+socket.on('time-update', (raceTimeElapse) => {
+    console.log("The time we got", raceTimeElapse);
+    displayMessage(raceTimeElapse);
 });
 
-socket.on('peak', (text) => {
-    displayMessage(text);
+// socket.on('peak', (text) => {
+//     displayMessage(text);
+// });
+
+// socket.on('update-leader-board', async(leaderBoard) => {
+//     try{
+//         await displayLeaderBoard(leaderBoard);
+//         console.log("We got the cars", leaderBoard);//TODO: create a new function to manipulate the DOM.
+//     } catch{
+//         console.log('error with getting the cars!')
+//     }
+// });
+
+
+socket.on(`update-leader-board`, (cars) => {
+    console.log('Leaderboard updated', cars);
+    displayLeaderBoard(cars);
 });
 
-socket.on('update-leader-board', (leaderBoard) => {
-    displayMessage(leaderBoard); //TODO: create a new function to manipulate the DOM.
-})
+
 
 //TODO use constant to pass in cases as words.
 socket.on('race-flags-update', (data) => {
@@ -50,5 +65,25 @@ socket.on('race-flags-update', (data) => {
 
 function displayMessage(value) {
     timerContainer.innerHTML = `<p>${value}</p>`;
+};
+
+function displayLeaderBoard(cars) {
+    leaderBoard.innerHTML = "";
+    let table = "<table><thead><tr><th>Car Number</th><th>Car Name</th><th>Laps</th><th>Current Lap Time</th><th>Best Lap Time</th></tr></thead><tbody>";
+    cars.forEach(car => {
+        table += `
+            <tr>
+                <td>${car.number}</td>
+                <td>${car.name}</td>
+                <td>${car.race_lap}</td>
+                <td>${car.current_lap_time}</td>
+                <td>${car.best_lap_time}</td>
+            </tr>
+        `;
+    });
+
+    table += "</tbody></table>";
+
+    leaderBoard.innerHTML = table;
 }
 

@@ -39,7 +39,6 @@ const raceControl = (io, socket) => {
                                 raceID = raceId;
                                 const driverInfo = await getDriverDetails(raceId)
                                 io.emit('display-race', driverInfo)
-                                // io.emit('set-raceId', raceId)   //! this could be handled directly within the backend, but lets do the IO for practice
                             } catch (err) {
                                 console.log('Error:', err)
                             }
@@ -66,12 +65,8 @@ const raceControl = (io, socket) => {
                         try {
                             const raceId = currentRace.id
                             raceID = currentRace.id;
-                            // io.emit('set-raceId', raceId);
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
-                            // console.log("this is the Current Id ", currentRace.id);
-                            // const racingCarIds = await dbAll(`SELECT id FROM cars WHERE  race_id=?`, [currentRace.id]);
-                            // console.log("the participant carIDs are", racingCarIds);
                         } catch (err) {
                             console.log('Error:', err)
                         }
@@ -95,7 +90,6 @@ const raceControl = (io, socket) => {
             io.emit('race-flags-update', status.SAFE);
             resolve();
         });
-
         //get next race and display on next race page
         console.log('Requesting next race status...')
         io.emit('trigger-get-next-race-status')

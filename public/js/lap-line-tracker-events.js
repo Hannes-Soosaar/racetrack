@@ -14,8 +14,7 @@ document.querySelectorAll('.button').forEach(button => {
         const buttonValue = parseInt(this.value);
         let raceIdCarNumber = [raceID, buttonValue];
         console.log("this is called twice at the backend!");
-        // socket.emit('set-lap', raceIdCarNumber);
-        socket.emit('set-car-lap', raceIdCarNumber);
+        socket.emit('set-car-lap', raceIdCarNumber); //! from here we also do the updateLeader-board.
     });
 });
 
@@ -43,6 +42,7 @@ socket.on('time-update', (timeElapsed) => {
 
 //TODO: might want to redo this
 socket.on('set-raceId', (raceId) => {
+    //! TODO, load the leaderboard
     raceID = raceId;
     socket.emit('raceId-set', raceID)
     displayRaceId(raceID);
