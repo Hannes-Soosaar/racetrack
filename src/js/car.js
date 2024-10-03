@@ -6,8 +6,6 @@ const Driver = require("../models/driver");
 const status = require("../config/const"); //TODO Rename all constant exports to status 
 const db = require("../../config/db.js");
 const time = require("../js/timer.js");
-const { QueryTypes } = require("sequelize");
-const { set } = require("express/lib/application.js");
 let carIDs = null;
 
 
@@ -28,7 +26,6 @@ async function getCarsByRaceId(raceId) {
 }
 
 async function setLapTime(carId) {
-
     console.log("Gotten car Id", carId);
     setLapNumber(carId);//OK
     let lapTime;
@@ -190,7 +187,6 @@ async function dbRun(query, params) {
         });
     });
 };
-
 
 module.exports = {
     getCarsByRaceId,

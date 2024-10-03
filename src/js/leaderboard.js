@@ -1,10 +1,19 @@
-//TODO: Get race
-//TODO: Make map of cars with times
-//TODO: Get all cars for the race.
-//TODO: Array based on best lap time.
-//TODO: Show race laps time.
+const Car = require('../models/car.js');
+const Driver = require("../models/driver");
+const cars = require('../js/car.js');
+const db = require("../../config/db.js");
+const time = require("../js/timer.js");
 
-// ! The race-result will be an ordered race list, eg. get all the cars from a race, order by number of laps and fastest lap time.  
+
+
+
+//TODO: this has been handled in car
+//TODO: Make map of cars with times
+//TODO: Get all cars for the race. -- handled in car.js 
+//TODO: Array based on best lap time. -- perhaps this can be 
+//TODO: Show race laps time. -- this will be 
+
+
 
 // const RaceResult = require("../models/race-result");
 // const status = require("../config/const");

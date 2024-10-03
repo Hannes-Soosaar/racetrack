@@ -14,6 +14,10 @@ module.exports = (io, socket) => {
         displayMessage('Disconnected from the server. from the WS folder');
     };
 
+    socket.on('leaderboard-connecter',(text) => {
+        console.log("backend -", text );
+    });
+
     socket.onerror = (error) => {
         displayMessage(`Error: ${error.message}`);
     };

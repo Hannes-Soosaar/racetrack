@@ -17,6 +17,7 @@ const lapLineTracker = require('./src/ws/socket.js');
 const raceFlags = require('./src/js/race-flags');
 const nextRace = require('./src/js/next-race');
 const carController = require('./controllers/carController');
+const leaderBoard = require('./src/js/leaderboard.js');
 
 // Import race controller functions
 const { 
@@ -52,6 +53,12 @@ app.get('/race-flags', (req, res) => res.sendFile(path.join(__dirname, 'views', 
 io.on('connection', (socket) => {
     console.log("New client connected:", socket.id);
 
+    // Additional real-time race control or lap tracking
+    // leaderBoard(io,socket);
+    lapLineTracker(io, socket);
+    raceControl(io, socket);
+    frontDesk(io, socket);
+
     // Handle key validation
     socket.on('validate-key', ({ key, role }) => {
         let validKey = false;
@@ -65,6 +72,25 @@ io.on('connection', (socket) => {
         console.log(`Key validation result: ${validKey}`);
         socket.emit('key-validation', { success: validKey });
     });
+
+    // Handle public views for race flags or next race
+    socket.on('public-view', (page) => {
+        if (page === 'race-flags') {
+            raceFlags(io, socket);
+            console.log('Connected to race flags');
+        } else if (page === 'next-race') {
+            nextRace(io, socket);
+            console.log('Connected to next race');
+        }
+    });
+
+    // Handle client disconnection
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+    });
+
+
+    //! Below are front-desk socket connections operations
 
     // Handle race creation via Socket.IO
     socket.on('create-race', async (raceData, callback) => {
@@ -210,27 +236,6 @@ socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
     });
     
 
-
-    // Handle public views for race flags or next race
-    socket.on('public-view', (page) => {
-        if (page === 'race-flags') {
-            raceFlags(io, socket);
-            console.log('Connected to race flags');
-        } else if (page === 'next-race') {
-            nextRace(io, socket);
-            console.log('Connected to next race');
-        }
-    });
-
-    // Additional real-time race control or lap tracking
-    lapLineTracker(io, socket);
-    raceControl(io, socket);
-    frontDesk(io, socket);
-
-    // Handle client disconnection
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
 });
 
 // Start the server
