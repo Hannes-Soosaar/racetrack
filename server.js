@@ -19,8 +19,20 @@ const nextRace = require('./src/js/next-race');
 const carController = require('./controllers/carController');
 
 // Import race controller functions
-const { createRaceSession, addDriverToRace, updateRaceSession, deleteRaceSession, deleteDriverFromRace, getDriversForRace, getRaceSessions, getRaceById } = require('./controllers/raceController');
+const { 
+    createRaceSession, 
+    addDriverToRace, 
+    updateRaceSession, 
+    deleteRaceSession, 
+    deleteDriverFromRace, 
+    getDriversForRace, 
+    getRaceSessions, 
+    getRaceById,
+    editDriverInRace 
+} = require('./controllers/raceController');
+
 const { createCarsForRace } = require('./controllers/carController');
+
 
 
 app.use(express.json());
@@ -146,6 +158,24 @@ socket.on('edit-race', async (raceId, raceData, callback) => {
             }),
         });
     });
+    
+
+    // Handle editing a driver in a race via Socket.IO
+// Handle editing a driver in a race via Socket.IO
+socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
+    editDriverInRace({ params: { raceId, driverId }, body: driverData }, {
+        status: (code) => ({
+            json: (response) => {
+                if (code === 200) {
+                    callback({ success: true });
+                } else {
+                    callback({ error: response.error });
+                }
+            }
+        })
+    });
+});
+
 
     socket.on('get-available-cars', (raceId, callback) => {
         carController.getCarsForRace({ params: { raceId } }, {

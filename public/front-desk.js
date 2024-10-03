@@ -103,14 +103,13 @@ function loadRaces() {
 }
 
 
-// Load drivers for a specific race via Socket.IO
+// Frontend: Edit driver button and functionality
 function loadDriversForRace(raceId) {
     socket.emit('get-drivers', raceId, (response) => {
         const driverList = document.getElementById(`driver-list-${raceId}`);
 
         console.log("Drivers response:", response);  // Debugging to check the response
 
-        // Ensure the driver list element exists
         if (!driverList) {
             console.error(`Driver list element for race ${raceId} not found.`);
             return;
@@ -118,12 +117,12 @@ function loadDriversForRace(raceId) {
 
         driverList.innerHTML = '';  // Clear the list before appending new items
 
-        // Ensure that drivers is an array before using .forEach()
         if (Array.isArray(response.drivers)) {
             response.drivers.forEach(driver => {
                 const li = document.createElement('li');
                 li.innerHTML = `
                     ${driver.first_name} ${driver.last_name} (Car: ${driver.car_number})
+                    <button onclick="editDriver(${raceId}, ${driver.id}, '${driver.first_name}', '${driver.last_name}', ${driver.car_number})">Edit</button>
                     <button onclick="deleteDriver(${raceId}, ${driver.id})">Delete</button>
                 `;
                 driverList.appendChild(li);
@@ -132,6 +131,42 @@ function loadDriversForRace(raceId) {
             console.error("Expected an array of drivers, but got:", response.drivers);
         }
     });
+}
+
+// Show edit form for driver
+function editDriver(raceId, driverId, firstName, lastName, carNumber) {
+    document.getElementById('edit-driver-id').value = driverId;
+    document.getElementById('edit-first-name').value = firstName;
+    document.getElementById('edit-last-name').value = lastName;
+    document.getElementById('edit-car-number').value = carNumber;
+    document.getElementById('edit-driver-form').onsubmit = (event) => {
+        event.preventDefault();
+        updateDriverInRace(raceId, driverId);
+    };
+    document.getElementById('edit-driver-modal').style.display = 'block';  // Show the modal for editing
+}
+
+// Update driver information in the race
+function updateDriverInRace(raceId, driverId) {
+    const firstName = document.getElementById('edit-first-name').value;
+    const lastName = document.getElementById('edit-last-name').value;
+    const carNumber = document.getElementById('edit-car-number').value;
+
+    const driverData = { firstName, lastName, carNumber };
+
+    socket.emit('edit-driver', { raceId, driverId, driverData }, (response) => {
+        if (response.error) {
+            alert(response.error);
+        } else {
+            loadDriversForRace(raceId);  // Reload drivers after updating
+            closeEditDriverModal();  // Close the modal after editing
+        }
+    });
+}
+
+// Close the edit driver modal
+function closeEditDriverModal() {
+    document.getElementById('edit-driver-modal').style.display = 'none';
 }
 
 

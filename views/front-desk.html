@@ -5,6 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Front Desk</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Styling for modals */
+        #edit-driver-modal, #edit-race-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            z-index: 1000;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Hidden initially */
+        #edit-driver-modal, #edit-race-modal, .modal-overlay {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <h1>Front Desk Access</h1>
@@ -28,7 +56,6 @@
             <input type="time" id="time" required>
             <button type="submit">Save Race</button>
         </form>
-        -----------------
 
         <h3>Race List</h3>
         <div id="race-list"></div> 
@@ -49,6 +76,25 @@
             <button type="button" onclick="closeEditModal()">Cancel</button>
         </form>
     </div>
+
+    <!-- Modal for editing driver -->
+    <div id="edit-driver-modal">
+        <h2>Edit Driver</h2>
+        <form id="edit-driver-form">
+            <input type="hidden" id="edit-driver-id">
+            <label for="edit-first-name">First Name:</label>
+            <input type="text" id="edit-first-name" required>
+            <label for="edit-last-name">Last Name:</label>
+            <input type="text" id="edit-last-name" required>
+            <label for="edit-car-number">Car Number:</label>
+            <input type="text" id="edit-car-number" required>
+            <button type="submit">Save Changes</button>
+            <button type="button" onclick="closeEditDriverModal()">Cancel</button>
+        </form>
+    </div>
+
+    <!-- Modal overlay for closing modals -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeEditModal(); closeEditDriverModal();"></div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/front-desk.js"></script>
