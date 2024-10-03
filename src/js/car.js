@@ -14,7 +14,6 @@ let carIDs = null;
 // The logic for updating cars is hard-coded. Each race has 8 cars always, each car has a slot in the race, so the first in the first
 // slot will always have an index of 0. and the eight car will be the car ID with the index of 7 in the carIDs Array.
 
-// // Takes race object and returns an array with all the cars in the race.
 async function getCarIdsByRaceId(raceId) {
     carIDs = await dbAll(`SELECT id FROM cars WHERE  race_id=?`, raceId);
     return carIDs;
@@ -27,9 +26,6 @@ async function getCarsByRaceId(raceId) {
     console.log("All Cars int", cars);
     return cars;
 }
-
-// ? Will be using race_elapsed_time temp.
-//! store start time here
 
 async function setLapTime(carId) {
 
@@ -77,7 +73,6 @@ async function setLapTime(carId) {
     }
 }
 
-// TODO: add try and catch.
 async function getPreviousLapTime(carId) {
     console.log("Started to get previous lap time",)
     const previousLapTime = await dbGet('SELECT race_elapse_time FROM cars WHERE id= ?', carId);
@@ -149,7 +144,6 @@ async function updateBestLapTime(carId, lapTime) {
     }
 }
 
-// This should be OK
 async function setLapNumber(carId) {
     const query = 'UPDATE cars SET race_lap = race_lap+1 where id= ?';
     try {
@@ -157,15 +151,6 @@ async function setLapNumber(carId) {
         console.log('lap number increased for car ID', carId);
     } catch (err) {
         console.log('error updating the lap number', err);
-    }
-};
-
-function getCarIdByCarNumber(carNumber) {
-    if (carIDs === null) {
-        console.error("there is no race/carId's");
-        return "error no carIDs set";
-    } else {
-        return carIDs[carNumber];
     }
 };
 

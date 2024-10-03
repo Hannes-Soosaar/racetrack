@@ -1,3 +1,5 @@
+//THIS FILE IS NOT USED
+
 module.exports = (io, socket) => {
     console.log('Setting up front desk');
 
