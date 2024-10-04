@@ -199,41 +199,52 @@ const getDriversForRace = (req, res) => {
 const deleteDriverFromRace = (req, res) => {
     const { raceId, driverId } = req.params;
 
-    console.log(`Deleting driver with ID ${driverId} from race ${raceId}`);  // Log driverId and raceId for debugging
-
-    if (!driverId || !raceId) {
-        return res.status(400).json({ error: 'Invalid driver ID or race ID' });
-    }
-
-    // Remove the driver from the `race_drivers` table
-    const deleteFromRaceDriversQuery = `DELETE FROM race_drivers WHERE race_id = ? AND driver_id = ?`;
-    db.run(deleteFromRaceDriversQuery, [raceId, driverId], function (err) {
-        if (err) {
-            console.error('Error deleting driver from race_drivers:', err);
-            return res.status(500).json({ error: 'Could not delete driver from the race', details: err });
+    // Check if the race is safe to start
+    const checkRaceStatusQuery = `SELECT status FROM races WHERE id = ?`;
+    db.get(checkRaceStatusQuery, [raceId], (err, row) => {
+        if (err || !row) {
+            return res.status(500).json({ error: 'Error checking race status', details: err });
         }
 
-        console.log(`Driver with ID ${driverId} successfully deleted from race ${raceId}`);
+        if (row.status === 'safe_to_start') {
+            return res.status(400).json({ error: 'Cannot modify drivers once the race is safe to start.' });
+        }
 
-        // Optionally, delete the driver from the `drivers` table as well
-        const deleteFromDriversQuery = `DELETE FROM drivers WHERE id = ?`;
-        db.run(deleteFromDriversQuery, [driverId], function (err) {
+        // Proceed with deleting the driver
+        const deleteFromRaceDriversQuery = `DELETE FROM race_drivers WHERE race_id = ? AND driver_id = ?`;
+        db.run(deleteFromRaceDriversQuery, [raceId, driverId], function (err) {
             if (err) {
-                console.error('Error deleting driver from drivers table:', err);
-                return res.status(500).json({ error: 'Could not delete driver from database', details: err });
+                return res.status(500).json({ error: 'Could not delete driver from the race', details: err });
             }
 
-            console.log(`Driver with ID ${driverId} successfully deleted from database`);
-            res.status(200).json({ message: 'Driver deleted successfully' });
+            const deleteFromDriversQuery = `DELETE FROM drivers WHERE id = ?`;
+            db.run(deleteFromDriversQuery, [driverId], function (err) {
+                if (err) {
+                    return res.status(500).json({ error: 'Could not delete driver from database', details: err });
+                }
+
+                res.status(200).json({ message: 'Driver deleted successfully' });
+            });
         });
     });
 };
+
 
 
 // Edit driver details in a race
 const editDriverInRace = (req, res) => {
     const { raceId, driverId } = req.params;  // Race session ID and driver ID
     const { firstName, lastName, carNumber } = req.body;
+// Check if the race is safe to start
+const checkRaceStatusQuery = `SELECT status FROM races WHERE id = ?`;
+db.get(checkRaceStatusQuery, [raceId], (err, row) => {
+    if (err || !row) {
+        return res.status(500).json({ error: 'Error checking race status', details: err });
+    }
+
+    if (row.status === 'safe_to_start') {
+        return res.status(400).json({ error: 'Cannot modify drivers once the race is safe to start.' });
+    }
 
     console.log('Incoming updated driver data:', { firstName, lastName, carNumber });
 
@@ -283,9 +294,27 @@ const editDriverInRace = (req, res) => {
                     res.status(200).json({ message: 'Driver details updated successfully' });
                 });
             });
+            });
         });
     });
 };
+
+// Update race status to "safe to start"
+const markRaceSafeToStart = (req, res, io) => {
+    const { id } = req.params;
+    const query = `UPDATE races SET status = 'safe_to_start' WHERE id = ?`;
+
+    db.run(query, [id], function (err) {
+        if (err) {
+            return res.status(500).json({ error: 'Error marking race as safe to start', details: err });
+        }
+
+        console.log(`Race ${id} marked as safe to start`);
+        io.emit('race-status-updated', { raceId: id, status: 'safe_to_start' }); // Notify all clients
+        res.status(200).json({ message: 'Race marked as safe to start' });
+    });
+};
+
 
 module.exports = {
     createRaceSession,
@@ -296,7 +325,8 @@ module.exports = {
     addDriverToRace,
     getDriversForRace,
     deleteDriverFromRace,
-    editDriverInRace  
+    editDriverInRace,
+    markRaceSafeToStart  
 };
 
  

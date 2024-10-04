@@ -29,8 +29,10 @@ const {
     getDriversForRace, 
     getRaceSessions, 
     getRaceById,
-    editDriverInRace 
+    editDriverInRace,
+    markRaceSafeToStart
 } = require('./controllers/raceController');
+
 
 const { createCarsForRace } = require('./controllers/carController');
 
@@ -234,8 +236,25 @@ socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
             })
         });
     });
-    
 
+    // Handle marking race as safe to start via Socket.IO
+    // server.js
+socket.on('mark-race-safe', (raceId, callback) => {
+    markRaceSafeToStart({ params: { id: raceId } }, {
+        status: (code) => ({
+            json: (response) => {
+                if (code === 200) {
+                    callback({ success: true });
+                    io.emit('race-status-updated', { raceId, status: 'safe_to_start' }); // Notify all clients
+                } else {
+                    callback({ error: response.error });
+                }
+            }
+        }),
+    }, io); 
+});
+
+    
 });
 
 // Start the server

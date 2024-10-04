@@ -20,7 +20,6 @@
 │   ├── race-control.js
 │   ├── race-flags.js
 │   └── styles.css
-├── racetrack.db
 ├── readme.md
 ├── server.js
 ├── src
@@ -39,9 +38,7 @@
 │   │   ├── leaderboard.js
 │   │   ├── next-race.js
 │   │   ├── race-control.js
-│   │   ├── race-countdown.js
 │   │   ├── race-flags.js
-│   │   ├── race-result.js
 │   │   ├── race.js
 │   │   └── timer.js
 │   ├── models
@@ -62,4 +59,4 @@
     ├── race-countdown.html
     └── race-flags.html
 
-12 directories, 50 files
+12 directories, 47 files

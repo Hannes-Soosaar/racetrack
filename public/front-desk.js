@@ -64,13 +64,6 @@ socket.on('key-validation', function (response) {
 // Load races via Socket.IO
 function loadRaces() {
     socket.emit('get-races', (races) => {
-        console.log('Races response:', races);  // Log the races response
-
-        if (!Array.isArray(races)) {
-            console.error('Expected races to be an array but got:', races);
-            return;  // Prevent further execution if races is not an array
-        }
-
         const raceList = document.getElementById('race-list');
         raceList.innerHTML = '';  // Clear existing races
 
@@ -78,11 +71,15 @@ function loadRaces() {
             const raceItem = document.createElement('div');
             raceItem.innerHTML = `
                 <strong>${race.session_name}</strong> - ${race.date} ${race.time}
-                <button onclick="editRace(${race.id})">Edit Race</button>
-                <button onclick="deleteRace(${race.id})">Delete Race</button>
-                
+                ${
+                    race.status === 'safe_to_start' 
+                    ? '<p>Race is safe to start. No further edits allowed.</p>' 
+                    : `<button onclick="editRace(${race.id})">Edit Race</button>
+                       <button onclick="deleteRace(${race.id})">Delete Race</button>
+                       <button onclick="markRaceSafeToStart(${race.id})">Mark as Safe to Start</button>`
+                }
                 <h3>Add Drivers to ${race.session_name}</h3>
-                <form onsubmit="addDriverToRace(event, ${race.id})">
+                <form onsubmit="addDriverToRace(event, ${race.id})" ${race.status === 'safe_to_start' ? 'style="display:none;"' : ''}>
                     <label for="first-name-${race.id}">First Name:</label>
                     <input type="text" id="first-name-${race.id}" required>
                     <label for="last-name-${race.id}">Last Name:</label>
@@ -97,41 +94,49 @@ function loadRaces() {
 
             // Load available cars and drivers for the race
             loadAvailableCars(race.id);
-            loadDriversForRace(race.id);
+            loadDriversForRace(race.id, race.status === 'safe_to_start');  // Pass status to conditionally disable buttons
         });
     });
 }
 
 
-// Frontend: Edit driver button and functionality
-function loadDriversForRace(raceId) {
+// Disable add/edit/delete buttons in loadDriversForRace if race is locked
+function loadDriversForRace(raceId, isSafeToStart) {
     socket.emit('get-drivers', raceId, (response) => {
         const driverList = document.getElementById(`driver-list-${raceId}`);
-
-        console.log("Drivers response:", response);  // Debugging to check the response
-
-        if (!driverList) {
-            console.error(`Driver list element for race ${raceId} not found.`);
-            return;
-        }
-
         driverList.innerHTML = '';  // Clear the list before appending new items
 
-        if (Array.isArray(response.drivers)) {
-            response.drivers.forEach(driver => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    ${driver.first_name} ${driver.last_name} (Car: ${driver.car_number})
-                    <button onclick="editDriver(${raceId}, ${driver.id}, '${driver.first_name}', '${driver.last_name}', ${driver.car_number})">Edit</button>
-                    <button onclick="deleteDriver(${raceId}, ${driver.id})">Delete</button>
-                `;
-                driverList.appendChild(li);
-            });
+        response.drivers.forEach(driver => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                ${driver.first_name} ${driver.last_name} (Car: ${driver.car_number})
+                ${isSafeToStart ? '' : `<button onclick="editDriver(${raceId}, ${driver.id}, '${driver.first_name}', '${driver.last_name}', ${driver.car_number})">Edit</button>
+                <button onclick="deleteDriver(${raceId}, ${driver.id})">Delete</button>`}
+            `;
+            driverList.appendChild(li);
+        });
+    });
+}
+
+
+// Add the markRaceSafeToStart function here
+function markRaceSafeToStart(raceId) {
+    if (!confirm('Are you sure you want to mark this race as safe to start? This will lock the race from further editing.')) {
+        return;
+    }
+    
+    // Emit socket event to mark race as safe to start
+    socket.emit('mark-safe-to-start', raceId, (response) => {
+        if (response.error) {
+            alert('Error marking race as safe to start: ' + response.error);
         } else {
-            console.error("Expected an array of drivers, but got:", response.drivers);
+            alert('Race marked as safe to start!');
+            loadRaces();  // Reload races to reflect the updated status
         }
     });
 }
+
+
 
 // Show edit form for driver
 function editDriver(raceId, driverId, firstName, lastName, carNumber) {
@@ -275,14 +280,15 @@ function deleteDriver(raceId, driverId) {
 
 // Load available cars for a race
 function loadAvailableCars(raceId) {
+    const carNumberSelect = document.getElementById(`car-number-${raceId}`);
+
+    // Check if the select element exists before proceeding
+    if (!carNumberSelect) {
+        console.error(`Car select element for race ${raceId} not found.`);
+        return;  // Exit function if element is not found
+    }
+
     socket.emit('get-available-cars', raceId, (cars) => {
-        const carNumberSelect = document.getElementById(`car-number-${raceId}`);
-
-        if (!carNumberSelect) {
-            console.error(`Car select element for race ${raceId} not found.`);
-            return;
-        }
-
         carNumberSelect.innerHTML = '';  // Clear previous options
 
         if (cars.length === 0) {
@@ -299,6 +305,21 @@ function loadAvailableCars(raceId) {
             option.textContent = `Car ${car.number}`;  // Display car number
             carNumberSelect.appendChild(option);
         });
+    });
+}
+
+
+
+// Handle marking race as safe to start
+// Frontend: Mark race as safe
+function markRaceSafeToStart(raceId) {
+    socket.emit('mark-race-safe', raceId, (response) => {
+        if (response.success) {
+            alert('Race marked as safe to start!');
+            loadRaces();  // Reload the race list after marking the race
+        } else {
+            alert('Failed to mark race as safe: ' + response.error);
+        }
     });
 }
 
