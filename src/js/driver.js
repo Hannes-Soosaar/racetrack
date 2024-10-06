@@ -20,6 +20,8 @@ async function setDriverForRace(driversIds, raceId){
 }
 
 //TODO: for each car loop over the drivers object and if there is there is a driver with the matching carNumber add the driver first Name and Last name to the Car object Name.
+
+
 //TODO: Get carid and number based on raceid return carsWithNumbers
 //TODO: Get driverid and carnumber based on raceid
 //TODO: set DriverId for a car if carnumbers match

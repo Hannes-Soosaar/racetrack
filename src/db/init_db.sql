@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS cars (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     driver_id INTEGER, -- Allow this to be NULL so a car can exist without a driver
     race_id INTEGER, -- Foreign key linking this car to a specific race
-    name TEXT, -- Optional: if you want to give cars a name
+    driver_name TEXT, -- Optional: if you want to give cars a name
     number INTEGER NOT NULL, -- Car number specific to the race (e.g., 1-8)
     race_lap INTEGER DEFAULT 0, -- Track the number of laps
     current_lap_time NUMBER DEFAULT 0.0, -- Current lap time for the car

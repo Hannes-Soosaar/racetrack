@@ -10,7 +10,7 @@ INSERT INTO drivers (first_name,last_name,status) VALUES
 ('Teet','Kala',8),
 ('Paul','Mari',8);
 
-INSERT INTO cars (driver_id,race_id,name, number,race_lap,current_lap_time,best_lap_time,race_elapse_time,status) VALUES
+INSERT INTO cars (driver_id,race_id,driver_name, number,race_lap,current_lap_time,best_lap_time,race_elapse_time,status) VALUES
 (1,1,'one',1,2,3,4,5,8),
 (2,1,'two',2,0,0,0,0,8),
 (3,1,'three',3,0,0,0,0,8),
