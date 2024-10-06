@@ -69,15 +69,14 @@ function displayMessage(value) {
 
 function displayLeaderBoard(cars) {
     leaderBoard.innerHTML = "";
-    let table = "<table><thead><tr><th>Car Number</th><th>Driver Name</th><th>Laps</th><th>Current Lap Time</th><th>Best Lap Time</th></tr></thead><tbody>";
+    let table = "<table><thead><tr><th>Car Number</th><th>Driver Name</th><th>Laps</th><th>Best Lap Time</th></tr></thead><tbody>";
     cars.forEach(car => {
         table += `
             <tr>
                 <td>${car.number}</td>
                 <td>${car.driver_name}</td>
                 <td>${car.race_lap}</td>
-                <td>${car.current_lap_time}</td>
-                <td>${car.best_lap_time}</td>
+                <td>${car.best_lap_time ? displayMinutesAndSeconds(car.best_lap_time) : '-'}</td>   <!-- Format best lap time -->
             </tr>
         `;
     });
@@ -86,4 +85,14 @@ function displayLeaderBoard(cars) {
 
     leaderBoard.innerHTML = table;
 }
+
+function displayMinutesAndSeconds(remainingRaceTime) {
+    const totalSeconds = Math.floor(remainingRaceTime / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+    return `${formattedMinutes} m :${formattedSeconds} s`;
+}
+
 
