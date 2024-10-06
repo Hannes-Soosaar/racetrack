@@ -16,7 +16,7 @@ async function getDriverIdsAndCarNumbers(raceId) {
     };
 }
 
-async function getDriverName(driverId) {
+async function getDriverName(driverId) { 
     const query = 'SELECT first_name, last_name FROM drivers WHERE  id = ?'
     let driverNames;
     try {
@@ -41,7 +41,6 @@ async function dbGet(query, params) {
     });
 };
 
-
 async function dbAll(query, params) {
     return new Promise((resolve, reject) => {
         db.all(query, params, (err, rows) => {
@@ -54,7 +53,8 @@ async function dbAll(query, params) {
     });
 };
 
-
 module.exports = {
-    gerDriversByRaceId,
+    getDriverIdsAndCarNumbers,
+    getDriverName
+
 }

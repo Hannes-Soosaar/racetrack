@@ -132,11 +132,12 @@ async function setBestLapTime(bestLapTime, carId) {
 }
 
 async function getCarIdsAndCarNumbers(raceId) {
+    console.log("the Race Id we are getting Numbers and IDs for is:", raceId);
     const query = 'SELECT id,number FROM cars WHERE race_id=?'
     let carIdsAndNumbers;
     try {
-        carIdsAndNumbers = await dbGet(query, [race_id]);
-        console.log('Driver with Id:  ', driverId, "found for car id: ", carId);
+        carIdsAndNumbers = await dbAll(query, [raceId]);
+        console.log('Driver with Id:  found for car id: ', raceId);
         return carIdsAndNumbers
     } catch (error) {
         console.log('error getting car id and number ', error);
@@ -166,7 +167,7 @@ async function setDriverName(carId, driverName) {
 }
 
 async function setDriverId(driverId,carId){
-    const query = 'UPDATE cars SET driver_id = ?a WHERE id =?'
+    const query = 'UPDATE cars SET driver_id = ? WHERE id =?'
     try {
         await dbRun(query, [driverId, carId]);
         console.log('Updating cars table car id', carId, 'with driver id: ', driverId);
@@ -228,9 +229,14 @@ async function dbRun(query, params) {
         });
     });
 };
+ 
 
 module.exports = {
     getCarsByRaceId,
     getCarIdsByRaceId,
+    getCarIdsAndCarNumbers,
+    getDriverId,
+    setDriverName,
+    setDriverId,
     setLapTime,
 }
