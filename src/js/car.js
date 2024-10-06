@@ -68,7 +68,6 @@ async function setLapTime(carId) {
     }
 }
 
-
 async function getPreviousLapTime(carId) {
     console.log("Started to get previous lap time",)
     const previousLapTime = await dbGet('SELECT race_elapse_time FROM cars WHERE id= ?', carId);
@@ -100,7 +99,6 @@ async function setNewLapStartTime(carId) {
     }
 };
 
-//This should be OK
 async function getCarLapTime(carId) {
     const previousLapTime = await getPreviousLapTime(carId);
     console.log("Previous lap time ", previousLapTime);
@@ -133,6 +131,50 @@ async function setBestLapTime(bestLapTime, carId) {
     }
 }
 
+async function getCarIdsAndCarNumbers(raceId) {
+    const query = 'SELECT id,number FROM cars WHERE race_id=?'
+    let carIdsAndNumbers;
+    try {
+        carIdsAndNumbers = await dbGet(query, [race_id]);
+        console.log('Driver with Id:  ', driverId, "found for car id: ", carId);
+        return carIdsAndNumbers
+    } catch (error) {
+        console.log('error getting car id and number ', error);
+        return null;
+    }
+}
+
+async function getDriverId(carId) {
+    const query = 'SELECT driver_if FROM cars WHERE id=?'
+    let driverId;
+    try {
+     driverId =  await dbGet(query, [driverName, carId]);
+        console.log('Driver with Id:  ', driverId, "found for car id: ",carId);
+    } catch (error) {
+        console.log('error getting driver Id', error);
+    }
+}
+
+async function setDriverName(carId, driverName) {
+    const query = 'UPDATE cars SET driver_name = ? WHERE id = ?'
+    try {
+        await dbRun(query, [driverName, carId]);
+        console.log('Updating cars table car id', carId, 'with driverName', driverName);
+    } catch (error) {
+        console.log('error', error, 'Updating cars table car id', carId, 'with driverName', driverName)
+    }
+}
+
+async function setDriverId(driverId,carId){
+    const query = 'UPDATE cars SET driver_id = ?a WHERE id =?'
+    try {
+        await dbRun(query, [driverId, carId]);
+        console.log('Updating cars table car id', carId, 'with driver id: ', driverId);
+    } catch (error) {
+        console.log('error', error, 'Updating cars table car id', carId, 'with driver Id', driverId);
+    }
+}
+
 async function updateBestLapTime(carId, lapTime) {
     const bestLapTime = await getBestLapTime(carId);
     if (lapTime < bestLapTime || bestLapTime === 0) {
@@ -150,11 +192,6 @@ async function setLapNumber(carId) {
     }
 };
 
-
-async function addDriverNameToCar(carId){
-
-};
-
 async function dbGet(query, params) {
     return new Promise((resolve, reject) => {
         db.get(query, params, (err, row) => {
@@ -167,8 +204,6 @@ async function dbGet(query, params) {
     });
 };
 
-
-// this sections could be imported
 async function dbAll(query, params) {
     return new Promise((resolve, reject) => {
         db.all(query, params, (err, rows) => {
