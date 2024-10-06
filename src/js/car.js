@@ -2,7 +2,6 @@
 // WORKS AS INTENDED
 
 const Car = require("../models/car");
-const Driver = require("../models/driver");
 const status = require("../config/const"); //TODO Rename all constant exports to status 
 const db = require("../../config/db.js");
 const time = require("../js/timer.js");
@@ -68,6 +67,7 @@ async function setLapTime(carId) {
         }
     }
 }
+
 
 async function getPreviousLapTime(carId) {
     console.log("Started to get previous lap time",)
@@ -150,6 +150,11 @@ async function setLapNumber(carId) {
     }
 };
 
+
+async function addDriverNameToCar(carId){
+
+};
+
 async function dbGet(query, params) {
     return new Promise((resolve, reject) => {
         db.get(query, params, (err, row) => {
@@ -162,6 +167,8 @@ async function dbGet(query, params) {
     });
 };
 
+
+// this sections could be imported
 async function dbAll(query, params) {
     return new Promise((resolve, reject) => {
         db.all(query, params, (err, rows) => {

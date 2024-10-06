@@ -39,16 +39,12 @@ Each roll has BE functionality - BE - we divide up the rolls - everybody does so
 
 - node js dev vs. regular mode.
 
-
-
 Questions:
 How to do the front end? 
 React Vue, Go and html-templates, something else?
 do we do BE and FE separate?
 Dockerize the project ( so we do not forget) ?
 Use SQLite for data persistance (do we want to use anything else) ?
-
-
 
 Mandatory
 
@@ -69,12 +65,9 @@ The Next Race display switches to the subsequent race, once the current race is 
 The Next Race display shows the drivers names, and the cars they're assigned to.
 If there are no upcoming races, no sessions are displayed.
 
-
-
 SAFETY OFFICIAL - AP KARL-HENDRIK
 
 If there is no upcoming race after the last session is ended, the Safety Official sees no upcoming races message.
-
 The safety official has one active button, which starts the race when pressed.
 When the race is started, the following happens:
 - The race mode is changed to "Safe"
@@ -87,9 +80,6 @@ When the Safety Official selects "Safe", the Flag screen is green.
 When the Safety Official selects "Hazard", the Flag screen is yellow.
 When the Safety Official selects "Danger", the Flag screen is red.
 When the Safety Official selects "Finish", the Flag screen is chequered.
-
-
-
 
 When the race mode changes to "Finish", the race controls disappear, and a button appears to end the race session. --This happens when the timer counts down to zero.
 When the Safety Official ends the race session, the next session appears on their interface.

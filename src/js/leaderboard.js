@@ -4,12 +4,11 @@ const car = require('../js/car.js');
 const db = require("../../config/db.js");
 const time = require("../js/timer.js");
 
-// takes in an array of Cars and sorts it
+// returns a sorted array of cars.
 async function getLeaderboard(raceId) {
     let cars;
     try {
-        cars = await car.getCarsByRaceId(raceId)
-        
+        cars = await car.getCarsByRaceId(raceId) 
     } catch {
         console.log("error, getting cars ", error);
     };
