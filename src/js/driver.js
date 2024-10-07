@@ -1,9 +1,8 @@
 const RaceDiver = require("../models/race_drivers.js");
 const db = require("../../config/db.js");
 
-//TODO: for each car loop over the drivers object and if there is there is a driver with the matching carNumber add the driver first Name and Last name to the Car object Name.
-
 async function getDriverIdsAndCarNumbers(raceId) {
+    console.log('getting the driver IDs and Car Numbers')
     const query = 'SELECT driver_id, car_number FROM race_drivers WHERE race_id =?';
     let driverIdsAndCarNumbers;
     try {

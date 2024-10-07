@@ -8,7 +8,7 @@ let raceID = null;
 
 const raceControl = (io, socket) => {
     console.log('Setting up race control');
-    currentRace = null
+    // currentRace = null
     // Handle starting the race
     socket.on('start-session', async () => {
         if (currentRace != null) {
@@ -33,7 +33,9 @@ const raceControl = (io, socket) => {
                         ORDER BY DATETIME(date || ' ' || time) ASC
                         LIMIT 1`);
                     if (nextRaceRow) {
+                        console.log("HERE, with a race!");
                         currentRace = new Race(nextRaceRow);
+                        race.setDriverIdToCars(currentRace.id);
                         (async () => {
                             try {
                                 const raceId = currentRace.id
@@ -66,7 +68,7 @@ const raceControl = (io, socket) => {
                         try {
                             const raceId = currentRace.id
                             raceID = currentRace.id;
-                            console.log("HERE!");
+                            console.log("HERE, with else!");
                             race.setDriverIdToCars(raceID)
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
@@ -107,7 +109,6 @@ const raceControl = (io, socket) => {
     });
 
     // Handle changing race mode 
-
     socket.on('change-mode', (mode) => {
         console.log(`Race mode changed to ${mode}`);
         io.emit('race-mode', mode);
@@ -157,6 +158,40 @@ const raceControl = (io, socket) => {
     });
 };
 
+function changeFlag(flagID) {
+    const sql = `UPDATE races SET status = ? WHERE id = ?`;
+    db.run(sql, [flagID, currentRace.id], function (err) {
+        if (err) {
+            ``
+            console.log(err.message);
+        }
+    });
+}
+
+async function getDriverDetails(raceId) {
+    const query = `
+    SELECT 
+        (drivers.first_name || ' ' || drivers.last_name) AS driver_name,
+        race_drivers.car_number
+    FROM race_drivers
+    JOIN drivers ON race_drivers.driver_id = drivers.id
+    WHERE race_drivers.race_id = ?
+    `
+    try {
+        const rows = await new Promise((resolve, reject) => {
+            db.all(query, [raceId], (err, rows) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(rows)
+                }
+            })
+        })
+        return rows
+    } catch (err) {
+        console.log('Error fetching driver details:', err)
+    }
+}
 
 // DB functions!
 async function dbGet(query, params) {
@@ -194,43 +229,6 @@ async function dbRun(query, params) {
         });
     });
 };
-
-function changeFlag(flagID) {
-    const sql = `UPDATE races SET status = ? WHERE id = ?`;
-    db.run(sql, [flagID, currentRace.id], function (err) {
-        if (err) {
-            ``
-            console.log(err.message);
-        }
-    });
-}
-
-async function getDriverDetails(raceId) {
-    const query = `
-    SELECT 
-        (drivers.first_name || ' ' || drivers.last_name) AS driver_name,
-        race_drivers.car_number
-    FROM race_drivers
-    JOIN drivers ON race_drivers.driver_id = drivers.id
-    WHERE race_drivers.race_id = ?
-    `
-    try {
-        const rows = await new Promise((resolve, reject) => {
-            db.all(query, [raceId], (err, rows) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve(rows)
-                }
-            })
-        })
-        return rows
-    } catch (err) {
-        console.log('Error fetching driver details:', err)
-    }
-}
-
-
 
 module.exports = {
     raceControl,
