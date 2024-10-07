@@ -5,8 +5,7 @@ const db = require('../config/db');
 exports.createCarsForRace = (raceId) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const carInsertQuery = `INSERT INTO cars (number, race_id, name) VALUES (?, ?, ?)`;
-
+            const carInsertQuery = `INSERT INTO cars (number, race_id, driver_name) VALUES (?, ?, ?)`;
             for (let i = 1; i <= 8; i++) {  // Assuming 8 cars per race
                 await new Promise((resolve, reject) => {
                     db.run(carInsertQuery, [i, raceId, `Car ${i}`], function (err) {

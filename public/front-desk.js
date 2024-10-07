@@ -287,10 +287,17 @@ function loadAvailableCars(raceId) {
         console.error(`Car select element for race ${raceId} not found.`);
         return;  // Exit function if element is not found
     }
-
     socket.emit('get-available-cars', raceId, (cars) => {
+        const carNumberSelect = document.getElementById(`car-number-${raceId}`);
+    
+        // Ensure the select element exists
+        if (!carNumberSelect) {
+            console.error(`Car select element for race ${raceId} not found.`);
+            return;
+        }
+    
         carNumberSelect.innerHTML = '';  // Clear previous options
-
+    
         if (cars.length === 0) {
             const option = document.createElement('option');
             option.value = '';
@@ -298,7 +305,7 @@ function loadAvailableCars(raceId) {
             carNumberSelect.appendChild(option);
             return;
         }
-
+    
         cars.forEach(car => {
             const option = document.createElement('option');
             option.value = car.number;  // Use car number as the value
