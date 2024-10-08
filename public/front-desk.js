@@ -1,4 +1,5 @@
 const socket = io();
+
 const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
@@ -71,9 +72,8 @@ function loadRaces() {
             const raceItem = document.createElement('div');
             raceItem.innerHTML = `
                 <strong>${race.session_name}</strong> - ${race.date} ${race.time}
-                ${
-                    race.status === 'safe_to_start' 
-                    ? '<p>Race is safe to start. No further edits allowed.</p>' 
+                ${race.status === 'safe_to_start'
+                    ? '<p>Race is safe to start. No further edits allowed.</p>'
                     : `<button onclick="editRace(${race.id})">Edit Race</button>
                        <button onclick="deleteRace(${race.id})">Delete Race</button>
                        <button onclick="markRaceSafeToStart(${race.id})">Mark as Safe to Start</button>`
@@ -124,7 +124,7 @@ function markRaceSafeToStart(raceId) {
     if (!confirm('Are you sure you want to mark this race as safe to start? This will lock the race from further editing.')) {
         return;
     }
-    
+
     // Emit socket event to mark race as safe to start
     socket.emit('mark-safe-to-start', raceId, (response) => {
         if (response.error) {
@@ -289,15 +289,15 @@ function loadAvailableCars(raceId) {
     }
     socket.emit('get-available-cars', raceId, (cars) => {
         const carNumberSelect = document.getElementById(`car-number-${raceId}`);
-    
+
         // Ensure the select element exists
         if (!carNumberSelect) {
             console.error(`Car select element for race ${raceId} not found.`);
             return;
         }
-    
+
         carNumberSelect.innerHTML = '';  // Clear previous options
-    
+
         if (cars.length === 0) {
             const option = document.createElement('option');
             option.value = '';
@@ -305,7 +305,7 @@ function loadAvailableCars(raceId) {
             carNumberSelect.appendChild(option);
             return;
         }
-    
+
         cars.forEach(car => {
             const option = document.createElement('option');
             option.value = car.number;  // Use car number as the value
@@ -330,6 +330,18 @@ function markRaceSafeToStart(raceId) {
     });
 }
 
+socket.on('block-driver-changes', id => {
+    const buttons = document.querySelectorAll('button')
+    const targetButtons = Array.from(buttons).filter(button => {
+        return button.getAttribute('onclick') && button.getAttribute('onclick').includes(id)
+    })
+
+    targetButtons.forEach(button => {
+        button.disabled = true
+    })
+
+    console.log('blocking driver changes for id: ', id)
+})
 
 document.addEventListener('DOMContentLoaded', function () {
     loadRaces();  // Call loadRaces when the page loads

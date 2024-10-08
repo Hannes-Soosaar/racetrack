@@ -10,6 +10,7 @@ module.exports = (io, socket) => {
         io.emit('trigger-get-next-race-status')
     })
 
+
     // Listen for race status updates (e.g., when a race is marked safe to start)
     socket.on('race-status-updated', ({ raceId, status }) => {
         if (status === 'safe_to_start') {
@@ -17,5 +18,5 @@ module.exports = (io, socket) => {
             loadRaces();  // Reload races to reflect the status change
         }
     });
-    
+
 };

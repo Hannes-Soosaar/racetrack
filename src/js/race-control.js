@@ -2,6 +2,7 @@ const db = require('../../config/db.js');
 const Race = require('../models/race.js');
 const status = require('../config/const.js')
 const race = require('../js/race.js');
+
 let currentRace = null;
 let raceID = null;
 // The order of the races that will be taken is the the earliest first that is not in the past.
@@ -40,6 +41,7 @@ const raceControl = (io, socket) => {
                             try {
                                 const raceId = currentRace.id
                                 raceID = raceId;
+                                io.emit('block-driver-changes', (raceId))
                                 const driverInfo = await getDriverDetails(raceId)
                                 io.emit('display-race', driverInfo)
                                 io.emit('race-status', 'Race not started')
@@ -72,6 +74,7 @@ const raceControl = (io, socket) => {
                             raceID = currentRace.id;
                             console.log("HERE, with else!");
                             race.setDriverIdToCars(raceID)
+                            io.emit('block-driver-changes', (raceId))
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
                             io.emit('race-status', 'Race not started')
