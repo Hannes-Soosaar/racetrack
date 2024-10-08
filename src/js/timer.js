@@ -5,6 +5,7 @@ let pauseDuration = 0;
 let pauseStart = 0;
 let remainingRaceTime = 0;
 let startTime=0;
+
 function startTimer(io, raceDurationMs) {
     if (raceInProgress) {
         console.log("Race already started!");

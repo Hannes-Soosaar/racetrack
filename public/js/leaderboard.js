@@ -6,7 +6,7 @@ const leaderBoard = document.getElementById('leaderboard');
 // This page only listens and displays.
 let cars = "cars not set yet!"
 socket.on('connect', () => {
-    console.log('Connected to WebSocket server leaderboard'); // reaches and works
+    console.log('Connected to WebSocket server leaderboard');
     socket.emit('leaderboard-connecter', 'leaderboard-connected');
 });
 
@@ -15,20 +15,6 @@ socket.on('time-update', (raceTimeElapse) => {
     console.log("The time we got", raceTimeElapse);
     displayMessage(raceTimeElapse);
 });
-
-// socket.on('peak', (text) => {
-//     displayMessage(text);
-// });
-
-// socket.on('update-leader-board', async(leaderBoard) => {
-//     try{
-//         await displayLeaderBoard(leaderBoard);
-//         console.log("We got the cars", leaderBoard);//TODO: create a new function to manipulate the DOM.
-//     } catch{
-//         console.log('error with getting the cars!')
-//     }
-// });
-
 
 socket.on(`update-leader-board`, (cars) => {
     console.log('Leaderboard updated', cars);
@@ -80,9 +66,7 @@ function displayLeaderBoard(cars) {
             </tr>
         `;
     });
-
     table += "</tbody></table>";
-
     leaderBoard.innerHTML = table;
 }
 

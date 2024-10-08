@@ -1,7 +1,7 @@
 
 BUGS:
 
-*If the race roster is emptied and you create a new race, the Race controll will not see it.
+* If the race roster is emptied and you create a new race, the Race controll will not see it.
 * the leader board can still mark a lap if the race is qued,but not started
 * the leader board get loaded when the lap linetracker emits a lap time. (start when- race is started.)
 
