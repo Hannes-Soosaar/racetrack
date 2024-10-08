@@ -6,6 +6,16 @@ BUGS:
 * the leader board get loaded when the lap linetracker emits a lap time. (start when- race is started.)
 
 
+-Leader board is updated on Start Race!
+-Lapline visuals 
+
+- Has been given a tablet which may be used in landscape or portrait
+- They must occupy a large tappable area).
+- Cars can still cross the lap line when the race is in finish mode.
+- The buttons must not function after the race is ended. They should disappear or be visually disabled.
+
+
+
 If a race is not started, but the flags page is loaded, the system crashes. Add if 0 null or undefined check!
 
 
@@ -17,7 +27,6 @@ There is an issue with having to have a connection open to get the
 2) logon screen                       
     Usermanagment      
         .env
-3) Agree on the styling. - WILL NOT DO.
 4) Establish WS connection. - DONE NEED TO UNDERSTAND HOW IT WORKS
 how is the data swapped between WS - is there a standard? There is only text and binary
 how is the listner configured on input ? 
