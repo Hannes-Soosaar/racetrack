@@ -91,6 +91,13 @@ const raceControl = (io, socket) => {
                 console.error(err.message);
             }
         }
+
+        if(currentRace.id !== null){
+        io.emit('load-leader-board', currentRace.id);
+        }else {
+            io.emit('load-no-race')
+        }
+    
     });
 
     socket.on('start-race', async () => {
