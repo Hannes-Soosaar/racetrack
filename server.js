@@ -20,14 +20,14 @@ const carController = require('./controllers/carController');
 const leaderBoard = require('./src/js/leaderboard.js');
 
 // Import race controller functions
-const { 
-    createRaceSession, 
-    addDriverToRace, 
-    updateRaceSession, 
-    deleteRaceSession, 
-    deleteDriverFromRace, 
-    getDriversForRace, 
-    getRaceSessions, 
+const {
+    createRaceSession,
+    addDriverToRace,
+    updateRaceSession,
+    deleteRaceSession,
+    deleteDriverFromRace,
+    getDriversForRace,
+    getRaceSessions,
     getRaceById,
     editDriverInRace,
     markRaceSafeToStart
@@ -104,27 +104,27 @@ io.on('connection', (socket) => {
             callback({ error: 'Race creation failed: ' + error.message });
         }
     });
-    
+
 
 
     // Get race details
-socket.on('get-race-details', (raceId, callback) => {
-    getRaceById(raceId).then((race) => {
-        callback({ race });
-    }).catch((err) => {
-        callback({ error: 'Error fetching race details: ' + err.message });
+    socket.on('get-race-details', (raceId, callback) => {
+        getRaceById(raceId).then((race) => {
+            callback({ race });
+        }).catch((err) => {
+            callback({ error: 'Error fetching race details: ' + err.message });
+        });
     });
-});
 
-// Edit race
-socket.on('edit-race', async (raceId, raceData, callback) => {
-    try {
-        await updateRaceSession(raceId, raceData);
-        callback({ success: true, message: 'Race updated successfully' });
-    } catch (error) {
-        callback({ error: 'Error updating race: ' + error.message });
-    }
-});
+    // Edit race
+    socket.on('edit-race', async (raceId, raceData, callback) => {
+        try {
+            await updateRaceSession(raceId, raceData);
+            callback({ success: true, message: 'Race updated successfully' });
+        } catch (error) {
+            callback({ error: 'Error updating race: ' + error.message });
+        }
+    });
 
 
     // Delete Race via Socket.IO
@@ -186,23 +186,23 @@ socket.on('edit-race', async (raceId, raceData, callback) => {
             }),
         });
     });
-    
+
 
     // Handle editing a driver in a race via Socket.IO
-// Handle editing a driver in a race via Socket.IO
-socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
-    editDriverInRace({ params: { raceId, driverId }, body: driverData }, {
-        status: (code) => ({
-            json: (response) => {
-                if (code === 200) {
-                    callback({ success: true });
-                } else {
-                    callback({ error: response.error });
+    // Handle editing a driver in a race via Socket.IO
+    socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
+        editDriverInRace({ params: { raceId, driverId }, body: driverData }, {
+            status: (code) => ({
+                json: (response) => {
+                    if (code === 200) {
+                        callback({ success: true });
+                    } else {
+                        callback({ error: response.error });
+                    }
                 }
-            }
-        })
+            })
+        });
     });
-});
 
 
     socket.on('get-available-cars', (raceId, callback) => {
@@ -219,7 +219,7 @@ socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
         });
     });
 
-    
+
 
     // Get All Races via Socket.IO
     socket.on('get-races', (callback) => {
@@ -239,22 +239,20 @@ socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
 
     // Handle marking race as safe to start via Socket.IO
     // server.js
-socket.on('mark-race-safe', (raceId, callback) => {
-    markRaceSafeToStart({ params: { id: raceId } }, {
-        status: (code) => ({
-            json: (response) => {
-                if (code === 200) {
-                    callback({ success: true });
-                    io.emit('race-status-updated', { raceId, status: 'safe_to_start' }); // Notify all clients
-                } else {
-                    callback({ error: response.error });
+    socket.on('mark-race-safe', (raceId, callback) => {
+        markRaceSafeToStart({ params: { id: raceId } }, {
+            status: (code) => ({
+                json: (response) => {
+                    if (code === 200) {
+                        callback({ success: true });
+                        io.emit('race-status-updated', { raceId, status: 'safe_to_start' }); // Notify all clients
+                    } else {
+                        callback({ error: response.error });
+                    }
                 }
-            }
-        }),
-    }, io); 
-});
-
-    
+            }),
+        }, io);
+    });
 });
 
 // Start the server

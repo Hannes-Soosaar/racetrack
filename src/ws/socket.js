@@ -68,7 +68,7 @@ module.exports = (io, socket) => {
     // });
 
     // This is used.
-    socket.on('set-car-lap', async (raceIdCarNumber) => { 
+    socket.on('set-car-lap', async (raceIdCarNumber) => {
         try {
             raceId = raceIdCarNumber[0];
             carNumber = raceIdCarNumber[1];

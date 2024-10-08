@@ -39,7 +39,6 @@ socket.on('time-update', (timeElapsed) => {
     displayMessage(timeElapsed);
 });
 
-
 //TODO: might want to redo this
 socket.on('set-raceId', (raceId) => {
     //! TODO, load the leaderboard
@@ -47,6 +46,7 @@ socket.on('set-raceId', (raceId) => {
     socket.emit('raceId-set', raceID)
     displayRaceId(raceID);
 });
+
 
 
 // When the race finishes it sends out null

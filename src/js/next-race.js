@@ -47,6 +47,6 @@ async function getNextRace() {
         console.log('Error fetching races:', err);
         return null;
     }
-} 
+}
 
 

@@ -60,6 +60,7 @@ newSessionButton.addEventListener('click', () => {
 startRaceButton.addEventListener('click', () => {
     console.log('Start Race button clicked');
     socket.emit('start-race');
+    socket.emit('change-mode', 'Safe')
     socket.emit('start-timer');
 });
 
@@ -91,6 +92,10 @@ endRaceButton.addEventListener('click', () => {
     socket.emit('stop-timer');
 });
 
+socket.on('trigger-end-race', () => {
+    socket.emit('end-race')
+})
+
 finishSessionButton.addEventListener('click', () => {
     socket.emit('end-session')
 });
@@ -103,8 +108,11 @@ socket.on('race-status', (status) => {
         contentDivAfterStart.style.display = 'none'
         newSessionDiv.style.display = 'block'
         document.getElementById('race-status-display-session').innerText = status
+    } else if (status === 'Race not started') {
+        document.getElementById('race-status-display').innerText = status
     } else if (status === 'Race ended') {
         disableButtons()
+        contentDivAfterStart.style.display = 'none'
         contentDivAfterFinish.style.display = 'block'
     } else if (status === 'Race started') {
         contentDiv.style.display = 'none'
@@ -133,3 +141,5 @@ function enableButtons() {
     document.getElementById('mode-danger').disabled = false
     document.getElementById('end-race').disabled = false
 }
+
+
