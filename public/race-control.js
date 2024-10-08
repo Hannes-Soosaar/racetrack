@@ -115,6 +115,7 @@ socket.on('race-status', (status) => {
         contentDivAfterStart.style.display = 'none'
         contentDivAfterFinish.style.display = 'block'
     } else if (status === 'Race started') {
+        raceModeDisplay.textContent = 'Safe'
         contentDiv.style.display = 'none'
         contentDivAfterStart.style.display = 'block'
         document.getElementById('race-status-display-2').innerText = status;
