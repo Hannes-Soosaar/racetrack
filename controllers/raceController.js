@@ -6,6 +6,14 @@ const createRaceSession = (raceData) => {
     return new Promise((resolve, reject) => {
         const { session_name, date, time, status } = raceData;
 
+        // Validate if the race date and time are in the future
+        const raceDateTime = new Date(`${date} ${time}`);
+        const currentDateTime = new Date();
+        
+        if (raceDateTime <= currentDateTime) {
+            return reject(new Error('Cannot create a race in the past. Please choose a future date and time.'));
+        }
+
         // Check if a race with the same session name already exists
         const checkDuplicateQuery = `SELECT COUNT(*) AS count FROM races WHERE session_name = ?`;
         db.get(checkDuplicateQuery, [session_name], (err, row) => {
@@ -30,6 +38,7 @@ const createRaceSession = (raceData) => {
         });
     });
 };
+
 
 
 // Get all race sessions
@@ -299,21 +308,6 @@ db.get(checkRaceStatusQuery, [raceId], (err, row) => {
     });
 };
 
-// Update race status to "safe to start"
-const markRaceSafeToStart = (req, res, io) => {
-    const { id } = req.params;
-    const query = `UPDATE races SET status = 'safe_to_start' WHERE id = ?`;
-
-    db.run(query, [id], function (err) {
-        if (err) {
-            return res.status(500).json({ error: 'Error marking race as safe to start', details: err });
-        }
-
-        console.log(`Race ${id} marked as safe to start`);
-        io.emit('race-status-updated', { raceId: id, status: 'safe_to_start' }); // Notify all clients
-        res.status(200).json({ message: 'Race marked as safe to start' });
-    });
-};
 
 
 module.exports = {
@@ -326,7 +320,6 @@ module.exports = {
     getDriversForRace,
     deleteDriverFromRace,
     editDriverInRace,
-    markRaceSafeToStart  
 };
 
  

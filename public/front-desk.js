@@ -70,16 +70,13 @@ function loadRaces() {
 
         races.forEach(race => {
             const raceItem = document.createElement('div');
+            raceItem.setAttribute('data-race-id', race.id);  // Add data-race-id for easier DOM manipulation
             raceItem.innerHTML = `
                 <strong>${race.session_name}</strong> - ${race.date} ${race.time}
-                ${race.status === 'safe_to_start'
-                    ? '<p>Race is safe to start. No further edits allowed.</p>'
-                    : `<button onclick="editRace(${race.id})">Edit Race</button>
-                       <button onclick="deleteRace(${race.id})">Delete Race</button>
-                       <button onclick="markRaceSafeToStart(${race.id})">Mark as Safe to Start</button>`
-                }
+                <button onclick="editRace(${race.id})">Edit Race</button>
+                <button onclick="deleteRace(${race.id})">Delete Race</button>
                 <h3>Add Drivers to ${race.session_name}</h3>
-                <form onsubmit="addDriverToRace(event, ${race.id})" ${race.status === 'safe_to_start' ? 'style="display:none;"' : ''}>
+                <form onsubmit="addDriverToRace(event, ${race.id})">
                     <label for="first-name-${race.id}">First Name:</label>
                     <input type="text" id="first-name-${race.id}" required>
                     <label for="last-name-${race.id}">Last Name:</label>
@@ -94,10 +91,12 @@ function loadRaces() {
 
             // Load available cars and drivers for the race
             loadAvailableCars(race.id);
-            loadDriversForRace(race.id, race.status === 'safe_to_start');  // Pass status to conditionally disable buttons
+            loadDriversForRace(race.id);  // Load drivers without checking status
         });
     });
 }
+
+
 
 
 // Disable add/edit/delete buttons in loadDriversForRace if race is locked
@@ -317,19 +316,6 @@ function loadAvailableCars(raceId) {
 
 
 
-// Handle marking race as safe to start
-// Frontend: Mark race as safe
-function markRaceSafeToStart(raceId) {
-    socket.emit('mark-race-safe', raceId, (response) => {
-        if (response.success) {
-            alert('Race marked as safe to start!');
-            loadRaces();  // Reload the race list after marking the race
-        } else {
-            alert('Failed to mark race as safe: ' + response.error);
-        }
-    });
-}
-
 socket.on('block-driver-changes', id => {
     const buttons = document.querySelectorAll('button')
     const targetButtons = Array.from(buttons).filter(button => {
@@ -346,3 +332,24 @@ socket.on('block-driver-changes', id => {
 document.addEventListener('DOMContentLoaded', function () {
     loadRaces();  // Call loadRaces when the page loads
 });
+
+// Handle updates to race status
+socket.on('race-status-updated', ({ raceId, status }) => {
+    if (status === 'safe_to_start') {
+        console.log(`Race ${raceId} is now safe to start`);
+        loadRaces();  // Reload races to reflect the new status
+    }
+    if (status === 'started') {
+        console.log(`Race ${raceId} has started`);
+        removeRaceFromList(raceId);  // Remove the race from the list without reloading the entire page
+    }
+});
+
+// Function to remove race from the list by raceId
+function removeRaceFromList(raceId) {
+    const raceItem = document.querySelector(`#race-list div[data-race-id="${raceId}"]`);
+    if (raceItem) {
+        raceItem.remove();  // Remove the race from the DOM
+    }
+}
+

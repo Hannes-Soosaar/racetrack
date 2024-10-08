@@ -237,22 +237,16 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Handle marking race as safe to start via Socket.IO
-    // server.js
-    socket.on('mark-race-safe', (raceId, callback) => {
-        markRaceSafeToStart({ params: { id: raceId } }, {
-            status: (code) => ({
-                json: (response) => {
-                    if (code === 200) {
-                        callback({ success: true });
-                        io.emit('race-status-updated', { raceId, status: 'safe_to_start' }); // Notify all clients
-                    } else {
-                        callback({ error: response.error });
-                    }
-                }
-            }),
-        }, io);
-    });
+    
+    // Handle marking the race as started
+socket.on('start-race', async () => {
+    try {
+        await startRace();  // Assuming this function marks the race as started in the database
+        io.emit('race-status-updated', { raceId: currentRace.id, status: 'started' });  // Notify all clients
+    } catch (error) {
+        console.error('Error starting race:', error);
+    }
+});
 });
 
 // Start the server

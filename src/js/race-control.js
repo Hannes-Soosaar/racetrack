@@ -91,28 +91,31 @@ const raceControl = (io, socket) => {
                 console.error(err.message);
             }
         }
-
-        if(currentRace.id !== null){
-        io.emit('load-leader-board', currentRace.id);
-        }else {
-            io.emit('load-no-race')
+        if (currentRace != null && currentRace.id !== null) {
+            io.emit('load-leader-board', currentRace.id);
+        } else {
+            io.emit('load-no-race');
         }
-    
     });
 
     socket.on('start-race', async () => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
         io.emit('set-raceId', raceID);
+        
         await new Promise((resolve) => {
             changeFlag(1);
             io.emit('race-flags-update', status.SAFE);
             resolve();
         });
-        //get next race and display on next race page
-        console.log('Requesting next race status...')
-        io.emit('trigger-get-next-race-status')
+    
+        // Notify all clients that the race has started
+        io.emit('race-status-updated', { raceId: raceID, status: 'started' });
+    
+        console.log('Requesting next race status...');
+        io.emit('trigger-get-next-race-status');
     });
+    
 
     socket.on('end-session', () => {
         changeFlag(2);
@@ -173,14 +176,18 @@ const raceControl = (io, socket) => {
 };
 
 function changeFlag(flagID) {
-    const sql = `UPDATE races SET status = ? WHERE id = ?`;
-    db.run(sql, [flagID, currentRace.id], function (err) {
-        if (err) {
-            ``
-            console.log(err.message);
-        }
-    });
+    if (currentRace && currentRace.id) {
+        const sql = `UPDATE races SET status = ? WHERE id = ?`;
+        db.run(sql, [flagID, currentRace.id], function (err) {
+            if (err) {
+                console.log(err.message);
+            }
+        });
+    } else {
+        console.log("No active race to update the flag.");
+    }
 }
+
 
 async function getDriverDetails(raceId) {
     const query = `
