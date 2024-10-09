@@ -7,7 +7,7 @@ const WAITING = 6; // all races after next
 const INACTIVE = 7; // not used
 const ACTIVE = 8;
 const PROD = false;
-const RACE_DURATION = 60000; // one minute
+const RACE_DURATION = 600000; // one minute
 // Mandatory wait time if wrong key
 const WAIT = 500;
 module.exports = {

@@ -86,16 +86,55 @@ border: 1px solid black;
 }
 
 .main-container{
+    width: 1080px;
     display: flex;
-    flex-wrap: wrap;
-    width: 100%;
+    flex-direction: column;
+    border: 1px solid black;
+    /* justify-content: center; */
 }
 
-.button-container {
-
+.page-container{
+    display: flex;
+    height: 100vh;
 }
-.table-container {
+
+.boarder-box{
+    flex-grow:1;
+    background-color:gray;
+}
+
+.header{
+    background-color: #f4f4f4;
+    text-align: center;
+}
+.main{
+    flex-grow: 1;
+    background-color: #f4f4f4;
+    align-items:flex-start;
+}
+
+.footer{
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.timer-display{
+    font-size: clamp(32px,30vw,250px);
+    text-align: center;
+    background-color: #333;
     
 }
+
+/* the Java script created element <p> comes with a margin and padding, this nulls it but only for the class of timer-display  */
+.timer-display p{
+    margin: 0;
+    padding: 0;
+}
+
+.heading {
+    font-size: 32px;
+}
+
+
 
 

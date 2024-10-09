@@ -71,8 +71,8 @@ function sendMessageFromValue(value) {
 }
 
 function displayMessage(value) {
-    messageContainer.innerHTML = `<p>${value}</p>`;
+    messageContainer.innerHTML = `${value}`;
 }
 function displayRaceId(value) {
-    IdContainer.innerHTML = `<p>${value}</p>`;
+    IdContainer.innerHTML = `${value}`;
 }
