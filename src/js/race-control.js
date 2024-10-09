@@ -14,7 +14,7 @@ const raceControl = (io, socket) => {
     socket.on('start-session', async () => {
         if (currentRace != null) {
             try {
-                const raceRow = await dbGet(`SELECT * FROM races WHERE id = ?`, [currentRace.id]);
+                const raceRow = await dbGet(`SELECT * FROM races WHERE id = ? AND status = ?`, [currentRace.id, 2]);
                 if (raceRow) {
                     await dbRun(`DELETE FROM races WHERE id = ?`, [currentRace.id]);
                     const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
@@ -28,32 +28,32 @@ const raceControl = (io, socket) => {
                             DELETE FROM drivers WHERE id IN (${driverIds.map(() => '?').join(', ')})`;
                         await dbRun(deleteDriversQuery, driverIds);
                     }
-                    const nextRaceRow = await dbGet(`
-                        SELECT * FROM races
-                        WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
-                        ORDER BY DATETIME(date || ' ' || time) ASC
-                        LIMIT 1`);
-                    if (nextRaceRow) {
-                        console.log("HERE, with a race!");
-                        currentRace = new Race(nextRaceRow);
-                        race.setDriverIdToCars(currentRace.id);
-                        (async () => {
-                            try {
-                                const raceId = currentRace.id
-                                raceID = raceId;
-                                io.emit('block-driver-changes', (raceId))
-                                const driverInfo = await getDriverDetails(raceId)
-                                io.emit('display-race', driverInfo)
-                                io.emit('race-status', 'Race not started')
-                            } catch (err) {
-                                console.log('Error:', err)
-                            }
-                        })()
-                        io.emit('trigger-next-race-message')
-                    } else {
-                        io.emit('race-status', 'No upcoming race found');
-                        currentRace = null
-                    }
+                }
+                const nextRaceRow = await dbGet(`
+                    SELECT * FROM races
+                    WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
+                    ORDER BY DATETIME(date || ' ' || time) ASC
+                    LIMIT 1`);
+                if (nextRaceRow) {
+                    console.log("HERE, with a race!");
+                    currentRace = new Race(nextRaceRow);
+                    race.setDriverIdToCars(currentRace.id);
+                    (async () => {
+                        try {
+                            const raceId = currentRace.id
+                            raceID = raceId;
+                            io.emit('block-driver-changes', (raceId))
+                            const driverInfo = await getDriverDetails(raceId)
+                            io.emit('display-race', driverInfo)
+                            io.emit('race-status', 'Race not started')
+                        } catch (err) {
+                            console.log('Error:', err)
+                        }
+                    })()
+                    io.emit('trigger-next-race-message')
+                } else {
+                    io.emit('race-status', 'No upcoming race found');
+                    currentRace = null
                 }
             } catch (err) {
                 console.error(err.message);
@@ -102,20 +102,20 @@ const raceControl = (io, socket) => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
         io.emit('set-raceId', raceID);
-        
+
         await new Promise((resolve) => {
             changeFlag(1);
             io.emit('race-flags-update', status.SAFE);
             resolve();
         });
-    
+
         // Notify all clients that the race has started
         io.emit('race-status-updated', { raceId: raceID, status: 'started' });
-    
+
         console.log('Requesting next race status...');
         io.emit('trigger-get-next-race-status');
     });
-    
+
 
     socket.on('end-session', () => {
         changeFlag(2);

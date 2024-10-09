@@ -237,16 +237,17 @@ io.on('connection', (socket) => {
         });
     });
 
-    
+
     // Handle marking the race as started
-socket.on('start-race', async () => {
-    try {
-        await startRace();  // Assuming this function marks the race as started in the database
-        io.emit('race-status-updated', { raceId: currentRace.id, status: 'started' });  // Notify all clients
-    } catch (error) {
-        console.error('Error starting race:', error);
-    }
-});
+
+    /*socket.on('start-race', async () => {
+        try {
+            await startRace();  // Assuming this function marks the race as started in the database
+            io.emit('race-status-updated', { raceId: currentRace.id, status: 'started' });  // Notify all clients
+        } catch (error) {
+            console.error('Error starting race:', error);
+        }
+    });*/
 });
 
 // Start the server

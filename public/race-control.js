@@ -1,6 +1,6 @@
 const socket = io();
 const accessForm = document.getElementById('access-form');
-const accessKeyInput = document.getElementById('access-key');
+const accessKeyInput = document.getElementById('access-input');
 const newSessionDiv = document.getElementById('session-content')
 const newSessionButton = document.getElementById('see-new-session')
 const contentDiv = document.getElementById('content');
