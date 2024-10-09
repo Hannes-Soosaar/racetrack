@@ -73,7 +73,8 @@ module.exports = (io, socket) => {
             raceId = raceIdCarNumber[0];
             carNumber = raceIdCarNumber[1];
             carIds = await car.getCarIdsByRaceId(raceId);
-            if (carIds) {
+            if (carIds && carIds.length > 0) {
+                console.log("Whats in the CarIds value", carIds);
                 await car.setLapTime(carIds[carNumber - 1].id);
                 const cars = await car.getCarsByRaceId(raceId);
                 io.emit('update-leader-board', cars)

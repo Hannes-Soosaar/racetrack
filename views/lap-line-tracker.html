@@ -12,30 +12,20 @@
 
 
 
-        <form id="access-form">
-            <label for="access-key">Enter Access Key:</label>
-            <input type="password" id="access-key" required>
-            <button type="submit">Submit</button>
-            <p id="error-message"></p>
-        </form>
-<div class="main-container">
-        <h1>Lap Line Tracker</h1>
-        <p>This is the Lap Line Tracker page.</p>
-        <div id="content" style="display:none;">
+    <form id="access-form">
+        <label for="access-key">Enter Access Key:</label>
+        <input type="password" id="access-key" required>
+        <button type="submit">Submit</button>
+        <p id="error-message"></p>
+    </form>
 
+
+    <div id="content" style="display:none;">
+        <div class="main-container">
+            <h1>Lap Line Tracker</h1>
             <div id="current Race-container"></div>
-            <div id="cars-container">
-                <button class="button" id="slot_1" value="1">Car 1</button>
-                <button class="button" id="slot_2" value="2">Car 2</button>
-                <button class="button" id="slot_3" value="3">Car 3</button>
-                <button class="button" id="slot_4" value="4">Car 4</button>
-                <button class="button" id="slot_5" value="5">Car 5</button>
-                <button class="button" id="slot_6" value="6">Car 6</button>
-                <button class="button" id="slot_7" value="7">Car 7</button>
-                <button class="button" id="slot_8" value="8">Car 8</button>
-            </div>
+            <div id="cars-container"></div>
             <div id="peak"></div>
-            <p>-------------</p>
             <div id="raceId"></div>
         </div>
     </div>
