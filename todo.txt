@@ -1,6 +1,9 @@
 
 BUGS:
-
+* the leaderborad shows cars with no drivers
+* the leader board sorts 0 as the smallest
+*the leaderBoard does not load on start race, but on lap start! (tie with start race emit)
+* lap line if started when the race controller session is started will already load the race. (tie with the timer or start race emit?)
 * If the race roster is emptied and you create a new race, the Race controll will not see it.
 * the leader board can still mark a lap if the race is qued,but not started
 * the leader board get loaded when the lap linetracker emits a lap time. (start when- race is started.)
@@ -9,10 +12,10 @@ BUGS:
 -Leader board is updated on Start Race!
 -Lapline visuals 
 
-- Has been given a tablet which may be used in landscape or portrait
+- Has been given a tablet which may be used in landscape or portrait DONE
 - They must occupy a large tappable area).
-- Cars can still cross the lap line when the race is in finish mode.
-- The buttons must not function after the race is ended. They should disappear or be visually disabled.
+- Cars can still cross the lap line when the race is in finish mode. DONE
+- The buttons must not function after the race is ended. They should disappear or be visually disabled. (DONE)
 
 
 
@@ -92,27 +95,21 @@ When the race session is ended, the race mode changes to "Danger".
 LAP-LINE OBSERVER
 
 When the race session starts, the Lap-Line Observer sees a button for each car. // DONE
-The lap button for each car has a large tappable area. 
-The Lap-line Tracker is designed for a tablet, featuring large tappable buttons for each car.
-It should work in Landscape or Portrait
+The lap button for each car has a large tappable area. WIP
+The Lap-line Tracker is designed for a tablet, featuring large tappable buttons for each car. WIP
+It should work in Landscape or Portrait DONE
+DONE- When the lap button is pressed for a car, the leader board is updated.  
 
 
 -LEADER BOARD
 
 DONE- The leaderboard shows the remaining time on the timer.  
 DONE- The leaderboard shows the flag color for the current race mode.
-
-
-When the lap button is pressed for a car, the leader board is updated. 
-
-
-The leaderboard is ordered by fastest lap times
-
-The leaderboard shows the drivers name and car number. // get_driver_car_number
-The leaderboard shows the fastest lap time for each car. //best_lap_time
-The leaderboard shows the current lap for each car. // race_lap +1
-
-Handle in the car section - The first lap starts when the car crosses the leader board for the first time.
+DONE- The leaderboard is ordered by fastest lap times
+DONE- The leaderboard shows the drivers name and car number. // get_driver_car_number
+DONE -The leaderboard shows the fastest lap time for each car. //best_lap_time
+DONE - The leaderboard shows the current lap for each car. // race_lap +1
+DONE - The first lap starts when the car crosses the leader board for the first time.
 
 
 SERVER-

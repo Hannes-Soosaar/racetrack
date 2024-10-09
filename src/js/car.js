@@ -14,7 +14,18 @@ async function getCarIdsByRaceId(raceId) {
 
 // Get all the carIds form the race and sets the global variable. ! this can be used in the score board.
 async function getCarsByRaceId(raceId) {
-    const query = `SELECT * FROM cars  WHERE race_id=? ORDER BY best_lap_time ASC`;
+    const query = `
+        SELECT * 
+        FROM cars 
+        WHERE race_id = ? 
+        AND driver_id IS NOT NULL 
+        ORDER BY 
+            CASE 
+                WHEN best_lap_time = 0 THEN 1
+                ELSE 0
+            END, 
+            best_lap_time ASC
+    `;
     const carRows = await dbAll(query, [raceId]);
     const cars = carRows.map(row => new Car(row));
     for (let car of cars) {
