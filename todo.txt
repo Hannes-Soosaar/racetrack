@@ -5,9 +5,10 @@ BUGS:
 * If the race roster is emptied and you create a new race, the Race controll will not see it. ??
 * you can create and launch an race with no drivers.
 * If a race is not started there is no flag, should be red!?
-*DONE(BUG?) - When the race session starts, the Lap-Line Observer sees a button for each car. Sees all cars.
-* end race does not zero timer!
 
+DONE(BUG?) - When the race session starts, the Lap-Line Observer sees a button for each car. Note: Sees all cars.
+
+DONE- end race does not zero timer!
 DONE the leaderborad shows cars with no drivers 
 DONE the leader board sorts 0 as the smallest
 DONE- the leaderBoard does not load on start race, but on lap start! (tie with start race emit)

@@ -11,14 +11,14 @@ let raceID = null;
 let message;
 
 
-//OK
+//Listeners
 accessForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const accessKey = accessKeyInput.value;
     socket.emit('validate-key', { key: accessKey, role: 'observer' });
 });
 
-// SOCKETS
+//SOCKETS
 socket.on('connect', () => {
     console.log('Connected to WebSocket server lap-line-tracker'); // reaches and works
     if (raceID === null) {
@@ -50,7 +50,6 @@ socket.on('set-raceId', (raceId) => {
     socket.emit('raceId-set', raceID)
 });
 
-// When the race finishes it sends out null
 socket.on('stop-timer', () => {
     message = raceID + " finished"
     displayRaceSessionMessage(message);
@@ -69,7 +68,6 @@ socket.on('key-validation', function (response) {
 });
 
 // FUNCTIONS
-
 function sendMessageFromValue(value) {
     console.log("send message! " + value);
     displayMessage(value);
@@ -105,7 +103,6 @@ function displayButtons() {
             });
         } else {
             alert("no race in progress!");
-
         }
     });
 }
