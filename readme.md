@@ -1,13 +1,13 @@
-#Real-time system for a local racetrack.
+# Real-time system for a local racetrack.
 
 This system provides real-time race management and tracking for local racetracks. Authenticated users can create, start and stop races, and track lap counts. 
 Unauthenticated users have access to live leaderboards, race schedules, participant details, and the current race mode.
 
-##Features
+## Features
 Authenticated users: Create, manage, and track races in real-time.
 Unauthenticated users: View real-time race information, including leaderboards and next race details.
 
-##Installation
+## Installation
 
 Follow these steps to set up the project:
 
@@ -27,7 +27,7 @@ You can set the environment variables directly in the command line as shown in t
 
     * For development: ```receptionist_key=8ded6076 observer_key=662e0f6c safety_key=a2d393bc npm run dev``` (races will last for 1 minute)
 
-##Access from other networks:
+## Access from other networks:
 
 5. Go to [ngrok, make an account/login, and download the standalone executable for your operating system.](https://dashboard.ngrok.com/get-started/setup/windows) 
 6. Extract and open the executable, copy the command with your auth token from [here]https://dashboard.ngrok.com/get-started/your-authtoken and run it in the console that opened from the executable.
