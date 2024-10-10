@@ -71,12 +71,15 @@ function loadRaces() {
         races.forEach(race => {
             const raceItem = document.createElement('div');
             raceItem.setAttribute('data-race-id', race.id);  // Add data-race-id for easier DOM manipulation
+
+            const isSafeToStart = (race.status === 'safe_to_start' || race.status === 'started');
+
             raceItem.innerHTML = `
                 <strong>${race.session_name}</strong> - ${race.date} ${race.time}
-                <button onclick="editRace(${race.id})">Edit Race</button>
-                <button onclick="deleteRace(${race.id})">Delete Race</button>
+                <button onclick="editRace(${race.id})" ${isSafeToStart ? 'disabled' : ''}>Edit Race</button>
+                <button onclick="deleteRace(${race.id})" ${isSafeToStart ? 'disabled' : ''}>Delete Race</button>
                 <h3>Add Drivers to ${race.session_name}</h3>
-                <form onsubmit="addDriverToRace(event, ${race.id})">
+                <form onsubmit="addDriverToRace(event, ${race.id})" ${isSafeToStart ? 'style="display:none;"' : ''}>
                     <label for="first-name-${race.id}">First Name:</label>
                     <input type="text" id="first-name-${race.id}" required>
                     <label for="last-name-${race.id}">Last Name:</label>
@@ -91,15 +94,12 @@ function loadRaces() {
 
             // Load available cars and drivers for the race
             loadAvailableCars(race.id);
-            loadDriversForRace(race.id);  // Load drivers without checking status
+            loadDriversForRace(race.id, isSafeToStart);
         });
     });
 }
 
-
-
-
-// Disable add/edit/delete buttons in loadDriversForRace if race is locked
+// Modify loadDriversForRace to handle disabling based on race status
 function loadDriversForRace(raceId, isSafeToStart) {
     socket.emit('get-drivers', raceId, (response) => {
         const driverList = document.getElementById(`driver-list-${raceId}`);
@@ -116,6 +116,7 @@ function loadDriversForRace(raceId, isSafeToStart) {
         });
     });
 }
+
 
 
 // Add the markRaceSafeToStart function here
@@ -352,6 +353,17 @@ function removeRaceFromList(raceId) {
         raceItem.remove();  // Remove the race from the DOM
     }
 }
+
+// Handle disabling driver addition when the race is marked as "safe to start"
+socket.on('block-driver-addition', (raceId) => {
+    const addDriverForm = document.querySelector(`form[onsubmit*="addDriverToRace(event, ${raceId})"]`);
+    if (addDriverForm) {
+        const inputs = addDriverForm.querySelectorAll('input, select, button');
+        inputs.forEach(input => {
+            input.disabled = true;
+        });
+    }
+});
 
 // Dynamically populate the time dropdown in 10-minute intervals
 function populateTimeDropdown() {

@@ -44,6 +44,7 @@ const raceControl = (io, socket) => {
                             const raceId = currentRace.id
                             raceID = raceId;
                             io.emit('block-driver-changes', (raceId))
+                            io.emit('block-driver-addition', (raceId)) // Block adding drivers as well
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
                             io.emit('race-status', 'Race not started')
@@ -76,6 +77,7 @@ const raceControl = (io, socket) => {
                             console.log("HERE, with else!");
                             race.setDriverIdToCars(raceID)
                             io.emit('block-driver-changes', (raceId))
+                            io.emit('block-driver-addition', (raceId)) // Block adding drivers as well
                             const driverInfo = await getDriverDetails(raceId)
                             io.emit('display-race', driverInfo)
                             io.emit('race-status', 'Race not started')
@@ -103,21 +105,26 @@ const raceControl = (io, socket) => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
         io.emit('set-raceId', raceID);
+        
+        // Emit an event to disable adding drivers to this race
+        io.emit('block-driver-addition', raceID);
+    
         const cars = await car.getCarsByRaceId(raceID);
-        console.log(cars)
-        io.emit('update-leader-board', cars)
+        console.log(cars);
+        io.emit('update-leader-board', cars);
         await new Promise((resolve) => {
             changeFlag(1);
             io.emit('race-flags-update', status.SAFE);
             resolve();
         });
-
+    
         // Notify all clients that the race has started
         io.emit('race-status-updated', { raceId: raceID, status: 'started' });
-
+    
         console.log('Requesting next race status...');
         io.emit('trigger-get-next-race-status');
     });
+    
 
 
     socket.on('end-session', () => {
@@ -260,4 +267,4 @@ module.exports = {
     raceControl,
     getDriverDetails,
     dbGet,
-}
+} 
