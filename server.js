@@ -30,7 +30,6 @@ const {
     getRaceSessions,
     getRaceById,
     editDriverInRace,
-    markRaceSafeToStart
 } = require('./controllers/raceController');
 
 

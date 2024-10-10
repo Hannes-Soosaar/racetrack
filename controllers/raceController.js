@@ -146,75 +146,58 @@ const deleteRaceSession = (req, res) => {
 const addDriverToRace = (req, res) => {
     const { id: raceId } = req.params;  // Race session ID
     const { firstName, lastName, carNumber } = req.body;
+
+    // Log incoming data to verify it
     console.log('Incoming driver data:', { firstName, lastName, carNumber });
 
     if (!firstName || !lastName || !carNumber) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Check if a driver with the same first name, last name exists for this race
-    const checkDriverQuery = `
-        SELECT COUNT(*) AS count 
-        FROM race_drivers rd 
-        JOIN drivers d ON rd.driver_id = d.id 
-        WHERE rd.race_id = ? AND d.first_name = ? AND d.last_name = ?`;
-
-    db.get(checkDriverQuery, [raceId, firstName, lastName], function (err, row) {
+    // Ensure driver data is properly inserted
+    const insertDriverQuery = `INSERT INTO drivers (first_name, last_name) VALUES (?, ?)`;
+    db.run(insertDriverQuery, [firstName, lastName], function (err) {
         if (err) {
-            return res.status(500).json({ error: 'Error checking driver uniqueness', details: err });
+            return res.status(500).json({ error: 'Could not add driver', details: err });
         }
-        if (row.count > 0) {
-            // Driver with the same name and surname already exists for this race
-            return res.status(400).json({ error: 'Driver with this name and surname already exists in the race' });
-        }
-
-        // Check if the car number is already assigned in the race
-        const checkCarNumberQuery = `SELECT COUNT(*) AS count FROM race_drivers WHERE race_id = ? AND car_number = ?`;
-        db.get(checkCarNumberQuery, [raceId, carNumber], function (err, row) {
+        const driverId = this.lastID;
+        // Assign the driver to the race with the car number
+        const insertRaceDriverQuery = `INSERT INTO race_drivers (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
+        db.run(insertRaceDriverQuery, [raceId, driverId, carNumber], function (err) {
             if (err) {
-                return res.status(500).json({ error: 'Error checking car number', details: err });
+                return res.status(500).json({ error: 'Could not assign driver to race', details: err });
             }
-            if (row.count > 0) {
-                return res.status(400).json({ error: `This car is already participating in the race.` });
-            }
-
-            // Insert the driver into the drivers table
-            const insertDriverQuery = `INSERT INTO drivers (first_name, last_name) VALUES (?, ?)`;
-            db.run(insertDriverQuery, [firstName, lastName], function (err) {
-                if (err) {
-                    return res.status(500).json({ error: 'Could not add driver', details: err });
-                }
-
-                const driverId = this.lastID;
-                // Assign the driver to the race with the car number
-                const insertRaceDriverQuery = `INSERT INTO race_drivers (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
-                db.run(insertRaceDriverQuery, [raceId, driverId, carNumber], function (err) {
-                    if (err) {
-                        return res.status(500).json({ error: 'Could not assign driver to race', details: err });
-                    }
-                    res.status(201).json({ message: 'Driver added to race successfully' });
-                });
-            });
+            res.status(201).json({ message: 'Driver added to race successfully' });
         });
     });
 };
 
 
 
+
 // Get drivers for a specific race
 const getDriversForRace = (req, res) => {
     const { id } = req.params;  // The race session ID
-    const query = `SELECT d.id, d.first_name, d.last_name, rd.car_number
-                   FROM race_drivers rd
-                   JOIN drivers d ON rd.driver_id = d.id
-                   WHERE rd.race_id = ?`;
+    const query = `
+        SELECT d.id, d.first_name, d.last_name, (d.first_name || ' ' || d.last_name) AS driver_name, rd.car_number
+FROM race_drivers rd
+JOIN drivers d ON rd.driver_id = d.id
+WHERE rd.race_id = ?
+
+    `;
     db.all(query, [id], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to retrieve drivers for this race', details: err });
         }
+        if (!rows || rows.length === 0) {
+            console.log('No drivers found for race:', id);
+        } else {
+            console.log('Drivers found:', rows);
+        }
         res.status(200).json(rows);
     });
 };
+
 
 
 

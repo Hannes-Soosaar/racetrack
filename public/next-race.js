@@ -11,21 +11,38 @@ socket.on('connect', () => {
 // Listen for updates to the next race status
 socket.on('update-next-race', (nextRaceData) => {
     console.log(nextRaceData);
-    nextRaceDiv.innerHTML = '';
-    const paragraph = document.createElement('p');
-    if (nextRaceData === null) {
-        paragraph.textContent = 'Currently there are no scheduled races!';
-        nextRaceDiv.appendChild(paragraph);
-    } else {
-        paragraph.textContent = 'Next race info:';
-        nextRaceDiv.appendChild(paragraph);
-        nextRaceData.forEach(driver => {
-            const textLine = document.createElement('p');
-            textLine.textContent = `Driver: ${driver.driver_name}, Car Number: ${driver.car_number}`;
-            nextRaceDiv.appendChild(textLine);
+    nextRaceDiv.innerHTML = '';  // Clear previous content
+
+    if (!nextRaceData || !nextRaceData.race) {
+        // Only display "No upcoming races" if there's no race data
+        const noRaceMessage = document.createElement('p');
+        noRaceMessage.textContent = 'No upcoming races!';
+        nextRaceDiv.appendChild(noRaceMessage);
+        return;
+    }
+
+    // Render race information
+    const raceInfo = document.createElement('p');
+    raceInfo.textContent = `Next race info: Race ${nextRaceData.race.session_name}, Time: ${nextRaceData.race.date} ${nextRaceData.race.time}`;
+    nextRaceDiv.appendChild(raceInfo);
+
+    // Render driver information
+    if (nextRaceData.drivers && nextRaceData.drivers.length > 0) {
+        nextRaceData.drivers.forEach(driver => {
+            const driverInfo = document.createElement('p');
+            const driverName = driver.driver_name || 'Unknown';
+            const carNumber = driver.car_number || 'No car assigned';
+            driverInfo.textContent = `Driver: ${driverName}, Car Number: ${carNumber}`;
+            nextRaceDiv.appendChild(driverInfo);
         });
+    } else {
+        const noDrivers = document.createElement('p');
+        noDrivers.textContent = 'No drivers assigned to this race.';
+        nextRaceDiv.appendChild(noDrivers);
     }
 });
+
+
 
 // Handle race status update for Next Race display
 socket.on('race-status-updated', ({ raceId, status }) => {

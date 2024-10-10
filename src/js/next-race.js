@@ -22,7 +22,7 @@ async function getNextRace() {
             AND status = 'upcoming'
             ORDER BY DATETIME(date || ' ' || time) ASC
             LIMIT 1
-            `
+        `;
 
         const nextRace = await new Promise((resolve, reject) => {
             db.get(racesQuery, [], (err, row) => {
@@ -36,8 +36,12 @@ async function getNextRace() {
 
         if (nextRace) {
             const raceId = nextRace.id;
-            const driverInfo = await getDriverDetails(raceId);
-            return driverInfo;
+            const drivers = await getDriverDetails(raceId);
+
+            return {
+                race: nextRace,
+                drivers: drivers
+            };
         } else {
             console.log('No upcoming races found.');
             return null;
@@ -48,5 +52,6 @@ async function getNextRace() {
         return null;
     }
 }
+
 
 
