@@ -1,7 +1,7 @@
 
 BUGS:
 ******************************
-* Front desk When all races are completed the and a new race is made, the last race completed is again shown. Then non of the races will not be moved or removed at the front desk, untill a new race is made. (bad update)
+* Front desk When all races are completed the and a new race is made, the last race completed is again shown. Non of the races will be moved or removed at the front desk, untill a new race is made. (bad update?)
 * If the race roster is emptied and you create a new race, the Race controll will not see it. ??
 * you can create and launch an race with no drivers.
 * If a race is not started there is no flag, should be red!?
@@ -25,9 +25,9 @@ MANDATORY:
 
 TODO: The README.md file at the root of the project has a user guide, describing the core functionality of the user interfaces
 TODO: The README.md file at the root of the project describes how to launch the project.
-TODO:- Has been given a tablet which may be used in landscape or portrait DONE
-TODO:- They must occupy a large tappable area).
-TODO:The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- USES the constant at the beggining of the race. only affecting the new races created. meaning anything created in regular mode will not change
+TODO: Has been given a tablet which may be used in landscape or portrait DONE
+TODO: They must occupy a large tappable area.
+TODO: The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- USES the constant at the beggining of the race. only affecting the new races created. meaning anything created in regular mode will not change
 TODO: The server waits 500ms to respond if an incorrect access key is entered in the interface.
 TODO: The interface re-prompts the user to enter a correct access key when an incorrect access key is inserted.
 TODO: The server will not start unless environment variables are set for interface access keys.
@@ -36,9 +36,15 @@ TODO: The server can be started with npm start
 TODO: The server can be started in developer mode with npm run dev. --The countdown timer runs for 1 minute instead on 10 minutes.
 TODO: The interfaces are reachable by devices on other networks (not just localhost).
 TODO: The interfaces must be reachable by devices on other networks. For example, the interface must be reachable from a mobile phone browser, while the server and interfaces are served from a computer.
-WIP- The Race Control interface is designed for a mobile interface.
+TODO: The Race Control interface is designed for a mobile interface.
+
 TIMER
 TODO:- edge-case functionali
+
+NEXT-RACE 
+TODO- what criteria did we need ?
+
+
 
 CHECK:
 
@@ -48,9 +54,6 @@ CHECK- When the race is started, the following happens:
         - The Next Race screen switches to the subsequent race session.
         - The Safety Official sees race mode controls.
 
-NEXT-RACE 
-
-ty
 
 RECEPTIONIST
 The receptionist can see a list of upcoming races.
@@ -65,29 +68,27 @@ The Next Race display switches to the subsequent race, once the current race is 
 The Next Race display shows the drivers names, and the cars they're assigned to.
 If there are no upcoming races, no sessions are displayed.
 
-
-
 DONE MANDATORY: 
 
 SAFETY OFFICIAL - AP KARL-HENDRIK
+
 DONE- If there is no upcoming race after the last session is ended, the Safety Official sees no upcoming races message.
 DONE- The safety official has one active button, which starts the race when pressed.
-
-
 DONE- When the Safety Official selects "Safe", the Flag screen is green.
 DONE- When the Safety Official selects "Hazard", the Flag screen is yellow.
 DONE- When the Safety Official selects "Danger", the Flag screen is red.
 DONE- When the Safety Official selects "Finish", the Flag screen is chequered.
-
 DONE- Timer -When the race mode changes to "Finish", the race controls disappear, and a button appears to end the race session. --This happens when the timer counts down to zero.
 DONE- it shows when nothing is next else it does nothing - When the Safety Official ends the race session, the next session appears on their interface. 
 DONE- When the race session is ended, the Next Race display shows an additional message to proceed to the paddock.
 DONE- When the race session is ended, the race mode changes to "Danger".
 
 LAP-LINE OBSERVER
+
 DONE- When the lap button is pressed for a car, the leader board is updated.  
 
 -LEADER BOARD
+
 DONE- The leaderboard shows the remaining time on the timer.  
 DONE- The leaderboard shows the flag color for the current race mode.
 DONE- The leaderboard is ordered by fastest lap times
@@ -121,17 +122,8 @@ DONE- The interfaces are reachable via their correct paths.
 | Next Race        | Race Driver       | `next-race`         |  --"--
 | Race Countdown   | Race Driver       | `race-countdown`    |  --"--
 | Race Flag        | Race Driver       | `race-flags`        |  --"--
-
-
 DONE- The buttons disappear or are visibly disabled between races.
 DONE- Communication between the interfaces certainly does not use a polling convention.
---
-
-Example Scenario:
-Real-time Chat Application: A WebSocket server could manage real-time communication between users.
-When a message is sent by one user, the WebSocket server stores it in an SQLite database and immediately broadcasts it 
-to other connected users.In summary, while SQLite cannot handle WebSocket connections directly, 
-you can use a server application to bridge the gap, allowing WebSocket communication and SQLite database interactions to work together.
 
 Extra
 DONE- The system state is persisted. --> gets data from the DB in realtime! 
