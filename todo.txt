@@ -1,11 +1,12 @@
 
 BUGS:
-
+******************************
 * Front desk When all races are completed the and a new race is made, the last race completed is again shown. Then non of the races will not be moved or removed at the front desk, untill a new race is made. (bad update)
 * If the race roster is emptied and you create a new race, the Race controll will not see it. ??
 * you can create and launch an race with no drivers.
-* If a race is not started, but the flags page is loaded, the system crashes. Add if 0 null or undefined check!
+* If a race is not started there is no flag, should be red!?
 *DONE(BUG?) - When the race session starts, the Lap-Line Observer sees a button for each car. Sees all cars.
+* end race does not zero timer!
 
 DONE the leaderborad shows cars with no drivers 
 DONE the leader board sorts 0 as the smallest
@@ -14,10 +15,13 @@ DONE- lap line if started when the race controller session is started will alrea
 DONE- the leader board can still mark a lap if the race is qued,but not started
 DONE- the leader board get loaded when the lap linetracker emits a lap time. (start when- race is started.)
 DONE -is idle flag red, yes!
+*******************************
 
-TEST WIP- When the server is restarted, the system resumes with the exact same. I.e. the race counter continues counting down, and upcoming races are not lost.
+TEST:
+TODO: - When the server is restarted, the system resumes with the exact same. I.e. the race counter continues counting down, and upcoming races are not lost.
 
-Mandatory
+MANDATORY:
+
 TODO: The README.md file at the root of the project has a user guide, describing the core functionality of the user interfaces
 TODO: The README.md file at the root of the project describes how to launch the project.
 TODO:- Has been given a tablet which may be used in landscape or portrait DONE
@@ -32,7 +36,20 @@ TODO: The server can be started in developer mode with npm run dev. --The countd
 TODO: The interfaces are reachable by devices on other networks (not just localhost).
 TODO: The interfaces must be reachable by devices on other networks. For example, the interface must be reachable from a mobile phone browser, while the server and interfaces are served from a computer.
 WIP- The Race Control interface is designed for a mobile interface.
+TIMER
+TODO:- edge-case functionali
 
+CHECK:
+
+CHECK- When the race is started, the following happens:
+        - The race mode is changed to "Safe"
+        - The leader board changes to the current race.
+        - The Next Race screen switches to the subsequent race session.
+        - The Safety Official sees race mode controls.
+
+NEXT-RACE 
+
+ty
 
 RECEPTIONIST
 The receptionist can see a list of upcoming races.
@@ -47,14 +64,14 @@ The Next Race display switches to the subsequent race, once the current race is 
 The Next Race display shows the drivers names, and the cars they're assigned to.
 If there are no upcoming races, no sessions are displayed.
 
+
+
+DONE MANDATORY: 
+
 SAFETY OFFICIAL - AP KARL-HENDRIK
 DONE- If there is no upcoming race after the last session is ended, the Safety Official sees no upcoming races message.
 DONE- The safety official has one active button, which starts the race when pressed.
-CHECK- When the race is started, the following happens:
-        - The race mode is changed to "Safe"
-        - The leader board changes to the current race.
-        - The Next Race screen switches to the subsequent race session.
-        - The Safety Official sees race mode controls.
+
 
 DONE- When the Safety Official selects "Safe", the Flag screen is green.
 DONE- When the Safety Official selects "Hazard", the Flag screen is yellow.
