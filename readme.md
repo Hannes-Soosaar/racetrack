@@ -30,7 +30,7 @@ You can set the environment variables directly in the command line as shown in t
 ## Access from other networks:
 
 5. Go to [ngrok, make an account/login, and download the standalone executable for your operating system.](https://dashboard.ngrok.com/get-started/setup/windows) 
-6. Extract and open the executable, copy the command with your auth token from [here]https://dashboard.ngrok.com/get-started/your-authtoken and run it in the console that opened from the executable.
+6. Extract and open the executable, copy the command with your auth token from [here](https://dashboard.ngrok.com/get-started/your-authtoken) and run it in the console that opened from the executable.
 7. Run ```ngrok http 8000``` and go to the address that is given to you in the console.
 
 You'll be given a public URL that you can use to access the server from any network.
