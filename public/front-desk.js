@@ -353,3 +353,30 @@ function removeRaceFromList(raceId) {
     }
 }
 
+// Dynamically populate the time dropdown in 10-minute intervals
+function populateTimeDropdown() {
+    const timeDropdown = document.getElementById('time');
+    
+    // Loop through hours (0-23) and minutes (0, 10, 20, ... 50)
+    for (let hour = 0; hour < 24; hour++) {
+        for (let minute = 0; minute < 60; minute += 10) {
+            const option = document.createElement('option');
+            
+            // Format the hour and minute to always be two digits (e.g., 00:00, 01:10)
+            const hourFormatted = String(hour).padStart(2, '0');
+            const minuteFormatted = String(minute).padStart(2, '0');
+            
+            // Set the option value and text (e.g., "01:10")
+            option.value = `${hourFormatted}:${minuteFormatted}`;
+            option.textContent = `${hourFormatted}:${minuteFormatted}`;
+            
+            // Add the option to the dropdown
+            timeDropdown.appendChild(option);
+        }
+    }
+}
+
+// Call the function to populate the time dropdown when the page loads
+document.addEventListener('DOMContentLoaded', populateTimeDropdown);
+
+

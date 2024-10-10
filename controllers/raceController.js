@@ -25,19 +25,32 @@ const createRaceSession = (raceData) => {
                 return reject(new Error('A race with this name already exists. Please choose a different name.'));
             }
 
-            // Proceed to create the race session if the name is unique
-            const query = `INSERT INTO races (session_name, date, time, status) VALUES (?, ?, ?, ?)`;
-            db.run(query, [session_name, date, time, status], function (err) {
+            // Check if another race is already scheduled for the same date and time
+            const checkDateTimeQuery = `SELECT COUNT(*) AS count FROM races WHERE date = ? AND time = ?`;
+            db.get(checkDateTimeQuery, [date, time], (err, row) => {
                 if (err) {
-                    return reject(new Error('Could not create race session'));
+                    return reject(new Error('Could not verify race time uniqueness'));
                 }
 
-                const raceId = this.lastID;  // Capture the race ID
-                resolve({ id: raceId, session_name, date, time, status });
+                if (row.count > 0) {
+                    return reject(new Error('A race is already scheduled for this date and time. Please choose a different time.'));
+                }
+
+                // Proceed to create the race session if no conflicts
+                const query = `INSERT INTO races (session_name, date, time, status) VALUES (?, ?, ?, ?)`;
+                db.run(query, [session_name, date, time, status], function (err) {
+                    if (err) {
+                        return reject(new Error('Could not create race session'));
+                    }
+
+                    const raceId = this.lastID;  // Capture the race ID
+                    resolve({ id: raceId, session_name, date, time, status });
+                });
             });
         });
     });
 };
+
 
 
 
