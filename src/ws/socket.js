@@ -16,10 +16,6 @@ module.exports = (io, socket) => {
         displayMessage('Disconnected from the server. from the WS folder');
     };
 
-    socket.on('leaderboard-connecter', (text) => {
-        console.log("backend -", text);
-    });
-
     socket.onerror = (error) => {
         displayMessage(`Error: ${error.message}`);
     };
@@ -48,24 +44,6 @@ module.exports = (io, socket) => {
         io.emit('peak', "Timer Stopped")
         time.stopTimer();
     });
-
-    //TEST TO SEE IF THIS IS USED!
-    // socket.on('set-lap', async (raceIdCarNumber) => {
-    //     try {
-    //         console.log('We need to modify the car in slot1 for the Race with the ID', raceIdCarNumber);
-    //         raceId = raceIdCarNumber[0];
-    //         carNumber = raceIdCarNumber[1];
-    //         carIds = await car.getCarIdsByRaceId(raceId);
-    //         if (carIds) {
-    //             console.log("the Cars Id in the race are", carIds);
-    //         } else {
-    //             console.log("No cars");
-    //         }
-    //     } catch (error) {
-    //         console.log("error during set-lap event", errror);
-    //     }
-    //     car.setLapTime(carIds[carNumber]);
-    // });
 
     // This is used.
     socket.on('set-car-lap', async (raceIdCarNumber) => {

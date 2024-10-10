@@ -4,47 +4,45 @@ const timerContainer = document.getElementById('race-timer');
 const raceFlag = document.getElementById('race-flag');
 const leaderBoard = document.getElementById('leaderboard');
 // This page only listens and displays.
-let cars = "cars not set yet!"
+let cars = "no race started"
+
 socket.on('connect', () => {
     console.log('Connected to WebSocket server leaderboard');
-    socket.emit('leaderboard-connecter', 'leaderboard-connected');
+    displayLeaderBoard(cars);
 });
 
-// This is to display 
+//This is to display 
 socket.on('time-update', (raceTimeElapse) => {
-    console.log("The time we got", raceTimeElapse);
     displayMessage(raceTimeElapse);
 });
 
 socket.on(`update-leader-board`, (cars) => {
-    console.log('Leaderboard updated', cars);
     displayLeaderBoard(cars);
 });
 
-
-
-//TODO use constant to pass in cases as words.
 socket.on('race-flags-update', (data) => {
     switch (data) {
         case 1:
-            raceFlag.classList.remove('chequered')
-            raceFlag.style.backgroundColor = 'green'
+            raceFlag.classList.remove('chequered');
+            raceFlag.style.backgroundColor = 'green';
             break
         case 2:
-            raceFlag.classList.remove('chequered')
-            raceFlag.style.backgroundColor = 'red'
+            raceFlag.classList.remove('chequered');
+            raceFlag.style.backgroundColor = 'red';
             break
         case 5:
-            raceFlag.classList.remove('chequered')
-            raceFlag.style.backgroundColor = 'yellow'
+            raceFlag.classList.remove('chequered');
+            raceFlag.style.backgroundColor = 'yellow';
             break
         case 3:
-            raceFlag.style.backgroundColor = ''
-            raceFlag.classList.add('chequered')
+            raceFlag.style.backgroundColor = '';
+            raceFlag.classList.add('chequered');
+            displayMessage("00:00");
+            displayLeaderBoard(0);
             break
         default:
-            raceFlag.style.backgroundColor = '' // Reset background color
-            raceFlag.classList.remove('chequered')
+            raceFlag.style.backgroundColor = ''; // Reset background color
+            raceFlag.classList.remove('chequered');
             break
     }
 })
@@ -54,10 +52,13 @@ function displayMessage(value) {
 };
 
 function displayLeaderBoard(cars) {
-    leaderBoard.innerHTML = "";
-    let table = "<table><thead><tr><th>Car Number</th><th>Driver Name</th><th>Laps</th><th>Best Lap Time</th></tr></thead><tbody>";
-    cars.forEach(car => {
-        table += `
+    if (cars === 0) {
+        leaderBoard.innerHTML = "Waiting for the Next Race to start!";
+    } else {
+        leaderBoard.innerHTML = "";
+        let table = "<table><thead><tr><th>Car Number</th><th>Driver Name</th><th>Laps</th><th>Best Lap Time</th></tr></thead><tbody>";
+        cars.forEach(car => {
+            table += `
             <tr>
                 <td>${car.number}</td>
                 <td>${car.driver_name}</td>
@@ -65,9 +66,10 @@ function displayLeaderBoard(cars) {
                 <td>${car.best_lap_time ? displayMinutesAndSeconds(car.best_lap_time) : '-'}</td>   <!-- Format best lap time -->
             </tr>
         `;
-    });
-    table += "</tbody></table>";
-    leaderBoard.innerHTML = table;
+        });
+        table += "</tbody></table>";
+        leaderBoard.innerHTML = table;
+    }
 }
 
 function displayMinutesAndSeconds(remainingRaceTime) {
@@ -78,5 +80,3 @@ function displayMinutesAndSeconds(remainingRaceTime) {
     const formattedSeconds = String(seconds).padStart(2, '0');
     return `${formattedMinutes} m :${formattedSeconds} s`;
 }
-
-

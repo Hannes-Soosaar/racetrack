@@ -25,7 +25,7 @@ socket.on('connect', () => {
         removeButtons();
         console.log("logic passed!")
         displayRaceSessionMessage("No race in progress");
-        socket.emit('get-raceId');
+        // socket.emit('get-raceId');
     } else {
         displayButtons();
         message = "Race with Id: " + raceID + " in progress";

@@ -2,6 +2,7 @@ const db = require('../../config/db.js');
 const Race = require('../models/race.js');
 const status = require('../config/const.js')
 const race = require('../js/race.js');
+const car = require("../js/car.js");
 
 let currentRace = null;
 let raceID = null;
@@ -102,7 +103,9 @@ const raceControl = (io, socket) => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
         io.emit('set-raceId', raceID);
-
+        const cars = await car.getCarsByRaceId(raceID);
+        console.log(cars)
+        io.emit('update-leader-board', cars)
         await new Promise((resolve) => {
             changeFlag(1);
             io.emit('race-flags-update', status.SAFE);
@@ -148,6 +151,8 @@ const raceControl = (io, socket) => {
         }
     });
 
+
+// TODO: do not call this at load for the lapline   
     socket.on('get-raceId', () => {
         socket.emit('set-raceId', (raceID))
     });
