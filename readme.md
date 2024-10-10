@@ -1,72 +1,36 @@
-A real-time system so that everyone has the information they need, exactly when they need it for a local racetrack 
+#Real-time system for a local racetrack.
 
+This system provides real-time race management and tracking for local racetracks. Authenticated users can create, start and stop races, and track lap counts. 
+Unauthenticated users have access to live leaderboards, race schedules, participant details, and the current race mode.
 
-User.
+##Features
+Authenticated users: Create, manage, and track races in real-time.
+Unauthenticated users: View real-time race information, including leaderboards and next race details.
 
-The landing page is the guest page.
-To access other functionality you must be logged in. 
-based on the credentials they will have access to one or more functions of the app. 
+##Installation
 
+Follow these steps to set up the project:
 
-Interface	Persona	Route
+1. Clone the repository: ```git clone https://gitea.kood.tech/olhalavryshyn/racetrack.git```
+2. Navigate to the project repository: ```cd racetrack``` 
+3. Before starting the server, you must define the following access keys as environment variables:
 
+- `receptionist_key` - Key for the receptionist role
+- `observer_key` - Key for the observer role
+- `safety_key` - Key for the safety role
 
-Front Desk	Receptionist	/front-desk
-Race Control	Safety Official	/race-control
-Lap-line Tracker	Lap-line Observer	/lap-line-tracker
+You can set the environment variables directly in the command line as shown in the next step.
 
+4. Start the server. 
 
-    Need - A Users 
+    * For production: ```receptionist_key=8ded6076 observer_key=662e0f6c safety_key=a2d393bc npm start ``` (races will last for 10 minutes)
 
-Rolls:
+    * For development: ```receptionist_key=8ded6076 observer_key=662e0f6c safety_key=a2d393bc npm run dev``` (races will last for 1 minute)
 
-Employee
-    Flag Bearer
-    Receptionist
-    Safety Official
-    Lap-line Observer
+##Access from other networks:
 
-Guest
-    RaceDriver
-    Spectator
+5. Go to [ngrok, make an account/login, and download the standalone executable for your operating system.](https://dashboard.ngrok.com/get-started/setup/windows) 
+6. Extract and open the executable, copy the command with your auth token from [here]https://dashboard.ngrok.com/get-started/your-authtoken and run it in the console that opened from the executable.
+7. Run ```ngrok http 8000``` and go to the address that is given to you in the console.
 
-Receptionist
-
-Can create/modify a driver
-Can create/add a race
-
-
-    Table
-
-RaceSessions
-    8 drivers
-    8 cars
-    10 minutes
-    winner_driverId
-    safetyOfficial_Id
-    status_id
-
-Laps
-    raceSession_id
-    diver_id
-
-Users
-    User name
-    Password bcrypt / (KEY) ".env file check!"
-    roll_id
-
-Rolls (Accesskey)
- Receptionist 
- Safety Official
- Lap-line 
- Observer
-
-
-
-
-
-
-
-
-
-
+You'll be given a public URL that you can use to access the server from any network.
