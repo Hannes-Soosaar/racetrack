@@ -1,7 +1,9 @@
+
 body {
     font-family: Arial, sans-serif;
+    box-sizing: border-box;
     margin: 0;
-    padding: 20px;
+    padding: 0;
     background-color: #f4f4f4;
 }
 
@@ -93,12 +95,13 @@ button {
     display: flex;
     flex-direction: column;
     border: 1px solid black;
+
     /* justify-content: center; */
 }
 
 .page-container {
-    display: flex;
     height: 100vh;
+    display: flex;
 }
 
 .boarder-box {
@@ -114,7 +117,11 @@ button {
 .main {
     flex-grow: 1;
     background-color: #f4f4f4;
+    border: 1px solid red;
+    min-width: 360px;
     align-items: flex-start;
+    min-height: fit-content;
+    overflow: auto ;
 }
 
 .footer {
@@ -125,7 +132,8 @@ button {
 .timer-display {
     font-size: clamp(32px, 30vw, 250px);
     text-align: center;
-    background-color: #333;
+    background-color:#f4f4f4;
+
 
 }
 
@@ -138,6 +146,22 @@ button {
 .heading {
     font-size: 32px;
 }
+
+
+.tap-button{
+    display: inline-block;
+    padding: 0.5em 1em;
+    font-size: clamp(18px, 5vw, 36px);
+    white-space: nowrap;
+    min-width: 10vw;
+    max-width: 80vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+
 
 button#mode-safe,
 button#mode-hazard,

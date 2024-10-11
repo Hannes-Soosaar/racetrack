@@ -9,16 +9,31 @@
 </head>
 
 <body>
-	<h1>Leaderboard</h1>
-	<p>
-		This is the Leaderboard page. Here you can view the current race
-		standings.
-	</p>
-	<div id="race-timer">Once the timer starts a time will be displayed</div>
-	<!-- iteration 1 is to see the leader board unordered with the required data -->
-	<div id="race-flag" class="raceFlagDiv"></div>
-	<div id="leaderboard"> the leaderboard should be here!</div>
-	<button id="fullscreenBtn">Go Fullscreen</button>
+
+	<div class="page-container">
+		<div class="boarder-box">
+		</div>
+		<div class="main-container">
+			<div class="header">
+				<h1 class="dynamic-heading">Race Countdown</h1>
+			</div>
+			<div class="main">
+				<h1>Leaderboard</h1>
+				<div id="race-timer">Once the timer starts a time will be displayed</div>
+				<!-- iteration 1 is to see the leader board unordered with the required data -->
+				<div id="race-flag" class="raceFlagDiv"></div>
+				<div id="leaderboard"> the leaderboard should be here!</div>
+			</div>
+			<div class="footer">
+				<button class="tap-button" id="Update" value="1">Update Message</button>
+			</div>
+		</div>
+		<div class="boarder-box">
+		</div>
+	</div>
+
+
+
 	<script src="/socket.io/socket.io.js"></script>
 	<script type="module" src="/js/leaderboard.js"></script>
 </body>

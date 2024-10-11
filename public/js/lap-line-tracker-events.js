@@ -83,14 +83,14 @@ function displayRaceSessionMessage(value) {
 function displayButtons() {
     console.log("displaying buttons");
     carsContainer.innerHTML = `   
-                <button class="button" id = "slot_1" value = "1" > Car 1</button >
-                <button class="button" id="slot_2" value="2">Car 2</button>
-                <button class="button" id="slot_3" value="3">Car 3</button>
-                <button class="button" id="slot_4" value="4">Car 4</button>
-                <button class="button" id="slot_5" value="5">Car 5</button>
-                <button class="button" id="slot_6" value="6">Car 6</button>
-                <button class="button" id="slot_7" value="7">Car 7</button>
-                <button class="button" id="slot_8" value="8">Car 8</button>
+                <button class="tap-button" id = "slot_1" value = "1" > Car 1</button >
+                <button class="tap-button" id="slot_2" value="2">Car 2</button>
+                <button class="tap-button" id="slot_3" value="3">Car 3</button>
+                <button class="tap-button" id="slot_4" value="4">Car 4</button>
+                <button class="tap-button" id="slot_5" value="5">Car 5</button>
+                <button class="tap-button" id="slot_6" value="6">Car 6</button>
+                <button class="tap-button" id="slot_7" value="7">Car 7</button>
+                <button class="tap-button" id="slot_8" value="8">Car 8</button>
     `;
     document.querySelectorAll('.button').forEach(button => {
         if (raceID !== null) {
