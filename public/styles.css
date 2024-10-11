@@ -91,7 +91,7 @@ button {
 }
 
 .main-container {
-    width: 1080px;
+    width: 100vw;
     display: flex;
     flex-direction: column;
     border: 1px solid black;
@@ -130,7 +130,7 @@ button {
 }
 
 .timer-display {
-    font-size: clamp(32px, 30vw, 250px);
+    font-size: clamp(32px, 80vw, 900px);
     text-align: center;
     background-color:#f4f4f4;
 

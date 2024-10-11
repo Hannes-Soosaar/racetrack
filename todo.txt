@@ -4,7 +4,7 @@ BUGS:
 * Front desk When all races are completed the and a new race is made, the last race completed is again shown. Non of the races will be moved or removed at the front desk, untill a new race is made. (bad update?)
 * If the race roster is emptied and you create a new race, the Race controll will not see it. ??
 * you can create and launch an race with no drivers.
-* If a race is not started there is no flag, should be red!?
+
 
 DONE(BUG?) - When the race session starts, the Lap-Line Observer sees a button for each car. Note: Sees all cars.
 
@@ -16,6 +16,7 @@ DONE- lap line if started when the race controller session is started will alrea
 DONE- the leader board can still mark a lap if the race is qued,but not started
 DONE- the leader board get loaded when the lap linetracker emits a lap time. (start when- race is started.)
 DONE -is idle flag red, yes!
+DONE- If a race is not started there is no flag, should be red!?
 *******************************
 
 TEST:
