@@ -1,6 +1,19 @@
 const socket = io();
 
 const timerContainer = document.getElementById('race-timer');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+fullscreenBtn.addEventListener('click', () => {
+    document.documentElement.requestFullscreen();
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        fullscreenBtn.style.display = 'none';
+    } else {
+        fullscreenBtn.style.display = '';
+    }
+});
 
 socket.on('connect', () => {
     console.log('Connected to WebSocket server race-Timer'); // reaches and works

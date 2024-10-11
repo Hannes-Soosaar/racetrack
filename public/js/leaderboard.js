@@ -3,6 +3,20 @@ const socket = io();
 const timerContainer = document.getElementById('race-timer');
 const raceFlag = document.getElementById('race-flag');
 const leaderBoard = document.getElementById('leaderboard');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+fullscreenBtn.addEventListener('click', () => {
+    document.documentElement.requestFullscreen();
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        fullscreenBtn.style.display = 'none';
+    } else {
+        fullscreenBtn.style.display = '';
+    }
+});
+
 // This page only listens and displays.
 let cars = "no race started"
 

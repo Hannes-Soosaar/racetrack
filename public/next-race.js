@@ -1,5 +1,18 @@
 const socket = io();
 const nextRaceDiv = document.getElementById('nextRaceStatus');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+fullscreenBtn.addEventListener('click', () => {
+    document.documentElement.requestFullscreen();
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        fullscreenBtn.style.display = 'none';
+    } else {
+        fullscreenBtn.style.display = '';
+    }
+});
 
 // On connection to the server
 socket.on('connect', () => {
