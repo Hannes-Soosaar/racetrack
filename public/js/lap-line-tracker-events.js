@@ -92,7 +92,7 @@ function displayButtons() {
                 <button class="tap-button" id="slot_7" value="7">Car 7</button>
                 <button class="tap-button" id="slot_8" value="8">Car 8</button>
     `;
-    document.querySelectorAll('.button').forEach(button => {
+    document.querySelectorAll('.tap-button').forEach(button => {
         if (raceID !== null) {
             console.log("the race ID is ", raceID, "and we are adding all this functionality");
             button.addEventListener('click', function () {

@@ -6,6 +6,47 @@ Unauthenticated users have access to live leaderboards, race schedules, particip
 ## Features
 Authenticated users: Create, manage, and track races in real-time.
 Unauthenticated users: View real-time race information, including leaderboards and next race details.
+Delete the database with ```make clean``` .
+Create an empty database with ```make init``` .
+
+## Overview of System Pages
+
+The system consists of seven web pages accessible from the main page.
+
+1. Front Desk - Requires receptionist_key for access. This page allows authenticated users to:
+
+    * Create races with specified time and date.
+    * Delete or edit created races, including their names, dates, or times.
+    * Add drivers to specific races and assign cars to those drivers.
+    * Edit driver names and assigned cars, or remove drivers from a race.
+
+2. Race Control - Requires safety_key for access. This page allows authenticated users to:
+
+    * Start the next race session.
+    * View the names and cars of participants in the upcoming race.
+    * Start the race and monitor the status of the current race.
+    * Change the race mode to safe, hazard, danger, or finish.
+    * End the current session and queue the next earliest race from the database.
+
+3. Lap Line Tracker - Requires observer_key for access. This page allows authenticated users to:
+
+    * View the status and ID of the current race.
+    * See the remaining time for the current race.
+    * Add laps for cars to save their lap times to the leaderboard.
+
+4. Leaderboard - Public page. 
+    * Displays the current race timer, the active race flag, and a leaderboard featuring car numbers, driver names, lap counts, and fastest lap times.
+
+5. Next Race - Public page. 
+    * Displays information about the upcoming race (race name, date and time, drivers, and their car numbers) if available.
+
+6. Race Countdown - Public page. 
+    * Displays the timer for the current race.
+
+7. Race Flags - Public page. 
+    * Displays the current race flag that corresponds to the race mode.
+
+All public pages include a button to enter fullscreen mode.
 
 ## Installation
 
