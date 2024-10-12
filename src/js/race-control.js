@@ -6,6 +6,7 @@ const car = require("../js/car.js");
 
 let currentRace = null;
 let raceID = null;
+let flag= null;
 // The order of the races that will be taken is the the earliest first that is not in the past.
 
 const raceControl = (io, socket) => {
@@ -105,26 +106,22 @@ const raceControl = (io, socket) => {
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
         io.emit('set-raceId', raceID);
-        
         // Emit an event to disable adding drivers to this race
         io.emit('block-driver-addition', raceID);
-    
         const cars = await car.getCarsByRaceId(raceID);
-        console.log(cars);
         io.emit('update-leader-board', cars);
         await new Promise((resolve) => {
             changeFlag(1);
             io.emit('race-flags-update', status.SAFE);
+            flag = status.SAFE;
             resolve();
         });
-    
         // Notify all clients that the race has started
         io.emit('race-status-updated', { raceId: raceID, status: 'started' });
-    
         console.log('Requesting next race status...');
         io.emit('trigger-get-next-race-status');
     });
-    
+
 
 
     socket.on('end-session', () => {
@@ -132,7 +129,18 @@ const raceControl = (io, socket) => {
         raceID = null;
         io.emit('set-raceId', raceID);
         io.emit('race-flags-update', 2);
+        flag = 2;
         io.emit('race-status', 'Session ended');
+    });
+
+    socket.on('get-session', async () => {
+        io.emit('set-raceId', raceID);
+        const cars = await car.getCarsByRaceId(raceID);
+        io.emit('update-leader-board', cars);
+        console.log(currentRace);
+        if (flag !== null) {
+            io.emit('race-flags-update', flag);
+        }
     });
 
     // Handle changing race mode 
@@ -144,25 +152,25 @@ const raceControl = (io, socket) => {
                 changeFlag(status.SAFE);
                 io.emit('race-flags-update', status.SAFE);
                 io.emit('resume-timer');
+                flag = status.SAFE;
                 break;
             case 'Hazard':
                 changeFlag(status.HAZARD);
                 io.emit('race-flags-update', status.HAZARD);
+                flag = status.HAZARD;
                 io.emit('pause-timer');
                 break;
             case 'Danger':
                 changeFlag(status.DANGER);
                 io.emit('pause-timer');
                 io.emit('race-flags-update', status.DANGER);
+                flag = status.HAZARD;
                 break;
         }
     });
 
 
-// TODO: do not call this at load for the lapline   
-    socket.on('get-raceId', () => {
-        socket.emit('set-raceId', (raceID))
-    });
+
 
     socket.on('request-flags-update', () => {
         console.log('Request for flags update received');
@@ -178,6 +186,8 @@ const raceControl = (io, socket) => {
         io.emit('race-mode', 'Finished');
         changeFlag(status.FINISHED);
         io.emit('race-flags-update', status.FINISHED);
+        flag = status.FINISHED;
+        flag= null;
         io.emit('stop-timer');
         io.emit('set-raceId', raceID);
     });

@@ -20,9 +20,10 @@ document.addEventListener('fullscreenchange', () => {
 // This page only listens and displays.
 let cars = "no race started"
 
-socket.on('connect', () => {
+socket.on('connect',  () => {
     console.log('Connected to WebSocket server leaderboard');
-    displayLeaderBoard(cars);
+    socket.emit('get-session');
+    // displayLeaderBoard(cars);
 });
 
 //This is to display 
@@ -62,24 +63,34 @@ socket.on('race-flags-update', (data) => {
 })
 
 function displayMessage(value) {
-    timerContainer.innerHTML = `<p>${value}</p>`;
+    timerContainer.innerHTML = `${value}`;
 };
 
 function displayLeaderBoard(cars) {
     if (cars === 0) {
-        leaderBoard.innerHTML = "Waiting for the Next Race to start!";
+        leaderBoard.innerHTML = "No race ongoing.";
     } else {
         leaderBoard.innerHTML = "";
-        let table = "<table><thead><tr><th>Car Number</th><th>Driver Name</th><th>Laps</th><th>Best Lap Time</th></tr></thead><tbody>";
+        let table = `<table>
+                            <thead>
+                                <tr>
+                                    <th>Car</th>
+                                    <th>Driver</th>
+                                    <th>Lap</th>
+                                    <th>Best Lap Time</th>
+                                </tr>
+                            </thead> 
+                        <tbody>
+                    `;
         cars.forEach(car => {
             table += `
-            <tr>
-                <td>${car.number}</td>
-                <td>${car.driver_name}</td>
-                <td>${car.race_lap}</td>
-                <td>${car.best_lap_time ? displayMinutesAndSeconds(car.best_lap_time) : '-'}</td>   <!-- Format best lap time -->
-            </tr>
-        `;
+                        <tr>
+                            <td>${car.number}</td>
+                            <td>${car.driver_name}</td>
+                            <td>${car.race_lap}</td>
+                            <td>${car.best_lap_time ? displayMinutesAndSeconds(car.best_lap_time) : '-'}</td> 
+                        </tr>
+                    `;
         });
         table += "</tbody></table>";
         leaderBoard.innerHTML = table;

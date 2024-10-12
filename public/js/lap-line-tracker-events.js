@@ -20,18 +20,19 @@ accessForm.addEventListener('submit', function (event) {
 
 //SOCKETS
 socket.on('connect', () => {
+    socket.emit('get-session');
     console.log('Connected to WebSocket server lap-line-tracker'); // reaches and works
-    if (raceID === null) {
-        removeButtons();
-        console.log("logic passed!")
-        displayRaceSessionMessage("No race in progress");
-        // socket.emit('get-raceId');
-    } else {
-        displayButtons();
-        message = "Race with Id: " + raceID + " in progress";
-        console.log(message);
-        displayRaceSessionMessage(message);
-    };
+    // if (raceID === null) {
+    //     removeButtons();
+    //     console.log("logic passed!")
+    //     displayRaceSessionMessage("No race in progress");
+    //     // socket.emit('get-raceId');
+    // } else {
+    //     displayButtons();
+    //     message = "Race with Id: " + raceID + " in progress";
+    //     console.log(message);
+    //     displayRaceSessionMessage(message);
+    // };
 });
 
 socket.on('time-update', (timeElapsed) => {

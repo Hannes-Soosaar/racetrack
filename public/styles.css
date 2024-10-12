@@ -52,7 +52,6 @@ button {
 }
 
 
-
 /* Styling for modals */
 #edit-driver-modal,
 #edit-race-modal {
@@ -85,24 +84,68 @@ button {
 
 
 .raceFlagDiv {
-    width: 300px;
-    height: 200px;
+    width: 400px;
+    height: 300px;
     border: 1px solid black;
+}
+
+.leader-timer{
+    width: 400px;
+    height: 300px;
+    display: flex;
+    border: 1px solid black;
+    align-items: center;
+    justify-content: center;
+    font-size: 5vw;  
+}
+
+ /* not used */
+.page-container {
+    /* height: 100vh; */
+    display: flex;
 }
 
 .main-container {
+    display: flex;
     width: 100vw;
-    display: flex;
     flex-direction: column;
+    justify-content: center;
     border: 1px solid black;
-
-    /* justify-content: center; */
+   
 }
 
-.page-container {
-    height: 100vh;
+.main {
     display: flex;
+    /* flex-grow: 1; */
+    background-color: #f4f4f4;
+    border: 1px solid red;
+    min-width: 360px;
+    justify-content:center;
+    min-height: fit-content;
+    overflow: auto ;
+
 }
+
+.left-container {
+    flex: 1.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: lightgray;
+    border: 1px solid green;
+}
+
+.right-container {
+    flex: 2.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: lightblue;
+    border: 1px solid blue;
+    min-height: 600px;
+}
+
 
 .boarder-box {
     flex-grow: 1;
@@ -110,6 +153,7 @@ button {
 }
 
 .header {
+    min-width: 360px;
     background-color: #f4f4f4;
     text-align: center;
 }
@@ -122,19 +166,40 @@ button {
     align-items: flex-start;
     min-height: fit-content;
     overflow: auto ;
+
 }
 
 .footer {
+    min-width: 360px;
     background-color: #f4f4f4;
     text-align: center;
 }
 
 .timer-display {
-    font-size: clamp(32px, 80vw, 900px);
+    font-size: clamp(2vw, 40vw, 70vw);
     text-align: center;
     background-color:#f4f4f4;
 
+}
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 2vw;  
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 10px; 
+    text-align: center;
+}
+
+thead {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9; 
 }
 
 /* the Java script created element <p> comes with a margin and padding, this nulls it but only for the class of timer-display  */
