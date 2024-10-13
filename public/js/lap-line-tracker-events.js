@@ -11,29 +11,22 @@ const errorMessage = document.getElementById('error-message');
 let raceID = null;
 let message;
 
-
-//Listeners
 accessForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const accessKey = accessKeyInput.value;
     socket.emit('validate-key', { key: accessKey, role: 'observer' });
 });
 
-//SOCKETS
 socket.on('connect', () => {
     socket.emit('get-session');
     console.log('Connected to WebSocket server lap-line-tracker'); // reaches and works
-    // if (raceID === null) {
-    //     removeButtons();
-    //     console.log("logic passed!")
-    //     displayRaceSessionMessage("No race in progress");
-    //     // socket.emit('get-raceId');
-    // } else {
-    //     displayButtons();
-    //     message = "Race with Id: " + raceID + " in progress";
-    //     console.log(message);
-    //     displayRaceSessionMessage(message);
-    // };
+    if (raceID === null) {
+        removeButtons();
+        displayRaceSessionMessage("No race in progress");
+    } else {
+        displayButtons();
+        displayRaceSessionMessage(message);
+    };
 });
 
 socket.on('time-update', (timeElapsed) => {
@@ -70,7 +63,6 @@ socket.on('key-validation', function (response) {
     }
 });
 
-// FUNCTIONS
 function sendMessageFromValue(value) {
     console.log("send message! " + value);
     displayMessage(value);
@@ -79,7 +71,7 @@ function sendMessageFromValue(value) {
 function displayMessage(value) {
     messageContainer.innerHTML = `${value}`;
 }
-function displayRaceSessionMessage(value) {
+function displayRaceSessionMessage(value){
     IdContainer.innerHTML = `${value}`;
 }
 
@@ -101,7 +93,6 @@ function displayButtons() {
             button.addEventListener('click', function () {
                 const buttonValue = parseInt(this.value);
                 let raceIdCarNumber = [raceID, buttonValue];
-                console.log("this is called twice at the backend!");
                 socket.emit('set-car-lap', raceIdCarNumber);
             });
         } else {
