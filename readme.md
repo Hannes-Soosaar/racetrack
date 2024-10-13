@@ -56,17 +56,17 @@ Follow these steps to set up the project:
 2. Navigate to the project repository: ```cd racetrack``` 
 3. Before starting the server, you must define the following access keys as environment variables:
 
-- `receptionist_key` - Key for the receptionist role
-- `observer_key` - Key for the observer role
-- `safety_key` - Key for the safety role
+- `receptionist_key` - Key for the receptionist role (Front Desk)
+- `safety_key` - Key for the safety role (Race Control)
+- `observer_key` - Key for the observer role (Lap Line Tracker)
 
 You can set the environment variables directly in the command line as shown in the next step.
 
 4. Start the server. 
 
-    * For production: ```receptionist_key=8ded6076 observer_key=662e0f6c safety_key=a2d393bc npm start ``` (races will last for 10 minutes)
+    * For production: ```RECEPTIONIST_KEY=123 SAFETY_KEY=234 OBSERVER_KEY=345 npm start ``` (races will last for 10 minutes)
 
-    * For development: ```receptionist_key=8ded6076 observer_key=662e0f6c safety_key=a2d393bc npm run dev``` (races will last for 1 minute)
+    * For development: ```RECEPTIONIST_KEY=123 SAFETY_KEY=234 OBSERVER_KEY=345 npm run test``` (races will last for 1 minute)
 
 ## Access from other networks:
 

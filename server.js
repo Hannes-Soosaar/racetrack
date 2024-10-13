@@ -34,6 +34,7 @@ const {
 
 
 const { createCarsForRace } = require('./controllers/carController');
+const { env } = require('process');
 
 
 
@@ -251,6 +252,13 @@ io.on('connection', (socket) => {
 
 // Start the server
 const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+
+if (!process.env.RECEPTIONIST_KEY || !process.env.OBSERVER_KEY || !process.env.SAFETY_KEY) {
+    console.log('Server cannot start unless environment variables are set. See usage in README.md')
+    process.exit(1)
+} else {
+    server.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
