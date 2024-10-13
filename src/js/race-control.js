@@ -279,4 +279,5 @@ module.exports = {
     raceControl,
     getDriverDetails,
     dbGet,
+    dbRun,
 } 

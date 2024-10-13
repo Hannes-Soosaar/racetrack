@@ -1,5 +1,6 @@
 const db = require('../config/db.js');
 const carController = require('./carController');
+const { dbRun } = require('../src/js/race-control.js')
 
 // Create a new race session and generate cars
 const createRaceSession = (raceData) => {
@@ -96,49 +97,41 @@ const getRaceById = (raceId) => {
 
 
 // Delete a race session
-const deleteRaceSession = (req, res) => {
-    const { id } = req.params;  // Race ID from the URL
+const deleteRaceSession = async (req, res) => {
+    const { id } = req.params; // Race ID from the URL
 
-    // Start with deleting the race from the races table (which will cascade delete entries in race_drivers and cars)
     const deleteRaceQuery = `DELETE FROM races WHERE id = ?`;
 
-    db.run(deleteRaceQuery, [id], function (err) {
-        if (err) {
-            return res.status(500).json({ error: 'Could not delete race', details: err });
-        }
+    try {
+        // Delete the race
+        await dbRun(deleteRaceQuery, [id]);
 
-        console.log(`Race with ID ${id} deleted. Now checking for orphaned drivers...`);
+        // Delete associated cars
+        const deleteCarsQuery = `DELETE FROM cars WHERE race_id = ?`;
+        await dbRun(deleteCarsQuery, [id]);
 
-        // Now check if there are any drivers left with no races
-        const orphanedDriversQuery = `
-            SELECT d.id
-            FROM drivers d
-            LEFT JOIN race_drivers rd ON d.id = rd.driver_id
-            WHERE rd.driver_id IS NULL
-        `;
+        // Delete associated drivers
+        const deleteDriversQuery = `
+            DELETE FROM drivers
+            WHERE id IN (
+                SELECT d.id
+                FROM drivers d
+                INNER JOIN race_drivers rd ON d.id = rd.driver_id
+                WHERE rd.race_id = ?
+            )`;
+        await dbRun(deleteDriversQuery, [id]);
 
-        db.all(orphanedDriversQuery, [], (err, orphanedDrivers) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error checking for orphaned drivers', details: err });
-            }
+        // Delete associated race drivers
+        const deleteRaceDriversQuery = `DELETE FROM race_drivers WHERE race_id = ?`;
+        await dbRun(deleteRaceDriversQuery, [id]);
 
-            if (orphanedDrivers.length > 0) {
-                const driverIds = orphanedDrivers.map(driver => driver.id);
-                const deleteDriversQuery = `DELETE FROM drivers WHERE id IN (${driverIds.join(',')})`;
+        // Send a success response
+        res.status(200).json({ message: 'Race session and associated data deleted successfully' });
 
-                db.run(deleteDriversQuery, function (err) {
-                    if (err) {
-                        return res.status(500).json({ error: 'Could not delete orphaned drivers', details: err });
-                    }
-
-                    console.log('Orphaned drivers deleted:', driverIds);
-                    res.status(200).json({ message: 'Race and related data deleted successfully, including orphaned drivers.' });
-                });
-            } else {
-                res.status(200).json({ message: 'Race and related data deleted successfully. No orphaned drivers found.' });
-            }
-        });
-    });
+    } catch (err) {
+        // Handle errors
+        return res.status(500).json({ error: 'Could not delete race session', details: err });
+    }
 };
 
 
@@ -154,20 +147,37 @@ const addDriverToRace = (req, res) => {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Ensure driver data is properly inserted
-    const insertDriverQuery = `INSERT INTO drivers (first_name, last_name) VALUES (?, ?)`;
-    db.run(insertDriverQuery, [firstName, lastName], function (err) {
+    const checkExistingDriverQuery = `
+        SELECT d.id
+        FROM drivers d
+        INNER JOIN race_drivers rd ON d.id = rd.driver_id
+        WHERE d.first_name = ? AND d.last_name = ? AND rd.race_id = ?`;
+
+    db.all(checkExistingDriverQuery, [firstName, lastName, raceId], (err, existingDriver) => {
         if (err) {
-            return res.status(500).json({ error: 'Could not add driver', details: err });
+            return res.status(500).json({ error: 'Could not check for existing driver', details: err });
         }
-        const driverId = this.lastID;
-        // Assign the driver to the race with the car number
-        const insertRaceDriverQuery = `INSERT INTO race_drivers (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
-        db.run(insertRaceDriverQuery, [raceId, driverId, carNumber], function (err) {
+
+        if (existingDriver.length > 0) {
+            return res.status(400).json({ error: 'Driver with that name already exists in this race.' });
+        }
+
+        // Ensure driver data is properly inserted
+        const insertDriverQuery = `INSERT INTO drivers (first_name, last_name) VALUES (?, ?)`;
+        db.run(insertDriverQuery, [firstName, lastName], function (err) {
             if (err) {
-                return res.status(500).json({ error: 'Could not assign driver to race', details: err });
+                return res.status(500).json({ error: 'Could not add driver', details: err });
             }
-            res.status(201).json({ message: 'Driver added to race successfully' });
+            const driverId = this.lastID;
+
+            // Assign the driver to the race with the car number
+            const insertRaceDriverQuery = `INSERT INTO race_drivers (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
+            db.run(insertRaceDriverQuery, [raceId, driverId, carNumber], function (err) {
+                if (err) {
+                    return res.status(500).json({ error: 'Could not assign driver to race', details: err });
+                }
+                res.status(201).json({ message: 'Driver added to race successfully' });
+            });
         });
     });
 };
