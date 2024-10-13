@@ -4,8 +4,8 @@
   "description": "Real-time race management system",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "DURATION=60000 node server.js",
+    "start": "DURATION=600000 node server.js"
   },
   "repository": {
     "type": "git",

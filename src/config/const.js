@@ -6,9 +6,8 @@ const HAZARD = 5; // Yellow Flag
 const WAITING = 6; // all races after next
 const INACTIVE = 7; // not used
 const ACTIVE = 8;
-const PROD = false;
-const RACE_DURATION = 600000; // one minute
-// Mandatory wait time if wrong key
+const RACE_DURATION = process.env.DURATION; // get the race duration from an env file.
+
 const WAIT = 500;
 module.exports = {
 	SAFE,
@@ -21,5 +20,4 @@ module.exports = {
 	ACTIVE,
 	WAIT,
 	RACE_DURATION,
-	PROD,
 };
