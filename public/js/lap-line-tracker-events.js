@@ -7,6 +7,7 @@ const contentDiv = document.getElementById('content');
 const messageContainer = document.getElementById('peak');
 const IdContainer = document.getElementById('raceId');
 const carsContainer = document.getElementById('cars-container');
+const errorMessage = document.getElementById('error-message');
 let raceID = null;
 let message;
 
@@ -60,6 +61,7 @@ socket.on('stop-timer', () => {
 });
 
 socket.on('key-validation', function (response) {
+    console.log("response");
     if (response.success) {
         accessForm.style.display = 'none';
         contentDiv.style.display = 'block';
@@ -100,7 +102,7 @@ function displayButtons() {
                 const buttonValue = parseInt(this.value);
                 let raceIdCarNumber = [raceID, buttonValue];
                 console.log("this is called twice at the backend!");
-                socket.emit('set-car-lap', raceIdCarNumber); //! from here we also do the updateLeader-board.
+                socket.emit('set-car-lap', raceIdCarNumber);
             });
         } else {
             alert("no race in progress!");

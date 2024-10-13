@@ -3,11 +3,13 @@ BUGS:
 ******************************
 * Front desk When all races are completed the and a new race is made, the last race completed is again shown. Non of the races will be moved or removed at the front desk, untill a new race is made. (bad update?)
 * If the race roster is emptied and you create a new race, the Race controll will not see it. ??
+TODO: Properly delete races.
 * you can create and launch an race with no drivers.
+TODO: Add check to where ?
+
 
 
 DONE(BUG?) - When the race session starts, the Lap-Line Observer sees a button for each car. Note: Sees all cars.
-
 DONE- end race does not zero timer!
 DONE the leaderborad shows cars with no drivers 
 DONE the leader board sorts 0 as the smallest
@@ -17,40 +19,8 @@ DONE- the leader board can still mark a lap if the race is qued,but not started
 DONE- the leader board get loaded when the lap linetracker emits a lap time. (start when- race is started.)
 DONE -is idle flag red, yes!
 DONE- If a race is not started there is no flag, should be red!?
-
 *******************************
 
-TEST:
-DONE: - When the server is restarted, the system resumes with the exact same. I.e. the race counter continues counting down, and upcoming races are not lost.
-MANDATORY:
-DONE: The server can be started with npm start
-DONE Has been given a tablet which may be used in landscape or portrait DONE
-DONE: They must occupy a large tappable area.
-DONE: The interfaces must be reachable by devices on other networks. For example, the interface must be reachable from a mobile phone browser, while the server and interfaces are served from a computer.
-DONE: The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- USES the constant at the beggining of the race. only affecting the new races created. meaning anything created in regular mode will not change
-DONE: The README.md file at the root of the project has a user guide, describing the core functionality of the user interfaces
-DONE: The README.md file at the root of the project describes how to launch the project.
-DONE: The server can be started in developer mode with npm run dev. --The countdown timer runs for 1 minute instead on 10 minutes.
-DONE: The interfaces are reachable by devices on other networks (not just localhost).
-
-
-
-TODO: The server waits 500ms to respond if an incorrect access key is entered in the interface.
-TODO: The interface re-prompts the user to enter a correct access key when an incorrect access key is inserted.
-
-
-TODO: The server will not start unless environment variables are set for interface access keys.
-TODO: The environment variable access codes match the accepted access codes entered into the interfaces.
-
-
-DONE: The Race Control interface is designed for a mobile interface.
-
-CHECK:
-DONE: When the race is started, the following happens:
-        - The race mode is changed to "Safe"
-        - The leader board changes to the current race.
-        - The Next Race screen switches to the subsequent race session.
-        - The Safety Official sees race mode controls.
 RECEPTIONIST
 The receptionist can see a list of upcoming races.
 The receptionist can delete an upcoming race.
@@ -62,7 +32,33 @@ The race drivers cannot be edited after the race is safe to start.
 The upcoming race session, is displayed on the Next Race display.
 The Next Race display switches to the subsequent race, once the current race is safe to start.
 The Next Race display shows the drivers names, and the cars they're assigned to.
-If there are no upcoming races, no sessions are displayed.
+If there are 
+
+
+DONE: - When the server is restarted, the system resumes with the exact same. I.e. the race counter continues counting down, and upcoming races are not lost.
+MANDATORY:
+DONE: The server can be started with npm start
+DONE Has been given a tablet which may be used in landscape or portrait DONE
+DONE: They must occupy a large tappable area.
+DONE: The interfaces must be reachable by devices on other networks. For example, the interface must be reachable from a mobile phone browser, while the server and interfaces are served from a computer.
+DONE: The countdown timer is 1 minute in dev mode (instead of 10 minutes). -- USES the constant at the beggining of the race. only affecting the new races created. meaning anything created in regular mode will not change
+DONE: The README.md file at the root of the project has a user guide, describing the core functionality of the user interfaces
+DONE: The README.md file at the root of the project describes how to launch the project.
+DONE: The server can be started in developer mode with npm run dev. --The countdown timer runs for 1 minute instead on 10 minutes.
+DONE: The interfaces are reachable by devices on other networks (not just localhost).
+DONE: The server waits 500ms to respond if an incorrect access key is entered in the interface.
+DONE: The interface re-prompts the user to enter a correct access key when an incorrect access key is inserted.
+DONE: The server will not start unless environment variables are set for interface access keys.
+DONE: The environment variable access codes match the accepted access codes entered into the interfaces.
+DONE: The Race Control interface is designed for a mobile interface.
+
+CHECK:
+DONE: When the race is started, the following happens:
+        - The race mode is changed to "Safe"
+        - The leader board changes to the current race.
+        - The Next Race screen switches to the subsequent race session.
+        - The Safety Official sees race mode controls.
+no upcoming races, no sessions are displayed.
 
 DONE MANDATORY: 
 
