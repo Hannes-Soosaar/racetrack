@@ -16,24 +16,10 @@ const raceControl = (io, socket) => {
     socket.on('start-session', async () => {
         if (currentRace != null) {
             try {
-                const raceRow = await dbGet(`SELECT * FROM races WHERE id = ? AND status = ?`, [currentRace.id, 3]);
-                if (raceRow) {
-                    await dbRun(`DELETE FROM races WHERE id = ?`, [currentRace.id]);
-                    const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
-                    // const racingCarIds = await dbAll(`SELECT id FROM cars WHERE  race_id=?`, [currentRace.id]);
-                    // console.log("the participant carIDs are", racingCarIds);
-                    const driverIds = driverRows.map(row => row.driver_id);
-                    await dbRun(`DELETE FROM cars WHERE race_id = ?`, [currentRace.id]);
-                    await dbRun(`DELETE FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
-                    if (driverIds.length > 0) {
-                        const deleteDriversQuery = `
-                            DELETE FROM drivers WHERE id IN (${driverIds.map(() => '?').join(', ')})`;
-                        await dbRun(deleteDriversQuery, driverIds);
-                    }
-                }
                 const nextRaceRow = await dbGet(`
                     SELECT * FROM races
                     WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
+                    AND status = 'upcoming'
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
                 if (nextRaceRow) {
@@ -66,6 +52,7 @@ const raceControl = (io, socket) => {
                 const nextRaceRow = await dbGet(`
                     SELECT * FROM races
                     WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
+                    AND status = 'upcoming'
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
                 if (nextRaceRow) {
@@ -103,6 +90,22 @@ const raceControl = (io, socket) => {
     });
 
     socket.on('start-race', async () => {
+        const raceRow = await dbGet(`SELECT * FROM races WHERE status = ?`, [3]);
+        if (raceRow) {
+            await dbRun(`DELETE FROM races WHERE id = ?`, [raceRow.id]);
+            const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [raceRow.id]);
+            // const racingCarIds = await dbAll(`SELECT id FROM cars WHERE  race_id=?`, [currentRace.id]);
+            // console.log("the participant carIDs are", racingCarIds);
+            const driverIds = driverRows.map(row => row.driver_id);
+            await dbRun(`DELETE FROM cars WHERE race_id = ?`, [raceRow.id]);
+            await dbRun(`DELETE FROM race_drivers WHERE race_id = ?`, [raceRow.id]);
+            if (driverIds.length > 0) {
+                const deleteDriversQuery = `
+                            DELETE FROM drivers WHERE id IN (${driverIds.map(() => '?').join(', ')})`;
+                await dbRun(deleteDriversQuery, driverIds);
+            }
+        }
+
         io.emit('race-status', 'Race started');
         io.emit('race-mode', 'Safe');
         io.emit('set-raceId', raceID);
@@ -168,9 +171,6 @@ const raceControl = (io, socket) => {
                 break;
         }
     });
-
-
-
 
     socket.on('request-flags-update', () => {
         console.log('Request for flags update received');
