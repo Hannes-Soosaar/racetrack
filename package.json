@@ -4,7 +4,7 @@
   "description": "Real-time race management system",
   "main": "server.js",
   "scripts": {
-    "test": "DURATION=60000 node server.js",
+    "test": "DURATION=10000 node server.js",
     "start": "DURATION=600000 node server.js"
   },
   "repository": {

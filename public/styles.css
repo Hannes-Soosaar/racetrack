@@ -51,7 +51,6 @@ button {
     background-position: 0px 0px, 0px 0px, -50px -50px, 50px 50px;
 }
 
-
 /* Styling for modals */
 #edit-driver-modal,
 #edit-race-modal {
@@ -85,22 +84,18 @@ button {
 .raceFlagDiv {
     width: 400px;
     height: 300px;
-    border: 1px solid black;
 }
 
 .leader-timer{
     width: 400px;
     height: 300px;
     display: flex;
-    border: 1px solid black;
     align-items: center;
     justify-content: center;
     font-size: 5vw;  
 }
 
- /* not used */
 .page-container {
-    /* height: 100vh; */
     display: flex;
 }
 
@@ -110,18 +105,14 @@ button {
     height:80vh;
     flex-direction: column;
     justify-content: center;
-    border: 1px solid black;
 }
 
 .main {
     display: flex;
-    /* flex-grow: 1; */
     background-color: #f4f4f4;
-    border: 1px solid red;
     min-width: 360px;
     justify-content:center;
     overflow: auto ;
-
 }
 
 .left-container {
@@ -130,8 +121,6 @@ button {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background-color: lightgray;
-    border: 1px solid green;
 }
 
 .right-container {
@@ -139,14 +128,11 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: lightblue;
-    border: 1px solid blue;
     min-height: 600px;
 }
 
 .boarder-box {
     flex-grow: 1;
-    background-color: gray;
 }
 
 .header {
@@ -197,7 +183,7 @@ thead {
 }
 
 tr:nth-child(even) {
-    background-color: #f9f9f9; 
+    background-color: rgb(189, 189, 189); 
 }
 
 .center{
@@ -212,21 +198,19 @@ tr:nth-child(even) {
     padding: 0;
 }
 
-
 .tap-button{
     display: inline-block;
     padding: 0.5em 1em;
     font-size: clamp(18px, 5vw, 10vw);
     white-space: nowrap;
     min-width: 10vw;
+
     max-width: 80vw;
     overflow: hidden;
     text-overflow: ellipsis;
     box-sizing: border-box;
     text-align: center;
 }
-
-
 
 button#mode-safe,
 button#mode-hazard,

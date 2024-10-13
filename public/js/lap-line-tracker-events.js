@@ -4,7 +4,6 @@ const socket = io();
 const accessForm = document.getElementById('access-form');
 const accessKeyInput = document.getElementById('access-key');
 const contentDiv = document.getElementById('content');
-const messageContainer = document.getElementById('peak');
 const IdContainer = document.getElementById('raceId');
 const carsContainer = document.getElementById('cars-container');
 const errorMessage = document.getElementById('error-message');
@@ -34,37 +33,29 @@ socket.on('connect', () => {
     socket.emit('get-session');
     console.log('Connected to WebSocket server lap-line-tracker'); // reaches and works
     if (raceID === null) {
+        console.log("on Connect null!")
         removeButtons();
-        displayRaceSessionMessage("No race in progress");
+        displayRaceSessionMessage("No race");
     } else {
         displayButtons();
         displayRaceSessionMessage(message);
     };
 });
 
-socket.on('time-update', (timeElapsed) => {
-    displayMessage(timeElapsed);
-});
-
 socket.on('set-raceId', (raceId) => {
     raceID = raceId;
     if (raceID === null || raceID === undefined) {
-        displayRaceSessionMessage("No race in progress");
+        displayRaceSessionMessage("No race");
+        removeButtons();
+        console.log("on Connect null!")
     } else {
-        const message = "Race with Id: " + raceID + " in progress";
+        const message = "Race: " + raceID + " in progress";
         displayRaceSessionMessage(message);
         displayButtons();
     }
     socket.emit('raceId-set', raceID)
 });
 
-socket.on('stop-timer', () => {
-    message = raceID + " finished"
-    displayRaceSessionMessage(message);
-    displayMessage("00:00");
-    raceID = null;
-    removeButtons();
-});
 
 socket.on('key-validation', function (response) {
     console.log("response");
@@ -75,15 +66,6 @@ socket.on('key-validation', function (response) {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
 });
-
-function sendMessageFromValue(value) {
-    console.log("send message! " + value);
-    displayMessage(value);
-}
-
-function displayMessage(value) {
-    messageContainer.innerHTML = `${value}`;
-}
 function displayRaceSessionMessage(value) {
     IdContainer.innerHTML = `${value}`;
 }

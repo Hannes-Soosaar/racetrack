@@ -3,7 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const dotenv = require('dotenv');
-const db = require('./config/db'); // Database connection
+// const db = require('./config/db'); // Database connection
 dotenv.config();
 
 const app = express(); // Initialize app
@@ -36,8 +36,6 @@ const {
 const { createCarsForRace } = require('./controllers/carController');
 const { env } = require('process');
 
-
-
 app.use(express.json());
 app.use(express.static('public')); // Serve static files
 
@@ -51,17 +49,12 @@ app.get('/next-race', (req, res) => res.sendFile(path.join(__dirname, 'views', '
 app.get('/race-countdown', (req, res) => res.sendFile(path.join(__dirname, 'views', 'race-countdown.html')));
 app.get('/race-flags', (req, res) => res.sendFile(path.join(__dirname, 'views', 'race-flags.html')));
 
-// Handle Socket.IO connections
 io.on('connection', (socket) => {
     console.log("New client connected:", socket.id);
-
-    // Additional real-time race control or lap tracking
-    // leaderBoard(io,socket);
     lapLineTracker(io, socket);
     raceControl(io, socket);
     frontDesk(io, socket);
 
-    // Handle key validation
     socket.on('validate-key', ({ key, role }) => {
         let validKey = false;
         if (role === 'receptionist' && key === process.env.RECEPTIONIST_KEY) {
@@ -72,9 +65,9 @@ io.on('connection', (socket) => {
             validKey = true;
         }
         console.log(`Key validation result: ${validKey}`);
-        if (validKey){
+        if (validKey) {
             socket.emit('key-validation', { success: validKey });
-        }else {
+        } else {
             setTimeout(() => {
                 socket.emit('key-validation', { success: validKey });
                 console.log('500ms timeout');
@@ -82,7 +75,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle public views for race flags or next race
     socket.on('public-view', (page) => {
         if (page === 'race-flags') {
             raceFlags(io, socket);
@@ -93,15 +85,10 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Handle client disconnection
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
     });
 
-
-    //! Below are front-desk socket connections operations
-
-    // Handle race creation via Socket.IO
     socket.on('create-race', async (raceData, callback) => {
         try {
             const race = await createRaceSession(raceData);
@@ -112,9 +99,6 @@ io.on('connection', (socket) => {
         }
     });
 
-
-
-    // Get race details
     socket.on('get-race-details', (raceId, callback) => {
         getRaceById(raceId).then((race) => {
             callback({ race });
@@ -123,7 +107,6 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Edit race
     socket.on('edit-race', async (raceId, raceData, callback) => {
         try {
             await updateRaceSession(raceId, raceData);
@@ -133,8 +116,6 @@ io.on('connection', (socket) => {
         }
     });
 
-
-    // Delete Race via Socket.IO
     socket.on('delete-race', (raceId, callback) => {
         deleteRaceSession({ params: { id: raceId } }, {
             status: (code) => ({
@@ -149,7 +130,6 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Handle adding a driver via Socket.IO
     socket.on('add-driver', ({ raceId, driverData }, callback) => {
         addDriverToRace({ params: { id: raceId }, body: driverData }, {
             status: (code) => ({
@@ -164,7 +144,6 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Remove Driver from Race via Socket.IO
     socket.on('remove-driver', ({ raceId, driverId }, callback) => {
         deleteDriverFromRace({ params: { raceId, driverId } }, {
             status: (code) => ({
@@ -179,7 +158,6 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Get Drivers for a Race via Socket.IO
     socket.on('get-drivers', (raceId, callback) => {
         getDriversForRace({ params: { id: raceId } }, {
             status: (code) => ({
@@ -194,9 +172,6 @@ io.on('connection', (socket) => {
         });
     });
 
-
-    // Handle editing a driver in a race via Socket.IO
-    // Handle editing a driver in a race via Socket.IO
     socket.on('edit-driver', ({ raceId, driverId, driverData }, callback) => {
         editDriverInRace({ params: { raceId, driverId }, body: driverData }, {
             status: (code) => ({
@@ -226,9 +201,6 @@ io.on('connection', (socket) => {
         });
     });
 
-
-
-    // Get All Races via Socket.IO
     socket.on('get-races', (callback) => {
         getRaceSessions({}, {
             status: (code) => ({
@@ -243,21 +215,8 @@ io.on('connection', (socket) => {
             })
         });
     });
-
-
-    // Handle marking the race as started
-
-    /*socket.on('start-race', async () => {
-        try {
-            await startRace();  // Assuming this function marks the race as started in the database
-            io.emit('race-status-updated', { raceId: currentRace.id, status: 'started' });  // Notify all clients
-        } catch (error) {
-            console.error('Error starting race:', error);
-        }
-    });*/
 });
 
-// Start the server
 const PORT = process.env.PORT || 8000;
 
 if (!process.env.RECEPTIONIST_KEY || !process.env.OBSERVER_KEY || !process.env.SAFETY_KEY) {

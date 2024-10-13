@@ -4,6 +4,8 @@ const timerContainer = document.getElementById('race-timer');
 const raceFlag = document.getElementById('race-flag');
 const leaderBoard = document.getElementById('leaderboard');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
+let carsSaved = "no race started"
+let lastRace;
 
 fullscreenBtn.addEventListener('click', () => {
     document.documentElement.requestFullscreen();
@@ -17,13 +19,11 @@ document.addEventListener('fullscreenchange', () => {
     }
 });
 
-// This page only listens and displays.
-let cars = "no race started"
 
-socket.on('connect',  () => {
+
+socket.on('connect', () => {
     console.log('Connected to WebSocket server leaderboard');
     socket.emit('get-session');
-    // displayLeaderBoard(cars);
 });
 
 //This is to display 
@@ -33,6 +33,10 @@ socket.on('time-update', (raceTimeElapse) => {
 
 socket.on(`update-leader-board`, (cars) => {
     displayLeaderBoard(cars);
+    if (carsSaved !== cars){
+    carsSaved = cars;
+    }
+
 });
 
 socket.on('race-flags-update', (data) => {
@@ -53,7 +57,8 @@ socket.on('race-flags-update', (data) => {
             raceFlag.style.backgroundColor = '';
             raceFlag.classList.add('chequered');
             displayMessage("00:00");
-            displayLeaderBoard(0);
+            lastRace = carsSaved;
+            displayLeaderBoard(lastRace);
             break
         default:
             raceFlag.style.backgroundColor = ''; // Reset background color
@@ -67,6 +72,7 @@ function displayMessage(value) {
 };
 
 function displayLeaderBoard(cars) {
+console.log("in display leader", cars) ;   
     if (cars === 0) {
         leaderBoard.innerHTML = "No race ongoing.";
     } else {
