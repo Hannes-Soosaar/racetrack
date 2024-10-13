@@ -23,6 +23,7 @@ const raceControl = (io, socket) => {
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
                 if (nextRaceRow) {
+                    io.emit('race-flags-update', status.DANGER);
                     console.log("HERE, with a race!");
                     currentRace = new Race(nextRaceRow);
                     race.setDriverIdToCars(currentRace.id);
@@ -56,6 +57,7 @@ const raceControl = (io, socket) => {
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
                 if (nextRaceRow) {
+                    io.emit('race-flags-update', status.DANGER);
                     console.log('Session found');
                     currentRace = new Race(nextRaceRow);
                     (async () => {
