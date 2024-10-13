@@ -72,7 +72,14 @@ io.on('connection', (socket) => {
             validKey = true;
         }
         console.log(`Key validation result: ${validKey}`);
-        socket.emit('key-validation', { success: validKey });
+        if (validKey){
+            socket.emit('key-validation', { success: validKey });
+        }else {
+            setTimeout(() => {
+                socket.emit('key-validation', { success: validKey });
+                console.log('500ms timeout');
+            }, 500);
+        }
     });
 
     // Handle public views for race flags or next race
