@@ -9,23 +9,14 @@
 </head>
 
 <body>
-    <div class="page-container">
-        <div class="boarder-box">
+    <div class="main-container">
+        <div class="heading">Race Countdown</div>
+        <div class="main">
+            <div class="timer-display" id="race-timer">00:00</div>
         </div>
-        <div class="main-container">
-            <div class="header">
-                <h1 class="dynamic-heading">Race Countdown</h1>
-            </div>
-            <div class="main">
-                <div class="timer-display" id="race-timer">00:00</div>
-            </div>
-            <div class="footer">
-                <button class="button" id="Update" value="1">Update Message</button>
-                <button id="fullscreenBtn">Go Fullscreen</button>
-            </div>
-        </div>
-        <div class="boarder-box">
-        </div>
+    </div>
+    <div class ="center">
+    <button class="tap-button" id="fullscreenBtn"> Go Fullscreen</button>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="/js/race-countdown.js"></script>

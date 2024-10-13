@@ -107,10 +107,10 @@ button {
 .main-container {
     display: flex;
     width: 100vw;
+    height:80vh;
     flex-direction: column;
     justify-content: center;
     border: 1px solid black;
-   
 }
 
 .main {
@@ -120,7 +120,6 @@ button {
     border: 1px solid red;
     min-width: 360px;
     justify-content:center;
-    min-height: fit-content;
     overflow: auto ;
 
 }
@@ -145,7 +144,6 @@ button {
     min-height: 600px;
 }
 
-
 .boarder-box {
     flex-grow: 1;
     background-color: gray;
@@ -157,18 +155,10 @@ button {
     text-align: center;
 }
 
-.main {
-    flex-grow: 1;
-    background-color: #f4f4f4;
-    border: 1px solid red;
-    min-width: 360px;
-    align-items: flex-start;
-    min-height: fit-content;
-    overflow: auto ;
-}
-
 .tablet-text{
-    font-size: 5vw;  
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    font-size: 4vw;  
     text-align: center;
 }
 
@@ -179,10 +169,15 @@ button {
 }
 
 .timer-display {
-    font-size: clamp(2vw, 40vw, 70vw);
+    font-size: clamp(2vw, 30vw, 60vw);
     text-align: center;
     background-color:#f4f4f4;
+}
 
+.heading {
+    font-size: 4vw;
+    text-align: center;
+    margin-bottom: 3vh;
 }
 
 table {
@@ -205,21 +200,23 @@ tr:nth-child(even) {
     background-color: #f9f9f9; 
 }
 
+.center{
+    display: flex;
+    text-align: center;
+    justify-content: center;
+}
+
 /* the Java script created element <p> comes with a margin and padding, this nulls it but only for the class of timer-display  */
 .timer-display p {
     margin: 0;
     padding: 0;
 }
 
-.heading {
-    font-size: 32px;
-}
-
 
 .tap-button{
     display: inline-block;
     padding: 0.5em 1em;
-    font-size: clamp(18px, 5vw, 5vw);
+    font-size: clamp(18px, 5vw, 10vw);
     white-space: nowrap;
     min-width: 10vw;
     max-width: 80vw;

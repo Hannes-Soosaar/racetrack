@@ -20,12 +20,16 @@
 
     <div id="content" style="display:none;">
         <div class="main-container">
-            <h1>Lap Line Tracker</h1>
+            <div class="heading">Lap Line Tracker</div>
             <div id="current Race-container"></div>
             <div id="cars-container"></div>
-            <div id="raceId" class="tablet-text" ></div>
+            <div id="raceId" class="tablet-text"></div>
+        </div>
+        <div class="footer">
+            <button class="tap-button" id="fullscreenBtn">Go Fullscreen</button>
         </div>
     </div>
+
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="/js/lap-line-tracker-events.js"></script>
