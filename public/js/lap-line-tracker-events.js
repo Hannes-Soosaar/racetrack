@@ -8,6 +8,7 @@ const messageContainer = document.getElementById('peak');
 const IdContainer = document.getElementById('raceId');
 const carsContainer = document.getElementById('cars-container');
 const errorMessage = document.getElementById('error-message');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
 let raceID = null;
 let message;
 
@@ -15,6 +16,18 @@ accessForm.addEventListener('submit', function (event) {
     event.preventDefault();
     const accessKey = accessKeyInput.value;
     socket.emit('validate-key', { key: accessKey, role: 'observer' });
+});
+
+fullscreenBtn.addEventListener('click', () => {
+    document.documentElement.requestFullscreen();
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        fullscreenBtn.style.display = 'none';
+    } else {
+        fullscreenBtn.style.display = '';
+    }
 });
 
 socket.on('connect', () => {
@@ -71,7 +84,7 @@ function sendMessageFromValue(value) {
 function displayMessage(value) {
     messageContainer.innerHTML = `${value}`;
 }
-function displayRaceSessionMessage(value){
+function displayRaceSessionMessage(value) {
     IdContainer.innerHTML = `${value}`;
 }
 
