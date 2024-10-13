@@ -20,6 +20,8 @@ The system consists of seven web pages accessible from the main page.
     * Add drivers to specific races and assign cars to those drivers.
     * Edit driver names and assigned cars, or remove drivers from a race.
 
+    This page is designed for a computer interface.
+
 2. Race Control - Requires safety_key for access. This page allows authenticated users to:
 
     * Start the next race session.
@@ -28,11 +30,15 @@ The system consists of seven web pages accessible from the main page.
     * Change the race mode to safe, hazard, danger, or finish.
     * End the current session and queue the next earliest race from the database.
 
+    This page is designed for a mobile interface.
+
 3. Lap Line Tracker - Requires observer_key for access. This page allows authenticated users to:
 
     * View the status and ID of the current race.
     * See the remaining time for the current race.
     * Add laps for cars to save their lap times to the leaderboard.
+
+    This page is designed for a tablet interface.
 
 4. Leaderboard - Public page. 
     * Displays the current race timer, the active race flag, and a leaderboard featuring car numbers, driver names, lap counts, and fastest lap times.
@@ -41,7 +47,7 @@ The system consists of seven web pages accessible from the main page.
     * Displays information about the upcoming race (race name, date and time, drivers, and their car numbers) if available.
 
 6. Race Countdown - Public page. 
-    * Displays the timer for the current race.
+    * Displays the timer for the current race. As an extra function, the timer pauses if the race mode changes to danger or hazard and resumes when mode changes back to safe.
 
 7. Race Flags - Public page. 
     * Displays the current race flag that corresponds to the race mode.
