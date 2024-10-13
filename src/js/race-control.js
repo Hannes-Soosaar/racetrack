@@ -130,11 +130,11 @@ const raceControl = (io, socket) => {
 
 
     socket.on('end-session', () => {
-        changeFlag(3);
-        raceID = null;
+        changeFlag(2);
         io.emit('set-raceId', raceID);
-        io.emit('race-flags-update', 3);
-        flag = 3;
+        raceID = null;
+        io.emit('race-flags-update', 2);
+        flag = 2;
         io.emit('race-status', 'Session ended');
     });
 
