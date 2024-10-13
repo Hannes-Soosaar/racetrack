@@ -103,7 +103,7 @@ finishSessionButton.addEventListener('click', () => {
 socket.on('race-status', (status) => {
     console.log('Received race status:', status);
     document.getElementById('race-status-display').innerText = status;
-    if (status === 'No upcoming race found') {
+    if (status === 'No upcoming race found' || status === 'Upcoming race has less than 2 drivers!') {
         contentDiv.style.display = 'none'
         contentDivAfterStart.style.display = 'none'
         newSessionDiv.style.display = 'block'

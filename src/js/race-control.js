@@ -14,76 +14,53 @@ const raceControl = (io, socket) => {
     // currentRace = null
     // Handle starting the race
     socket.on('start-session', async () => {
-        if (currentRace != null) {
-            try {
-                const nextRaceRow = await dbGet(`
+        try {
+            const nextRaceRow = await dbGet(`
                     SELECT * FROM races
                     WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
                     AND status = 'upcoming'
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
-                if (nextRaceRow) {
-                    io.emit('race-flags-update', status.DANGER);
-                    console.log("HERE, with a race!");
-                    currentRace = new Race(nextRaceRow);
-                    race.setDriverIdToCars(currentRace.id);
-                    (async () => {
-                        try {
-                            const raceId = currentRace.id
-                            raceID = raceId;
-                            io.emit('block-driver-changes', (raceId))
-                            io.emit('block-driver-addition', (raceId)) // Block adding drivers as well
-                            const driverInfo = await getDriverDetails(raceId)
-                            io.emit('display-race', driverInfo)
-                            io.emit('race-status', 'Race not started')
-                        } catch (err) {
-                            console.log('Error:', err)
-                        }
-                    })()
-                    io.emit('trigger-next-race-message')
-                } else {
-                    io.emit('race-status', 'No upcoming race found');
-                    currentRace = null
+            if (nextRaceRow) {
+                console.log("Next race info:", nextRaceRow)
+                const checkDriverAmountQuery = `SELECT * FROM race_drivers WHERE race_id = ?`
+                try {
+                    const amountOfDrivers = await dbAll(checkDriverAmountQuery, [nextRaceRow.id])
+                    if (amountOfDrivers.length >= 2) {
+                        io.emit('race-flags-update', status.DANGER);
+                        console.log('Session found');
+                        currentRace = new Race(nextRaceRow);
+                        (async () => {
+                            try {
+                                const raceId = currentRace.id
+                                raceID = currentRace.id;
+                                console.log("HERE, with else!");
+                                race.setDriverIdToCars(raceID)
+                                io.emit('block-driver-changes', (raceId))
+                                io.emit('block-driver-addition', (raceId)) // Block adding drivers as well
+                                const driverInfo = await getDriverDetails(raceId)
+                                io.emit('display-race', driverInfo)
+                                io.emit('race-status', 'Race not started')
+                            } catch (err) {
+                                console.log('Error:', err)
+                            }
+                        })()
+                        io.emit('trigger-next-race-message')
+                    } else {
+                        io.emit('race-status', 'Upcoming race has less than 2 drivers!');
+                        currentRace = null
+                    }
+                } catch (err) {
+                    console.log('Error:', err)
                 }
-            } catch (err) {
-                console.error(err.message);
+            } else {
+                io.emit('race-status', 'No upcoming race found');
+                currentRace = null
             }
-        } else {
-            try {
-                const nextRaceRow = await dbGet(`
-                    SELECT * FROM races
-                    WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
-                    AND status = 'upcoming'
-                    ORDER BY DATETIME(date || ' ' || time) ASC
-                    LIMIT 1`);
-                if (nextRaceRow) {
-                    io.emit('race-flags-update', status.DANGER);
-                    console.log('Session found');
-                    currentRace = new Race(nextRaceRow);
-                    (async () => {
-                        try {
-                            const raceId = currentRace.id
-                            raceID = currentRace.id;
-                            console.log("HERE, with else!");
-                            race.setDriverIdToCars(raceID)
-                            io.emit('block-driver-changes', (raceId))
-                            io.emit('block-driver-addition', (raceId)) // Block adding drivers as well
-                            const driverInfo = await getDriverDetails(raceId)
-                            io.emit('display-race', driverInfo)
-                            io.emit('race-status', 'Race not started')
-                        } catch (err) {
-                            console.log('Error:', err)
-                        }
-                    })()
-                    io.emit('trigger-next-race-message')
-                } else {
-                    io.emit('race-status', 'No upcoming race found');
-                    currentRace = null
-                }
-            } catch (err) {
-                console.error(err.message);
-            }
+        } catch (err) {
+            console.error(err.message);
         }
+
         if (currentRace != null && currentRace.id !== null) {
             io.emit('load-leader-board', currentRace.id);
         } else {
