@@ -6,7 +6,7 @@ const car = require("../js/car.js");
 
 let currentRace = null;
 let raceID = null;
-let flag= null;
+let flag = null;
 // The order of the races that will be taken is the the earliest first that is not in the past.
 
 const raceControl = (io, socket) => {
@@ -16,7 +16,7 @@ const raceControl = (io, socket) => {
     socket.on('start-session', async () => {
         if (currentRace != null) {
             try {
-                const raceRow = await dbGet(`SELECT * FROM races WHERE id = ? AND status = ?`, [currentRace.id, 2]);
+                const raceRow = await dbGet(`SELECT * FROM races WHERE id = ? AND status = ?`, [currentRace.id, 3]);
                 if (raceRow) {
                     await dbRun(`DELETE FROM races WHERE id = ?`, [currentRace.id]);
                     const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [currentRace.id]);
@@ -125,11 +125,11 @@ const raceControl = (io, socket) => {
 
 
     socket.on('end-session', () => {
-        changeFlag(2);
+        changeFlag(3);
         raceID = null;
         io.emit('set-raceId', raceID);
-        io.emit('race-flags-update', 2);
-        flag = 2;
+        io.emit('race-flags-update', 3);
+        flag = 3;
         io.emit('race-status', 'Session ended');
     });
 
@@ -187,7 +187,7 @@ const raceControl = (io, socket) => {
         changeFlag(status.FINISHED);
         io.emit('race-flags-update', status.FINISHED);
         flag = status.FINISHED;
-        flag= null;
+        flag = null;
         io.emit('stop-timer');
         io.emit('set-raceId', raceID);
     });

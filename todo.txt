@@ -1,8 +1,9 @@
 
 BUGS:
 ******************************
-* Front desk When all races are completed the and a new race is made, the last race completed is again shown. Non of the races will be moved or removed at the front desk, untill a new race is made. (bad update?)
-* If the race roster is emptied and you create a new race, the Race controll will not see it. ??
+* Front desk When all races are completed the and a new race is made, the last race completed is again shown. 
+Non of the races will be moved or removed at the front desk, untill a new race is made. (bad update?) SHOULD BE DONE
+* If the race roster is emptied and you create a new race, the Race controll will not see it. ?? DONE? (can't see the bug)
 TODO: Properly delete races.
 * you can create and launch an race with no drivers.
 TODO: Add check to where ?

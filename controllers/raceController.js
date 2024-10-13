@@ -9,7 +9,7 @@ const createRaceSession = (raceData) => {
         // Validate if the race date and time are in the future
         const raceDateTime = new Date(`${date} ${time}`);
         const currentDateTime = new Date();
-        
+
         if (raceDateTime <= currentDateTime) {
             return reject(new Error('Cannot create a race in the past. Please choose a future date and time.'));
         }
@@ -56,8 +56,8 @@ const createRaceSession = (raceData) => {
 
 // Get all race sessions
 const getRaceSessions = (req, res) => {
-    const query = `SELECT * FROM races`;
-    db.all(query, [], (err, rows) => {
+    const query = `SELECT * FROM races WHERE status = ?`;
+    db.all(query, ['upcoming'], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: 'Could not retrieve races', details: err });
         }
@@ -240,65 +240,65 @@ const deleteDriverFromRace = (req, res) => {
 const editDriverInRace = (req, res) => {
     const { raceId, driverId } = req.params;  // Race session ID and driver ID
     const { firstName, lastName, carNumber } = req.body;
-// Check if the race is safe to start
-const checkRaceStatusQuery = `SELECT status FROM races WHERE id = ?`;
-db.get(checkRaceStatusQuery, [raceId], (err, row) => {
-    if (err || !row) {
-        return res.status(500).json({ error: 'Error checking race status', details: err });
-    }
+    // Check if the race is safe to start
+    const checkRaceStatusQuery = `SELECT status FROM races WHERE id = ?`;
+    db.get(checkRaceStatusQuery, [raceId], (err, row) => {
+        if (err || !row) {
+            return res.status(500).json({ error: 'Error checking race status', details: err });
+        }
 
-    if (row.status === 'safe_to_start') {
-        return res.status(400).json({ error: 'Cannot modify drivers once the race is safe to start.' });
-    }
+        if (row.status === 'safe_to_start') {
+            return res.status(400).json({ error: 'Cannot modify drivers once the race is safe to start.' });
+        }
 
-    console.log('Incoming updated driver data:', { firstName, lastName, carNumber });
+        console.log('Incoming updated driver data:', { firstName, lastName, carNumber });
 
-    if (!firstName || !lastName || !carNumber) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
+        if (!firstName || !lastName || !carNumber) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
 
-    // Check if a driver with the same first name, last name exists for this race (excluding the current driver)
-    const checkDriverQuery = `
+        // Check if a driver with the same first name, last name exists for this race (excluding the current driver)
+        const checkDriverQuery = `
         SELECT COUNT(*) AS count 
         FROM race_drivers rd 
         JOIN drivers d ON rd.driver_id = d.id 
         WHERE rd.race_id = ? AND d.first_name = ? AND d.last_name = ? AND d.id != ?`;
 
-    db.get(checkDriverQuery, [raceId, firstName, lastName, driverId], function (err, row) {
-        if (err) {
-            return res.status(500).json({ error: 'Error checking driver uniqueness', details: err });
-        }
-        if (row.count > 0) {
-            // Driver with the same name and surname already exists for this race
-            return res.status(400).json({ error: 'Another driver with this name and surname already exists in the race' });
-        }
-
-        // Check if the car number is already assigned in the race (excluding the current driver)
-        const checkCarNumberQuery = `SELECT COUNT(*) AS count FROM race_drivers WHERE race_id = ? AND car_number = ? AND driver_id != ?`;
-        db.get(checkCarNumberQuery, [raceId, carNumber, driverId], function (err, row) {
+        db.get(checkDriverQuery, [raceId, firstName, lastName, driverId], function (err, row) {
             if (err) {
-                return res.status(500).json({ error: 'Error checking car number', details: err });
+                return res.status(500).json({ error: 'Error checking driver uniqueness', details: err });
             }
             if (row.count > 0) {
-                return res.status(400).json({ error: `This car is already assigned to another driver in the race.` });
+                // Driver with the same name and surname already exists for this race
+                return res.status(400).json({ error: 'Another driver with this name and surname already exists in the race' });
             }
 
-            // Update the driver information
-            const updateDriverQuery = `UPDATE drivers SET first_name = ?, last_name = ? WHERE id = ?`;
-            db.run(updateDriverQuery, [firstName, lastName, driverId], function (err) {
+            // Check if the car number is already assigned in the race (excluding the current driver)
+            const checkCarNumberQuery = `SELECT COUNT(*) AS count FROM race_drivers WHERE race_id = ? AND car_number = ? AND driver_id != ?`;
+            db.get(checkCarNumberQuery, [raceId, carNumber, driverId], function (err, row) {
                 if (err) {
-                    return res.status(500).json({ error: 'Could not update driver details', details: err });
+                    return res.status(500).json({ error: 'Error checking car number', details: err });
+                }
+                if (row.count > 0) {
+                    return res.status(400).json({ error: `This car is already assigned to another driver in the race.` });
                 }
 
-                // Update the car number for the driver in the race
-                const updateRaceDriverQuery = `UPDATE race_drivers SET car_number = ? WHERE race_id = ? AND driver_id = ?`;
-                db.run(updateRaceDriverQuery, [carNumber, raceId, driverId], function (err) {
+                // Update the driver information
+                const updateDriverQuery = `UPDATE drivers SET first_name = ?, last_name = ? WHERE id = ?`;
+                db.run(updateDriverQuery, [firstName, lastName, driverId], function (err) {
                     if (err) {
-                        return res.status(500).json({ error: 'Could not update driver assignment in the race', details: err });
+                        return res.status(500).json({ error: 'Could not update driver details', details: err });
                     }
-                    res.status(200).json({ message: 'Driver details updated successfully' });
+
+                    // Update the car number for the driver in the race
+                    const updateRaceDriverQuery = `UPDATE race_drivers SET car_number = ? WHERE race_id = ? AND driver_id = ?`;
+                    db.run(updateRaceDriverQuery, [carNumber, raceId, driverId], function (err) {
+                        if (err) {
+                            return res.status(500).json({ error: 'Could not update driver assignment in the race', details: err });
+                        }
+                        res.status(200).json({ message: 'Driver details updated successfully' });
+                    });
                 });
-            });
             });
         });
     });
@@ -310,7 +310,7 @@ module.exports = {
     createRaceSession,
     getRaceSessions,
     updateRaceSession,
-    getRaceById, 
+    getRaceById,
     deleteRaceSession,
     addDriverToRace,
     getDriversForRace,
@@ -318,7 +318,7 @@ module.exports = {
     editDriverInRace,
 };
 
- 
+
 
 
 
