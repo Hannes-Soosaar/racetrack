@@ -38,23 +38,19 @@ DONE: The interfaces are reachable by devices on other networks (not just localh
 TODO: The server waits 500ms to respond if an incorrect access key is entered in the interface.
 TODO: The interface re-prompts the user to enter a correct access key when an incorrect access key is inserted.
 
+
 TODO: The server will not start unless environment variables are set for interface access keys.
 TODO: The environment variable access codes match the accepted access codes entered into the interfaces.
 
 
-TODO: The Race Control interface is designed for a mobile interface.
+DONE: The Race Control interface is designed for a mobile interface.
 
 CHECK:
-
-TODO: When the race is started, the following happens:
+DONE: When the race is started, the following happens:
         - The race mode is changed to "Safe"
         - The leader board changes to the current race.
         - The Next Race screen switches to the subsequent race session.
         - The Safety Official sees race mode controls.
-TODO- what criteria did we need ?
-
-
-
 RECEPTIONIST
 The receptionist can see a list of upcoming races.
 The receptionist can delete an upcoming race.
