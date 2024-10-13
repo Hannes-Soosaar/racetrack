@@ -127,14 +127,12 @@ const raceControl = (io, socket) => {
         io.emit('trigger-get-next-race-status');
     });
 
-
-
     socket.on('end-session', () => {
-        changeFlag(2);
+        changeFlag(3);
         io.emit('set-raceId', raceID);
         raceID = null;
-        io.emit('race-flags-update', 2);
-        flag = 2;
+        io.emit('race-flags-update', 3);
+        flag = 3;
         io.emit('race-status', 'Session ended');
     });
 
