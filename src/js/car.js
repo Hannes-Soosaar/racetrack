@@ -1,5 +1,5 @@
 const Car = require("../models/car");
-const status = require("../config/const"); //TODO Rename all constant exports to status 
+const status = require("../config/const");
 const db = require("../../config/db.js");
 const time = require("../js/timer.js");
 let carIDs = null;

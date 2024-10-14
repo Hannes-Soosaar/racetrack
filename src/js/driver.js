@@ -2,12 +2,10 @@ const RaceDiver = require("../models/race_drivers.js");
 const db = require("../../config/db.js");
 
 async function getDriverIdsAndCarNumbers(raceId) {
-    console.log('getting the driver IDs and Car Numbers')
     const query = 'SELECT driver_id, car_number FROM race_drivers WHERE race_id =?';
     let driverIdsAndCarNumbers;
     try {
         driverIdsAndCarNumbers = await dbAll(query, raceId);
-        console.log('got the driverIds and carNumbers', driverIdsAndCarNumbers);
         return driverIdsAndCarNumbers;
     } catch (error) {
         console.log('Error getting driverIds and car numbers', error);
@@ -55,5 +53,4 @@ async function dbAll(query, params) {
 module.exports = {
     getDriverIdsAndCarNumbers,
     getDriverName
-
 }
