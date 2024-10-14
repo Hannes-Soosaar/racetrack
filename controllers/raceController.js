@@ -151,7 +151,9 @@ const addDriverToRace = (req, res) => {
         SELECT d.id
         FROM drivers d
         INNER JOIN race_drivers rd ON d.id = rd.driver_id
-        WHERE d.first_name = ? AND d.last_name = ? AND rd.race_id = ?`;
+        WHERE LOWER(d.first_name) = LOWER(?) 
+        AND LOWER(d.last_name) = LOWER(?) 
+        AND rd.race_id = ?`;
 
     db.all(checkExistingDriverQuery, [firstName, lastName, raceId], (err, existingDriver) => {
         if (err) {
@@ -250,6 +252,21 @@ const deleteDriverFromRace = (req, res) => {
 const editDriverInRace = (req, res) => {
     const { raceId, driverId } = req.params;  // Race session ID and driver ID
     const { firstName, lastName, carNumber } = req.body;
+
+    const carNumberInt = Number(carNumber)
+
+    if (isNaN(carNumberInt)) {
+        return res.status(400).json({ error: 'Car number has to be a valid number.' });
+    }
+
+    if (!Number.isInteger(carNumberInt)) {
+        return res.status(400).json({ error: 'Car number has to be an integer.' });
+    }
+
+    if (carNumberInt < 1 || carNumberInt > 8) {
+        return res.status(400).json({ error: 'Car number out of bounds.' });
+    }
+
     // Check if the race is safe to start
     const checkRaceStatusQuery = `SELECT status FROM races WHERE id = ?`;
     db.get(checkRaceStatusQuery, [raceId], (err, row) => {
@@ -272,7 +289,7 @@ const editDriverInRace = (req, res) => {
         SELECT COUNT(*) AS count 
         FROM race_drivers rd 
         JOIN drivers d ON rd.driver_id = d.id 
-        WHERE rd.race_id = ? AND d.first_name = ? AND d.last_name = ? AND d.id != ?`;
+        WHERE rd.race_id = ? AND LOWER(d.first_name) = LOWER(?) AND LOWER(d.last_name) = LOWER(?) AND d.id != ?`;
 
         db.get(checkDriverQuery, [raceId, firstName, lastName, driverId], function (err, row) {
             if (err) {
