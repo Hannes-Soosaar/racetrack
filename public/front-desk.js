@@ -117,8 +117,6 @@ function loadDriversForRace(raceId, isSafeToStart) {
     });
 }
 
-
-
 // Add the markRaceSafeToStart function here
 function markRaceSafeToStart(raceId) {
     if (!confirm('Are you sure you want to mark this race as safe to start? This will lock the race from further editing.')) {
@@ -135,8 +133,6 @@ function markRaceSafeToStart(raceId) {
         }
     });
 }
-
-
 
 // Show edit form for driver
 function editDriver(raceId, driverId, firstName, lastName, carNumber) {
@@ -158,7 +154,6 @@ function updateDriverInRace(raceId, driverId) {
     const firstName = document.getElementById('edit-first-name').value;
     const lastName = document.getElementById('edit-last-name').value;
     const carNumber = document.getElementById('edit-car-number').value;
-
     const driverData = { firstName, lastName, carNumber };
 
     socket.emit('edit-driver', { raceId, driverId, driverData }, (response) => {
@@ -169,7 +164,6 @@ function updateDriverInRace(raceId, driverId) {
             closeEditDriverModal();  // Close the modal after editing
         }
     });
-
     socket.emit('g-n-r-s')
 }
 
@@ -181,11 +175,9 @@ function closeEditDriverModal() {
 // Add a driver to a specific race via Socket.IO
 function addDriverToRace(event, raceId) {
     event.preventDefault();
-
     const firstName = document.getElementById(`first-name-${raceId}`).value;
     const lastName = document.getElementById(`last-name-${raceId}`).value;
     const carNumber = document.getElementById(`car-number-${raceId}`).value;
-
     const driverData = { firstName, lastName, carNumber };
 
     socket.emit('add-driver', { raceId, driverData }, (response) => {
@@ -242,9 +234,9 @@ function updateRace(event) {
         }
     });
 }
-
 function closeEditModal() {
     document.getElementById('edit-race-modal').style.display = 'none';
+    socket.emit('g-n-r-s')
 }
 
 // Delete a race via Socket.IO
@@ -268,7 +260,6 @@ function deleteDriver(raceId, driverId) {
     if (!confirm('Are you sure you want to delete this driver from the race?')) {
         return;
     }
-
     socket.emit('remove-driver', { raceId, driverId }, (response) => {
         if (response.error) {
             alert('Error deleting driver: ' + response.error);
@@ -276,14 +267,12 @@ function deleteDriver(raceId, driverId) {
             loadDriversForRace(raceId);  // Reload drivers after deletion
         }
     });
-
     socket.emit('g-n-r-s')
 }
 
 // Load available cars for a race
 function loadAvailableCars(raceId) {
     const carNumberSelect = document.getElementById(`car-number-${raceId}`);
-
     // Check if the select element exists before proceeding
     if (!carNumberSelect) {
         console.error(`Car select element for race ${raceId} not found.`);
@@ -291,15 +280,12 @@ function loadAvailableCars(raceId) {
     }
     socket.emit('get-available-cars', raceId, (cars) => {
         const carNumberSelect = document.getElementById(`car-number-${raceId}`);
-
         // Ensure the select element exists
         if (!carNumberSelect) {
             console.error(`Car select element for race ${raceId} not found.`);
             return;
         }
-
         carNumberSelect.innerHTML = '';  // Clear previous options
-
         if (cars.length === 0) {
             const option = document.createElement('option');
             option.value = '';
@@ -307,7 +293,6 @@ function loadAvailableCars(raceId) {
             carNumberSelect.appendChild(option);
             return;
         }
-
         cars.forEach(car => {
             const option = document.createElement('option');
             option.value = car.number;  // Use car number as the value
@@ -316,8 +301,6 @@ function loadAvailableCars(raceId) {
         });
     });
 }
-
-
 
 socket.on('block-driver-changes', id => {
     const buttons = document.querySelectorAll('button')
@@ -392,5 +375,3 @@ function populateTimeDropdown() {
 
 // Call the function to populate the time dropdown when the page loads
 document.addEventListener('DOMContentLoaded', populateTimeDropdown);
-
-
