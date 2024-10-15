@@ -28,10 +28,8 @@ CREATE TABLE IF NOT EXISTS cars (
     best_lap_time NUMBER DEFAULT 0.0, -- Best lap time for the car
     --! this is not a car atribute should move to the race.
     race_elapse_time NUMBER DEFAULT 0.0, -- Total elapsed race time 
-    status INTEGER, -- Car status (active, finished, etc.)
-    
-    FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE SET NULL, -- Set driver_id to NULL if the driver is deleted
-    FOREIGN KEY (race_id) REFERENCES races(id) ON DELETE CASCADE -- Ensure the car is tied to a specific race
+    status INTEGER -- Car status (active, finished, etc.)
+
 );
 
 CREATE TABLE IF NOT EXISTS races (

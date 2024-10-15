@@ -136,7 +136,7 @@ const deleteRaceSession = async (req, res) => {
 
 
 
-const addDriverToRace = (req, res) => {
+const addDriverToRace = async (req, res) => {
     const { id: raceId } = req.params;  // Race session ID
     const { firstName, lastName, carNumber } = req.body;
 
@@ -155,7 +155,7 @@ const addDriverToRace = (req, res) => {
         AND LOWER(d.last_name) = LOWER(?) 
         AND rd.race_id = ?`;
 
-    db.all(checkExistingDriverQuery, [firstName, lastName, raceId], (err, existingDriver) => {
+    await db.all(checkExistingDriverQuery, [firstName, lastName, raceId], (err, existingDriver) => {
         if (err) {
             return res.status(500).json({ error: 'Could not check for existing driver', details: err });
         }
@@ -182,7 +182,18 @@ const addDriverToRace = (req, res) => {
             });
         });
     });
+    await setDriverIdInCars(raceId, carNumber);
 };
+
+
+function setDriverIdInCars(raceId, carNumber) {
+    const insertDriverIdToCar = `UPDATE cars SET driver_id = ? WHERE race_id = ? AND number = ?`;
+    db.run(insertDriverIdToCar, ["-1", raceId, carNumber], function (err) {
+        if (err) {
+            console.log("there was an error ", err)
+        }
+    });
+}
 
 
 
