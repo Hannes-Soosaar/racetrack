@@ -2,8 +2,6 @@
 DROP TABLE IF EXISTS drivers;
 DROP TABLE IF EXISTS cars;
 DROP TABLE IF EXISTS races;
-DROP TABLE IF EXISTS race_slots;
-DROP TABLE IF EXISTS race_results;
 DROP TABLE IF EXISTS race_drivers;
 
 --Define and build tables

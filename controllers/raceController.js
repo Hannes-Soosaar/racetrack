@@ -1,6 +1,7 @@
 const db = require('../config/db.js');
 const carController = require('./carController');
-const { dbRun } = require('../src/js/race-control.js')
+const { dbRun } = require('../src/js/race-control.js');
+const { query } = require('express');
 
 // Create a new race session and generate cars
 const createRaceSession = (raceData) => {
@@ -80,8 +81,9 @@ const updateRaceSession = (raceId, raceData) => {
             resolve();
         });
     });
-};
 
+
+};
 
 const getRaceById = (raceId) => {
     return new Promise((resolve, reject) => {
@@ -178,20 +180,41 @@ const addDriverToRace = async (req, res) => {
                 if (err) {
                     return res.status(500).json({ error: 'Could not assign driver to race', details: err });
                 }
+                setDriverIdInCars(driverId, raceId, carNumber); //! This works
                 res.status(201).json({ message: 'Driver added to race successfully' });
             });
         });
     });
-    await setDriverIdInCars(raceId, carNumber);
+
+
 };
 
-function setDriverIdInCars(raceId, carNumber) {
+function setDriverIdInCars(driverId, raceId, carNumber) {
     const insertDriverIdToCar = `UPDATE cars SET driver_id = ? WHERE race_id = ? AND number = ?`;
-    db.run(insertDriverIdToCar, ["-1", raceId, carNumber], function (err) {
+    db.run(insertDriverIdToCar, [driverId, raceId, carNumber], function (err) {
         if (err) {
             console.log("there was an error ", err)
         }
     });
+}
+
+async function setDriverIdInCarToNull(raceId, driverId) {
+    console.log("Trying to delete from", raceId, "where the car number", driverId);
+    const query = 'SELECT driver_id FROM cars WHERE race_id = ? and driver_id= ?'
+    const insertDriverIdToCar = `UPDATE cars SET driver_id = null WHERE race_id = ? AND driver_id = ?`;
+    let rows = null;
+    try {
+        rows = await dbGet(query, [raceId, driverId]);
+        await dbRun(insertDriverIdToCar, [raceId, driverId]);
+    }
+    catch (error) {
+        console.log("there was an error ", error);
+    }
+    if (rows) {
+        console.log(`the row that needs to be set to null is:`, rows);
+    } else {
+        console.log(`No rows found for race ID ${raceId} and car number ${driverId}`)
+    }
 }
 
 // Get drivers for a specific race
@@ -211,16 +234,13 @@ WHERE rd.race_id = ?
         if (!rows || rows.length === 0) {
             console.log('No drivers found for race:', id);
         } else {
-            console.log('Drivers found:', rows);
         }
         res.status(200).json(rows);
     });
 };
 
 
-
-
-const deleteDriverFromRace = (req, res) => {
+const deleteDriverFromRace = async (req, res) => {
     const { raceId, driverId } = req.params;
 
     // Check if the race is safe to start
@@ -251,17 +271,20 @@ const deleteDriverFromRace = (req, res) => {
             });
         });
     });
+    await setDriverIdInCarToNull(raceId, driverId); // ! This works
 };
 
 
 
 // Edit driver details in a race
-const editDriverInRace = (req, res) => {
+const editDriverInRace = async (req, res) => {
     const { raceId, driverId } = req.params;  // Race session ID and driver ID
     const { firstName, lastName, carNumber } = req.body;
+    let oldCarNumber = null;
+    let newCarNumber = null;
+    oldCarNumber = await getCarNumberByDriverId(driverId);
 
     const carNumberInt = Number(carNumber)
-
     if (isNaN(carNumberInt)) {
         return res.status(400).json({ error: 'Car number has to be a valid number.' });
     }
@@ -323,7 +346,8 @@ const editDriverInRace = (req, res) => {
                     if (err) {
                         return res.status(500).json({ error: 'Could not update driver details', details: err });
                     }
-
+                    newCarNumber = carNumber;
+                    console.log("saving new car number", carNumber);
                     // Update the car number for the driver in the race
                     const updateRaceDriverQuery = `UPDATE race_drivers SET car_number = ? WHERE race_id = ? AND driver_id = ?`;
                     db.run(updateRaceDriverQuery, [carNumber, raceId, driverId], function (err) {
@@ -336,8 +360,62 @@ const editDriverInRace = (req, res) => {
             });
         });
     });
+
+console.log("This is the old idNumber", driverId);
+    console.log("This is the new Car number", Number(carNumber));
+
+    if (oldCarNumber !== null) {
+        console.log(" MUST RUN1 Removing old car Id!")
+        await setDriverIdInCarToNull(raceId, driverId);
+    }
+    if (carNumber !== null) {
+        console.log("MUST RUN2  Addeing new car Id", carNumber);
+        await setDriverIdInCars(driverId, raceId, Number(carNumber));
+    }
 };
 
+async function getCarNumberByDriverId(driverId) {
+    console.log(``)
+    let carNumber;
+    const query = `SELECT number FROM cars WHERE driver_id =?`
+    try {
+        const result = await db.get(query, driverId);
+        carNumber = result ? result.number : null;
+    } catch (error) {
+        console.log('unable to get car number by driver ID', error);
+    }
+    console.log(" the Driver ID is")
+    return carNumber;
+}
+
+
+
+
+async function dbGet(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
+        });
+    });
+};
+
+async function dbAll(query, params) {
+    console.log("the parameters for the query", params)
+    return new Promise((resolve, reject) => {
+        db.all(query, params, (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+                console.log("ROWS in dbAll", rows);
+            }
+        });
+    });
+};
 
 
 module.exports = {
@@ -351,7 +429,6 @@ module.exports = {
     deleteDriverFromRace,
     editDriverInRace,
 };
-
 
 
 

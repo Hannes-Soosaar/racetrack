@@ -35,7 +35,7 @@ exports.getCarsForRace = (req, res) => {
             console.error('Database error:', err.message);
             return res.status(500).json({ error: 'Failed to retrieve cars' });
         }
-        console.log('Available cars:', rows);  // Debugging: log available cars
+        // console.log('Available cars:', rows);  // Debugging: log available cars
         res.status(200).json(rows);  // Send the cars to the client
     });
 };
