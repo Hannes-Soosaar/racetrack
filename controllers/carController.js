@@ -25,7 +25,6 @@ exports.createCarsForRace = (raceId) => {
     });
 };
 
-
 exports.getCarsForRace = (req, res) => {
     const { raceId } = req.params;
     const query = `SELECT * FROM cars WHERE race_id = ? AND driver_id IS NULL`;  // Fetch unassigned cars
@@ -39,7 +38,3 @@ exports.getCarsForRace = (req, res) => {
         res.status(200).json(rows);  // Send the cars to the client
     });
 };
-
-
-
-

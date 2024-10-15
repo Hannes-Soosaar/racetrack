@@ -170,6 +170,7 @@ function updateDriverInRace(raceId, driverId) {
 // Close the edit driver modal
 function closeEditDriverModal() {
     document.getElementById('edit-driver-modal').style.display = 'none';
+
 }
 
 // Add a driver to a specific race via Socket.IO
@@ -233,6 +234,7 @@ function updateRace(event) {
             closeEditModal();  // Close the modal
         }
     });
+    loadAvailableCars(raceId);
 }
 function closeEditModal() {
     document.getElementById('edit-race-modal').style.display = 'none';
@@ -251,7 +253,7 @@ function deleteRace(raceId) {
             loadRaces();  // Reload races after deletion
         }
     });
-
+    loadAvailableCars(raceId);
     socket.emit('g-n-r-s')
 }
 
@@ -268,6 +270,7 @@ function deleteDriver(raceId, driverId) {
         }
     });
     socket.emit('g-n-r-s')
+    loadAvailableCars(raceId);
 }
 
 // Load available cars for a race
@@ -337,6 +340,7 @@ function removeRaceFromList(raceId) {
     if (raceItem) {
         raceItem.remove();  // Remove the race from the DOM
     }
+    loadAvailableCars(raceId);
 }
 
 // Handle disabling driver addition when the race is marked as "safe to start"
