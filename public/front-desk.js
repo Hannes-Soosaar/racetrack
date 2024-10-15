@@ -178,7 +178,6 @@ function closeEditDriverModal() {
     document.getElementById('edit-driver-modal').style.display = 'none';
 }
 
-
 // Add a driver to a specific race via Socket.IO
 function addDriverToRace(event, raceId) {
     event.preventDefault();
@@ -196,10 +195,9 @@ function addDriverToRace(event, raceId) {
             loadDriversForRace(raceId);  // Reload drivers after adding
         }
     });
-
+    loadAvailableCars(raceId);
     socket.emit('g-n-r-s')
 }
-
 
 function editRace(raceId) {
     // Emit an event to fetch the race details via Socket.IO
@@ -219,7 +217,6 @@ function editRace(raceId) {
         }
     });
 }
-
 
 function updateRace(event) {
     event.preventDefault();  // Prevent form submission
@@ -249,8 +246,6 @@ function updateRace(event) {
 function closeEditModal() {
     document.getElementById('edit-race-modal').style.display = 'none';
 }
-
-
 
 // Delete a race via Socket.IO
 function deleteRace(raceId) {
@@ -284,7 +279,6 @@ function deleteDriver(raceId, driverId) {
 
     socket.emit('g-n-r-s')
 }
-
 
 // Load available cars for a race
 function loadAvailableCars(raceId) {

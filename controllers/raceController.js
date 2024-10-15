@@ -185,7 +185,6 @@ const addDriverToRace = async (req, res) => {
     await setDriverIdInCars(raceId, carNumber);
 };
 
-
 function setDriverIdInCars(raceId, carNumber) {
     const insertDriverIdToCar = `UPDATE cars SET driver_id = ? WHERE race_id = ? AND number = ?`;
     db.run(insertDriverIdToCar, ["-1", raceId, carNumber], function (err) {
@@ -194,9 +193,6 @@ function setDriverIdInCars(raceId, carNumber) {
         }
     });
 }
-
-
-
 
 // Get drivers for a specific race
 const getDriversForRace = (req, res) => {
