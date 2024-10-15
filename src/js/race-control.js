@@ -69,7 +69,7 @@ const raceControl = (io, socket) => {
     });
 
     socket.on('start-race', async () => {
-        const raceRow = await dbGet(`SELECT * FROM races WHERE status = ?`, [3]);
+        const raceRow = await dbGet(`SELECT * FROM races WHERE status = ?`, [2]);
         if (raceRow) {
             await dbRun(`DELETE FROM races WHERE id = ?`, [raceRow.id]);
             const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [raceRow.id]);
