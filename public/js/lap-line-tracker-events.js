@@ -31,9 +31,8 @@ document.addEventListener('fullscreenchange', () => {
 
 socket.on('connect', () => {
     socket.emit('get-session');
-    console.log('Connected to WebSocket server lap-line-tracker'); // reaches and works
+    console.log('Connected to WebSocket server lap-line-tracker');
     if (raceID === null) {
-        console.log("on Connect null!")
         removeButtons();
         displayRaceSessionMessage("No race");
     } else {
@@ -47,15 +46,13 @@ socket.on('set-raceId', (raceId) => {
     if (raceID === null || raceID === undefined) {
         displayRaceSessionMessage("No race");
         removeButtons();
-        console.log("on Connect null!")
     } else {
         const message = "Race: " + raceID + " in progress";
         displayRaceSessionMessage(message);
         displayButtons();
     }
-    socket.emit('raceId-set', raceID)
+    socket.emit('raceId-set', raceID) //? This is not used.
 });
-
 
 socket.on('key-validation', function (response) {
     console.log("response");
@@ -66,6 +63,7 @@ socket.on('key-validation', function (response) {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
 });
+
 function displayRaceSessionMessage(value) {
     IdContainer.innerHTML = `${value}`;
 }
@@ -84,7 +82,6 @@ function displayButtons() {
     `;
     document.querySelectorAll('.tap-button').forEach(button => {
         if (raceID !== null) {
-            console.log("the race ID is ", raceID, "and we are adding all this functionality");
             button.addEventListener('click', function () {
                 const buttonValue = parseInt(this.value);
                 let raceIdCarNumber = [raceID, buttonValue];

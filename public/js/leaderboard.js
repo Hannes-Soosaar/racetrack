@@ -26,7 +26,7 @@ socket.on('connect', () => {
     socket.emit('get-session');
 });
 
-//This is to display 
+ 
 socket.on('time-update', (raceTimeElapse) => {
     displayMessage(raceTimeElapse);
 });
@@ -36,7 +36,6 @@ socket.on(`update-leader-board`, (cars) => {
     if (carsSaved !== cars){
     carsSaved = cars;
     }
-
 });
 
 socket.on('race-flags-update', (data) => {

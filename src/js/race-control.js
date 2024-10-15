@@ -104,12 +104,16 @@ const raceControl = (io, socket) => {
         io.emit('trigger-get-next-race-status');
     });
 
+    //! Changes,  last known tested and working solution commented out 
     socket.on('end-session', () => {
-        changeFlag(3);
+        // changeFlag(status.FINISHED);
+        changeFlag(status.DANGER);
         io.emit('set-raceId', raceID);
         raceID = null;
-        io.emit('race-flags-update', 3);
-        flag = 3;
+        io.emit('race-flags-update', status.DANGER);
+        // io.emit('race-flags-update', status.FINISHED);
+        flag = status.DANGER;
+        // flag = status.FINISHED;
         io.emit('race-status', 'Session ended');
     });
 
