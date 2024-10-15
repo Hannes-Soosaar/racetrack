@@ -226,4 +226,7 @@ module.exports = {
     setDriverName,
     setDriverId,
     setLapTime,
+    dbAll,
+    dbRun,
+    dbGet,
 }

@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS drivers;
 DROP TABLE IF EXISTS cars;
 DROP TABLE IF EXISTS races;
 DROP TABLE IF EXISTS race_drivers;
+DROP TABLE IF EXISTS timer;
 
 --Define and build tables
 CREATE TABLE IF NOT EXISTS drivers (
@@ -48,3 +49,10 @@ CREATE TABLE IF NOT EXISTS race_drivers (
     FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE,
     UNIQUE (race_id, car_number)  -- Ensure car assignment is unique within a race
 );
+
+CREATE TABLE IF NOT EXISTS timer (
+id INTEGER  PRIMARY KEY AUTOINCREMENT,
+timer NUMBER DEFAULT 0.0
+);
+
+INSERT INTO timer (timer) VALUES (0.0);

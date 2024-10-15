@@ -1,3 +1,5 @@
+const db = require("../../config/db.js");
+
 let timerInterval;
 let racePaused = false;
 let raceInProgress = false;
@@ -5,7 +7,20 @@ let pauseDuration = 0;
 let pauseStart = 0;
 let remainingRaceTime = 0;
 let startTime = 0;
-function startTimer(io, raceDurationMs) {
+let storedTimer;
+
+async function startTimer(io, raceDurationMs) {
+    try {
+        storedTimer = await getStoredTimer();
+        console.log("Stored Timer", storedTimer);
+        if (storedTimer > 0) {
+            console.log("Trying to set the")
+            raceDurationMs = storedTimer;
+        }
+    } catch (error) {
+        console.log(` error getting time from timer :`, error);
+    }
+
     if (raceInProgress) {
         console.log("Race already started!");
         return;
@@ -22,12 +37,13 @@ function startTimer(io, raceDurationMs) {
             remainingRaceTime = 0;
             clearInterval(timerInterval);
             raceInProgress = false;
-            console.log("Race should be finishing now")
+
             io.emit('trigger-end-race')
         }
         raceTimeElapse = displayMinutesAndSeconds(remainingRaceTime);
         io.emit('time-update', raceTimeElapse);
         getUpdateTimerValue(remainingRaceTime);
+        setTimerToDb(remainingRaceTime);
     }, 100);
 }
 
@@ -54,9 +70,9 @@ function stopTimer() {
     pauseStart = 0;
     remainingRaceTime = 0;
     startTime = 0;
-    console.log("Race ended")
+    console.log("Race ended");
+    setTimerToDb(0);
 }
-
 function getUpdateTimerValue() {
     return remainingRaceTime;
 }
@@ -74,6 +90,52 @@ function displayMinutesAndSeconds(remainingRaceTime) {
     return `${formattedMinutes}:${formattedSeconds}`;
 }
 
+async function getStoredTimer() {
+    const query = `SELECT timer FROM timer WHERE id=1`;
+    let remainingSavedRaceTime;
+    try {
+        remainingSavedRaceTime = await dbGet(query);
+    } catch (error) {
+        console.log(` error getting remaining to DB : `, error);
+    }
+    console.log("this is what the data looks like", remainingSavedRaceTime.timer)
+    return Number(remainingSavedRaceTime.timer);
+}
+
+async function setTimerToDb(timeInMs) {
+    const query = `UPDATE timer SET timer = ? WHERE id =1`
+    try {
+        dbRun(query, [Number(timeInMs)])
+    } catch (error) {
+        console.log(` error setting timer to DB : `, error);
+    }
+}
+
+
+async function dbGet(query, params) {
+    return new Promise((resolve, reject) => {
+        db.get(query, params, (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
+        });
+    });
+};
+
+async function dbRun(query, params) {
+    return new Promise((resolve, reject) => {
+        db.run(query, params, function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this);
+            }
+        });
+    });
+};
+
 module.exports = {
     startTimer,
     stopTimer,
@@ -83,4 +145,6 @@ module.exports = {
     displayMinutesAndSeconds,
     getUpdateTimerValue,
     getRaceStartTime,
+    setTimerToDb,
+
 };
