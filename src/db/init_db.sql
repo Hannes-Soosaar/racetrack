@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS races (
     date TEXT NOT NULL,        -- Date of the race (e.g., "2024-09-12") HS: this is not needed.
     time TEXT NOT NULL,        -- Time of the race (e.g., "14:00") : this should contain the remaining time of the race.
     duration INTEGER DEFAULT -1,        -- Keep track of what the race duration. starts with -1 as default.
-    status TEXT DEFAULT 'upcoming'  -- Tracks the race status (upcoming, active, finished)
+    status TEXT DEFAULT 'upcoming',  -- Tracks the race status (upcoming, active, finished)
+    race_status TEXT DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS race_drivers (
