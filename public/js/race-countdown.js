@@ -27,6 +27,10 @@ socket.on('stop-timer', () => {
     displayMessage("00:00");
 });
 
+socket.on('reload', () => {
+    location.reload()
+})
+
 function displayMessage(value) {
     timerContainer.innerHTML = `<p>${value}</p>`;
 }

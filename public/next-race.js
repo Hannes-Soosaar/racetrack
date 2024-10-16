@@ -108,3 +108,7 @@ socket.on('trigger-next-race-message', () => {
     driverMessage.textContent = 'Drivers, please proceed to the paddock';
     nextRaceDiv.appendChild(driverMessage);
 });
+
+socket.on('reload', () => {
+    location.reload()
+})

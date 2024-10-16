@@ -354,6 +354,10 @@ socket.on('block-driver-addition', (raceId) => {
     }
 });
 
+socket.on('reload', () => {
+    location.reload()
+})
+
 // Dynamically populate the time dropdown in 10-minute intervals
 function populateTimeDropdown() {
     const timeDropdown = document.getElementById('time');

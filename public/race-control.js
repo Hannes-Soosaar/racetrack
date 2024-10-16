@@ -26,6 +26,7 @@ accessForm.addEventListener('submit', function (event) {
 // Handle key validation response
 socket.on('key-validation', function (response) {
     if (response.success) {
+        socket.emit('continue-race-if-exists')
         accessForm.style.display = 'none';
         newSessionDiv.style.display = 'block'
     } else {
@@ -33,6 +34,9 @@ socket.on('key-validation', function (response) {
     }
 });
 
+socket.on('hide-new-session', () => {
+    newSessionDiv.style.display = 'none'
+})
 
 socket.on('display-race', (data) => {
     const [driverInfo, isRaceContinuing] = data
@@ -149,5 +153,9 @@ function enableButtons() {
     document.getElementById('mode-danger').disabled = false
     document.getElementById('end-race').disabled = false
 }
+
+socket.on('reload', () => {
+    location.reload()
+})
 
 

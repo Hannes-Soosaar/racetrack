@@ -26,15 +26,15 @@ socket.on('connect', () => {
     socket.emit('get-session');
 });
 
- 
+
 socket.on('time-update', (raceTimeElapse) => {
     displayMessage(raceTimeElapse);
 });
 
 socket.on(`update-leader-board`, (cars) => {
     displayLeaderBoard(cars);
-    if (carsSaved !== cars){
-    carsSaved = cars;
+    if (carsSaved !== cars) {
+        carsSaved = cars;
     }
 });
 
@@ -66,12 +66,16 @@ socket.on('race-flags-update', (data) => {
     }
 })
 
+socket.on('reload', () => {
+    location.reload()
+})
+
 function displayMessage(value) {
     timerContainer.innerHTML = `${value}`;
 };
 
 function displayLeaderBoard(cars) {
-console.log("in display leader", cars) ;   
+    console.log("in display leader", cars);
     if (cars === 0) {
         leaderBoard.innerHTML = "No race ongoing.";
     } else {

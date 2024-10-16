@@ -79,6 +79,20 @@ const raceControl = (io, socket) => {
         }
     });
 
+    socket.on('continue-race-if-exists', async () => {
+        let ongoingRace = await dbGet(`
+            SELECT * FROM races
+            WHERE race_status = 'ongoing'
+            LIMIT 1`)
+
+        if (ongoingRace) {
+            currentRace = new Race(ongoingRace)
+            io.emit('race-status', 'Race started');
+            io.emit('race-mode', 'Safe');
+            io.emit('hide-new-session')
+        }
+    })
+
     socket.on('start-race', async () => {
         changeRaceStatus('ongoing')
         const raceRow = await dbGet(`SELECT * FROM races WHERE status = ?`, [2]);
@@ -286,4 +300,4 @@ module.exports = {
     getDriverDetails,
     dbGet,
     dbRun,
-} 
+}

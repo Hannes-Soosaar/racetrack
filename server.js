@@ -217,6 +217,7 @@ io.on('connection', (socket) => {
     });
 });
 
+
 const PORT = process.env.PORT || 8000;
 
 if (!process.env.RECEPTIONIST_KEY || !process.env.OBSERVER_KEY || !process.env.SAFETY_KEY) {
@@ -226,4 +227,20 @@ if (!process.env.RECEPTIONIST_KEY || !process.env.OBSERVER_KEY || !process.env.S
     server.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
+
+    if (process.listenerCount('SIGINT') === 0) {
+        process.on('SIGINT', () => {
+            console.log('\n\nSIGINT');
+            io.emit('reload');
+            process.exit(0);
+        });
+    }
+
+    if (process.listenerCount('SIGTERM') === 0) {
+        process.on('SIGTERM', () => {
+            console.log('\n\nSIGTERM');
+            io.emit('reload');
+            process.exit(0);
+        });
+    }
 }

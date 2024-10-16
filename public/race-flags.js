@@ -46,3 +46,7 @@ socket.on('race-flags-update', (data) => {
             break
     }
 })
+
+socket.on('reload', () => {
+    location.reload()
+})

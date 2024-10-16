@@ -64,6 +64,10 @@ socket.on('key-validation', function (response) {
     }
 });
 
+socket.on('reload', () => {
+    location.reload()
+})
+
 function displayRaceSessionMessage(value) {
     IdContainer.innerHTML = `${value}`;
 }
