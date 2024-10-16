@@ -50,7 +50,7 @@ const raceControl = (io, socket) => {
                                 io.emit('block-driver-changes', (raceId))
                                 io.emit('block-driver-addition', (raceId)) // Block adding drivers as well
                                 const driverInfo = await getDriverDetails(raceId)
-                                io.emit('display-race', driverInfo)
+                                io.emit('display-race', [driverInfo, isRaceContinuing])
                                 io.emit('race-status', 'Race not started')
                             } catch (err) {
                                 console.log('Error:', err)
