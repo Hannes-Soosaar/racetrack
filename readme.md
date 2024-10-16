@@ -59,7 +59,6 @@ All public pages include a button to enter fullscreen mode.
 * 'hazard' and 'danger' race mode will pause the race timer
 * If the server stops during an ongoing race, upon restarting, the next race will be the one that was interrupted. When the race is started again, the countdown timer will resume from where it left off.
 
-
 ## Installation
 
 Follow these steps to set up the project:

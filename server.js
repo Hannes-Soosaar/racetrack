@@ -227,4 +227,3 @@ if (!process.env.RECEPTIONIST_KEY || !process.env.OBSERVER_KEY || !process.env.S
         console.log(`Server is running on port ${PORT}`);
     });
 }
-

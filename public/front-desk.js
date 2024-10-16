@@ -306,16 +306,16 @@ function loadAvailableCars(raceId) {
 }
 
 socket.on('block-driver-changes', id => {
-    const buttons = document.querySelectorAll('button')
-    const targetButtons = Array.from(buttons).filter(button => {
-        return button.getAttribute('onclick') && button.getAttribute('onclick').includes(id)
-    })
-
-    targetButtons.forEach(button => {
-        button.disabled = true
-    })
-
-    console.log('blocking driver changes for id: ', id)
+    const raceDiv = document.querySelector(`div[data-race-id="${id}"]`)
+    if (raceDiv) {
+        const buttons = raceDiv.querySelectorAll('button')
+        buttons.forEach(button => {
+            button.disabled = true
+        })
+        console.log('blocking driver changes for id: ', id)
+    } else {
+        console.log(`No div found with data-race-id: ${id}`)
+    }
 })
 
 document.addEventListener('DOMContentLoaded', function () {
