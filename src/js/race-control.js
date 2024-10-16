@@ -15,12 +15,21 @@ const raceControl = (io, socket) => {
     // Handle starting the race
     socket.on('start-session', async () => {
         try {
-            const nextRaceRow = await dbGet(`
+            let nextRaceRow = await dbGet(`
                     SELECT * FROM races
                     WHERE DATETIME(date || ' ' || time) > CURRENT_TIMESTAMP
                     AND status = 'upcoming'
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
+            let ongoingRace = await dbGet(`
+                SELECT * FROM races
+                WHERE race_status = 'ongoing'
+                LIMIT 1`)
+
+            if (ongoingRace) {
+                nextRaceRow = ongoingRace
+            }
+
             if (nextRaceRow) {
                 console.log("Next race info:", nextRaceRow)
                 const checkDriverAmountQuery = `SELECT * FROM race_drivers WHERE race_id = ?`
@@ -69,6 +78,7 @@ const raceControl = (io, socket) => {
     });
 
     socket.on('start-race', async () => {
+        changeRaceStatus('ongoing')
         const raceRow = await dbGet(`SELECT * FROM races WHERE status = ?`, [2]);
         if (raceRow) {
             await dbRun(`DELETE FROM races WHERE id = ?`, [raceRow.id]);
@@ -161,6 +171,7 @@ const raceControl = (io, socket) => {
     });
 
     socket.on('end-race', () => {
+        changeRaceStatus('ended')
         raceID = null;
         console.log('Race ended');
         io.emit('race-status', 'Race ended');
@@ -188,6 +199,19 @@ function changeFlag(flagID) {
         });
     } else {
         console.log("No active race to update the flag.");
+    }
+}
+
+function changeRaceStatus(status) {
+    if (currentRace && currentRace.id) {
+        const sql = `UPDATE races SET race_status = ? WHERE id = ?`;
+        db.run(sql, [status, currentRace.id], function (err) {
+            if (err) {
+                console.log(err.message)
+            }
+        });
+    } else {
+        console.log("No active race to update race status.")
     }
 }
 
