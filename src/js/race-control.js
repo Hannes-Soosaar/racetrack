@@ -7,6 +7,7 @@ const car = require("../js/car.js");
 let currentRace = null;
 let raceID = null;
 let flag = null;
+let isRaceContinuing = false
 // The order of the races that will be taken is the the earliest first that is not in the past.
 
 const raceControl = (io, socket) => {
@@ -28,6 +29,7 @@ const raceControl = (io, socket) => {
 
             if (ongoingRace) {
                 nextRaceRow = ongoingRace
+                isRaceContinuing = true
             }
 
             if (nextRaceRow) {
@@ -172,6 +174,7 @@ const raceControl = (io, socket) => {
 
     socket.on('end-race', () => {
         changeRaceStatus('ended')
+        isRaceContinuing = false
         raceID = null;
         console.log('Race ended');
         io.emit('race-status', 'Race ended');
