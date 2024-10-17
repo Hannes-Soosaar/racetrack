@@ -38,7 +38,8 @@ socket.on('hide-new-session', () => {
     newSessionDiv.style.display = 'none'
 })
 
-socket.on('display-race', (driverInfo) => {
+socket.on('display-race', (data) => {
+    const [driverInfo, isRaceContinuing] = data
 
     contentDiv.style.display = 'block'
     newSessionDiv.style.display = 'none'
@@ -49,6 +50,12 @@ socket.on('display-race', (driverInfo) => {
         paragraph.textContent = `Driver: ${driver.driver_name}, Car Number: ${driver.car_number}`;
         raceInformationDiv.appendChild(paragraph);
     })
+
+    if (isRaceContinuing) {
+        startRaceButton.textContent = 'Continue race'
+    } else {
+        startRaceButton.textContent = 'Start race'
+    }
 })
 
 newSessionButton.addEventListener('click', () => {

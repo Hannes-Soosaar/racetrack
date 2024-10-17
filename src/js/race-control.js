@@ -7,7 +7,7 @@ const car = require("../js/car.js");
 let currentRace = null;
 let raceID = null;
 let flag = null;
-
+let isRaceContinuing = false
 // The order of the races that will be taken is the the earliest first that is not in the past.
 
 const raceControl = (io, socket) => {
@@ -22,6 +22,15 @@ const raceControl = (io, socket) => {
                     AND status = 'upcoming'
                     ORDER BY DATETIME(date || ' ' || time) ASC
                     LIMIT 1`);
+            let ongoingRace = await dbGet(`
+                SELECT * FROM races
+                WHERE race_status = 'ongoing'
+                LIMIT 1`)
+
+            if (ongoingRace) {
+                nextRaceRow = ongoingRace
+                isRaceContinuing = true
+            }
 
             if (nextRaceRow) {
                 console.log("Next race info:", nextRaceRow)
@@ -41,7 +50,7 @@ const raceControl = (io, socket) => {
                                 io.emit('block-driver-changes', (raceId))
                                 io.emit('block-driver-addition', (raceId)) // Block adding drivers as well
                                 const driverInfo = await getDriverDetails(raceId)
-                                io.emit('display-race', driverInfo)
+                                io.emit('display-race', [driverInfo, isRaceContinuing])
                                 io.emit('race-status', 'Race not started')
                             } catch (err) {
                                 console.log('Error:', err)
