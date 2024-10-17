@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // Import race control, front desk, and other modules
-const { raceControl, dbGet } = require('./src/js/race-control');
+const { raceControl, dbGet, dbRun } = require('./src/js/race-control');
 const frontDesk = require('./src/js/front-desk');
 const lapLineTracker = require('./src/ws/socket.js');
 const raceFlags = require('./src/js/race-flags');
@@ -224,7 +224,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('get-continuing-session', async () => {
-        console.log('get-session called from leaderboard connect.')
+        console.log('get-continuing-session called from leaderboard connect.')
         try {
             const ongoingRace = await dbGet(`
                 SELECT * FROM races
@@ -235,13 +235,13 @@ io.on('connection', (socket) => {
                 io.emit('set-raceId', ongoingRace.id);
                 const cars = await car.getCarsByRaceId(ongoingRace.id);
                 io.emit('update-leader-board', cars);
-                io.emit('race-flags-update', status.DANGER)
                 let raceTimer = await getStoredTimer()
                 console.log('This is raceTimer', raceTimer)
-
                 raceTimeElapse = displayMinutesAndSeconds(raceTimer);
                 console.log('This is raceTimeElapse', raceTimeElapse)
                 io.emit('time-update', raceTimeElapse);
+                const statusInt = parseInt(ongoingRace.status, 10)
+                io.emit('race-flags-update', statusInt)
             } else {
                 console.log('No session to continue')
             }
@@ -261,8 +261,22 @@ if (!process.env.RECEPTIONIST_KEY || !process.env.OBSERVER_KEY || !process.env.S
     console.log('Server cannot start unless environment variables are set. See usage in README.md')
     process.exit(1)
 } else {
-    server.listen(PORT, () => {
+    server.listen(PORT, async () => {
         console.log(`Server is running on port ${PORT}`);
+
+        try {
+            const ongoingRace = await dbGet(`
+                SELECT * FROM races
+                WHERE race_status = 'ongoing'
+                LIMIT 1`)
+
+            if (ongoingRace) {
+                await dbRun(`UPDATE races SET status = ? WHERE id = ?`, [2, ongoingRace.id])
+            }
+        } catch (err) {
+            console.error(err.message);
+        }
+
     });
 
 

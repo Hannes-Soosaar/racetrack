@@ -15,6 +15,8 @@ const endRaceButton = document.getElementById('end-race');
 const finishSessionButton = document.getElementById('end-session')
 const raceModeDisplay = document.getElementById('race-mode-start');
 const raceInformationDiv = document.getElementById('race-information')
+const raceDisplayAmountDiv = document.getElementById('upcoming-race-display')
+const raceDisplayAmount = document.getElementById('upcoming-race-count')
 
 // Handle access key submission
 accessForm.addEventListener('submit', function (event) {
@@ -29,10 +31,16 @@ socket.on('key-validation', function (response) {
         accessForm.style.display = 'none';
         newSessionDiv.style.display = 'block'
         socket.emit('continue-session-if-exists')
+        socket.emit('get-upcoming-races')
     } else {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
 });
+
+socket.on('display-race-amount', (amount) => {
+    raceDisplayAmountDiv.style.display = 'block'
+    raceDisplayAmount.textContent = `${amount}`
+})
 
 socket.on('display-race', (data) => {
     const [driverInfo, isRaceContinuing] = data
@@ -77,6 +85,7 @@ startRaceButton.addEventListener('click', () => {
     socket.emit('start-race');
     socket.emit('change-mode', 'Safe')
     socket.emit('start-timer');
+    socket.emit('get-upcoming-races')
 });
 
 modeSafeButton.addEventListener('click', () => {

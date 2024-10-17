@@ -44,7 +44,6 @@ const createRaceSession = (raceData) => {
                     if (err) {
                         return reject(new Error('Could not create race session'));
                     }
-
                     const raceId = this.lastID;  // Capture the race ID
                     resolve({ id: raceId, session_name, date, time, status });
                 });
@@ -122,7 +121,6 @@ const deleteRaceSession = async (req, res) => {
 
         // Send a success response
         res.status(200).json({ message: 'Race session and associated data deleted successfully' });
-
     } catch (err) {
         // Handle errors
         return res.status(500).json({ error: 'Could not delete race session', details: err });

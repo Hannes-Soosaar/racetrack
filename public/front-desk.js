@@ -31,7 +31,6 @@ accessForm.addEventListener('submit', function (event) {
 // Handle form submission for creating/updating a race
 raceForm.addEventListener('submit', function (event) {
     event.preventDefault();
-
     const id = raceIdInput.value;
     const session_name = sessionNameInput.value;
     const date = dateInput.value;
@@ -49,6 +48,7 @@ raceForm.addEventListener('submit', function (event) {
             loadRaces();  // Reload races
         }
     });
+    socket.emit('get-upcoming-races')
 });
 
 // Handle key validation response
@@ -209,11 +209,11 @@ function editRace(raceId) {
             document.getElementById('edit-race-modal').style.display = 'block';
         }
     });
+    socket.emit('get-upcoming-races')
 }
 
 function updateRace(event) {
     event.preventDefault();  // Prevent form submission
-
     const raceId = document.getElementById('edit-race-id').value;
     const sessionName = document.getElementById('edit-session-name').value;
     const date = document.getElementById('edit-date').value;
@@ -235,7 +235,9 @@ function updateRace(event) {
         }
     });
     loadAvailableCars(raceId);
+    socket.emit('get-upcoming-races')
 }
+
 function closeEditModal() {
     document.getElementById('edit-race-modal').style.display = 'none';
     socket.emit('g-n-r-s')
@@ -255,6 +257,7 @@ function deleteRace(raceId) {
     });
     loadAvailableCars(raceId);
     socket.emit('g-n-r-s')
+    socket.emit('get-upcoming-races')
 }
 
 // Delete a driver from a specific race via Socket.IO

@@ -55,8 +55,9 @@ The system consists of seven web pages accessible from the main page.
 All public pages include a button to enter fullscreen mode.
 
 ### Extras:
-* Receptionist can add drivers to specific cars
-* 'hazard' and 'danger' race mode will pause the race timer
+* Receptionist can add drivers to specific cars.
+* 'hazard' and 'danger' race mode will pause the race timer.
+* Race Control can see how many races are queued at all times.
 * If the server stops during an ongoing race, upon restarting, the system state is persisted. The leaderboard will show the current race and paused timer. The timer will be resumed once Race Control continues the race.
 
 ## Installation

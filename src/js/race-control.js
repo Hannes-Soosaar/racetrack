@@ -15,6 +15,19 @@ const raceControl = (io, socket) => {
     // currentRace = null
     // Handle starting the race
 
+    socket.on('get-upcoming-races', async () => {
+        try {
+            const getRaces = await dbAll(`
+                SELECT * FROM races
+                WHERE status = 'upcoming'
+                `)
+            const raceCount = getRaces.length
+            io.emit('display-race-amount', raceCount)
+        } catch (err) {
+            console.error(err.message);
+        }
+    })
+
     socket.on('continue-session-if-exists', async () => {
         try {
             const isRaceHappening = await dbGet(`
@@ -101,7 +114,7 @@ const raceControl = (io, socket) => {
     socket.on('start-race', async () => {
         changeRaceStatus('ongoing')
         const raceRow = await dbGet(`SELECT * FROM races WHERE status = ?`, [2]);
-        if (raceRow) {
+        if (raceRow && !isRaceContinuing) {
             await dbRun(`DELETE FROM races WHERE id = ?`, [raceRow.id]);
             const driverRows = await dbAll(`SELECT driver_id FROM race_drivers WHERE race_id = ?`, [raceRow.id]);
             // const racingCarIds = await dbAll(`SELECT id FROM cars WHERE  race_id=?`, [currentRace.id]);
@@ -136,7 +149,7 @@ const raceControl = (io, socket) => {
     });
 
     //! Changes,  last known tested and working solution commented out 
-    socket.on('end-session', () => {
+    socket.on('end-session', async () => {
         // changeFlag(status.FINISHED);
         changeFlag(status.DANGER);
         io.emit('set-raceId', raceID);
