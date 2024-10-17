@@ -3,6 +3,10 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const dotenv = require('dotenv');
+const status = require('./src/config/const.js')
+const Car = require("./src/models/car");
+const car = require("./src/js/car.js");
+
 // const db = require('./config/db'); // Database connection
 dotenv.config();
 
@@ -11,13 +15,17 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 // Import race control, front desk, and other modules
-const { raceControl } = require('./src/js/race-control');
+const { raceControl, dbGet } = require('./src/js/race-control');
 const frontDesk = require('./src/js/front-desk');
 const lapLineTracker = require('./src/ws/socket.js');
 const raceFlags = require('./src/js/race-flags');
 const nextRace = require('./src/js/next-race');
 const carController = require('./controllers/carController');
 const leaderBoard = require('./src/js/leaderboard.js');
+const {
+    getStoredTimer,
+    displayMinutesAndSeconds
+} = require('./src/js/timer.js')
 
 // Import race controller functions
 const {
@@ -31,7 +39,6 @@ const {
     getRaceById,
     editDriverInRace,
 } = require('./controllers/raceController');
-
 
 const { createCarsForRace } = require('./controllers/carController');
 const { env } = require('process');
@@ -215,7 +222,37 @@ io.on('connection', (socket) => {
             })
         });
     });
+
+    socket.on('get-continuing-session', async () => {
+        console.log('get-session called from leaderboard connect.')
+        try {
+            const ongoingRace = await dbGet(`
+                SELECT * FROM races
+                WHERE race_status = 'ongoing'
+                LIMIT 1`)
+
+            if (ongoingRace) {
+                io.emit('set-raceId', ongoingRace.id);
+                const cars = await car.getCarsByRaceId(ongoingRace.id);
+                io.emit('update-leader-board', cars);
+                io.emit('race-flags-update', status.DANGER)
+                let raceTimer = await getStoredTimer()
+                console.log('This is raceTimer', raceTimer)
+
+                raceTimeElapse = displayMinutesAndSeconds(raceTimer);
+                console.log('This is raceTimeElapse', raceTimeElapse)
+                io.emit('time-update', raceTimeElapse);
+            } else {
+                console.log('No session to continue')
+            }
+        } catch (err) {
+            console.error(err.message);
+        }
+    });
 });
+
+
+
 
 
 const PORT = process.env.PORT || 8000;
@@ -227,6 +264,8 @@ if (!process.env.RECEPTIONIST_KEY || !process.env.OBSERVER_KEY || !process.env.S
     server.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
+
+
 
     if (process.listenerCount('SIGINT') === 0) {
         process.on('SIGINT', () => {

@@ -146,5 +146,5 @@ module.exports = {
     getUpdateTimerValue,
     getRaceStartTime,
     setTimerToDb,
-
+    getStoredTimer,
 };

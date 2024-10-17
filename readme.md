@@ -57,7 +57,7 @@ All public pages include a button to enter fullscreen mode.
 ### Extras:
 * Receptionist can add drivers to specific cars
 * 'hazard' and 'danger' race mode will pause the race timer
-* If the server stops during an ongoing race, upon restarting, the next race will be the one that was interrupted. When the race is started again, the countdown timer will resume from where it left off.
+* If the server stops during an ongoing race, upon restarting, the system state is persisted. The leaderboard will show the current race and paused timer. The timer will be resumed once Race Control continues the race.
 
 ## Installation
 

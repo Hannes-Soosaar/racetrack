@@ -23,6 +23,7 @@ document.addEventListener('fullscreenchange', () => {
 
 socket.on('connect', () => {
     console.log('Connected to WebSocket server leaderboard');
+    socket.emit('get-continuing-session')
     socket.emit('get-session');
 });
 
