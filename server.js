@@ -212,7 +212,7 @@ io.on('connection', (socket) => {
         getRaceSessions({}, {
             status: (code) => ({
                 json: (response) => {
-                    console.log('Races from server:', response);  // Log what is being returned
+                    // console.log('Races from server:', response); 
                     if (code === 200) {
                         callback(response);  // Send the array of races
                     } else {

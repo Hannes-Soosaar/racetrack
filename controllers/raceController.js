@@ -162,11 +162,12 @@ const addDriverToRace = async (req, res) => {
                 return res.status(500).json({ error: 'Could not add driver', details: err });
             }
             const driverId = this.lastID;
-
             // Assign the driver to the race with the car number
             const insertRaceDriverQuery = `INSERT INTO race_drivers (race_id, driver_id, car_number) VALUES (?, ?, ?)`;
             db.run(insertRaceDriverQuery, [raceId, driverId, carNumber], function (err) {
                 if (err) {
+                    console.log(`ERROR inserting into drive into race_drivers`)
+                    console.log(err);
                     return res.status(500).json({ error: 'Could not assign driver to race', details: err });
                 }
                 setDriverIdInCars(driverId, raceId, carNumber);
@@ -176,13 +177,19 @@ const addDriverToRace = async (req, res) => {
     });
 };
 
-function setDriverIdInCars(driverId, raceId, carNumber) {
+async function setDriverIdInCars(driverId, raceId, carNumber) {
     const insertDriverIdToCar = `UPDATE cars SET driver_id = ? WHERE race_id = ? AND number = ?`;
-    db.run(insertDriverIdToCar, [driverId, raceId, carNumber], function (err) {
-        if (err) {
-            console.log("there was an error ", err)
-        }
-    });
+
+    try {
+        await db.run(insertDriverIdToCar, [driverId, raceId, carNumber], function (err) {
+            if (err) {
+                console.log("there was an error ", err)
+            }
+        });
+    } catch (error) {
+        console.log('error setting Driver', error)
+    }
+
 }
 
 async function setDriverIdInCarToNull(raceId, driverId) {

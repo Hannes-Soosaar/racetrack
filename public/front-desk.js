@@ -101,6 +101,7 @@ function loadRaces() {
 
 // Modify loadDriversForRace to handle disabling based on race status
 function loadDriversForRace(raceId, isSafeToStart) {
+    loadAvailableCars(raceId);
     socket.emit('get-drivers', raceId, (response) => {
         const driverList = document.getElementById(`driver-list-${raceId}`);
         driverList.innerHTML = '';  // Clear the list before appending new items
@@ -183,7 +184,7 @@ function addDriverToRace(event, raceId) {
 
     socket.emit('add-driver', { raceId, driverData }, (response) => {
         if (response.error) {
-            alert(response.error);  // Show any error
+            alert( response.error);  // Show any error
         } else {
             loadDriversForRace(raceId);  // Reload drivers after adding
         }
@@ -278,6 +279,7 @@ function deleteDriver(raceId, driverId) {
 
 // Load available cars for a race
 function loadAvailableCars(raceId) {
+    console.log("Loading of Available cars!")
     const carNumberSelect = document.getElementById(`car-number-${raceId}`);
     // Check if the select element exists before proceeding
     if (!carNumberSelect) {
