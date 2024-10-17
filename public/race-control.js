@@ -26,17 +26,13 @@ accessForm.addEventListener('submit', function (event) {
 // Handle key validation response
 socket.on('key-validation', function (response) {
     if (response.success) {
-        socket.emit('continue-race-if-exists')
         accessForm.style.display = 'none';
         newSessionDiv.style.display = 'block'
+        socket.emit('continue-session-if-exists')
     } else {
         errorMessage.textContent = 'Invalid access key. Please try again.';
     }
 });
-
-socket.on('hide-new-session', () => {
-    newSessionDiv.style.display = 'none'
-})
 
 socket.on('display-race', (data) => {
     const [driverInfo, isRaceContinuing] = data
@@ -55,6 +51,14 @@ socket.on('display-race', (data) => {
         startRaceButton.textContent = 'Continue race'
     } else {
         startRaceButton.textContent = 'Start race'
+    }
+})
+
+socket.on('change-session-button', isRaceContinuing => {
+    if (isRaceContinuing) {
+        newSessionButton.textContent = 'Continue session'
+    } else {
+        newSessionButton.textContent = 'Start the next session'
     }
 })
 
@@ -100,6 +104,7 @@ endRaceButton.addEventListener('click', () => {
     raceModeDisplay.textContent = 'Finish'
     console.log('End Race button clicked');
     socket.emit('end-race');
+    socket.emit('continue-session-if-exists')
     socket.emit('stop-timer');
 });
 

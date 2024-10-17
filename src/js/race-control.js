@@ -14,6 +14,26 @@ const raceControl = (io, socket) => {
     console.log('Setting up race control');
     // currentRace = null
     // Handle starting the race
+
+    socket.on('continue-session-if-exists', async () => {
+        try {
+            const isRaceHappening = await dbGet(`
+                SELECT * FROM races
+                WHERE race_status = 'ongoing'
+                LIMIT 1`)
+
+            if (isRaceHappening) {
+                isRaceContinuing = true
+                io.emit('change-session-button', isRaceContinuing)
+            } else {
+                isRaceContinuing = false
+                io.emit('change-session-button', isRaceContinuing)
+            }
+        } catch (err) {
+            console.error(err.message);
+        }
+    })
+
     socket.on('start-session', async () => {
         try {
             let nextRaceRow = await dbGet(`
@@ -29,7 +49,6 @@ const raceControl = (io, socket) => {
 
             if (ongoingRace) {
                 nextRaceRow = ongoingRace
-                isRaceContinuing = true
             }
 
             if (nextRaceRow) {
@@ -78,20 +97,6 @@ const raceControl = (io, socket) => {
             io.emit('load-no-race');
         }
     });
-
-    socket.on('continue-race-if-exists', async () => {
-        let ongoingRace = await dbGet(`
-            SELECT * FROM races
-            WHERE race_status = 'ongoing'
-            LIMIT 1`)
-
-        if (ongoingRace) {
-            currentRace = new Race(ongoingRace)
-            io.emit('race-status', 'Race started');
-            io.emit('race-mode', 'Safe');
-            io.emit('hide-new-session')
-        }
-    })
 
     socket.on('start-race', async () => {
         changeRaceStatus('ongoing')
