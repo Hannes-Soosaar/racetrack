@@ -30,6 +30,7 @@ socket.on('connect', () => {
 
 socket.on('time-update', (raceTimeElapse) => {
     displayMessage(raceTimeElapse);
+    console.log('leaderboard.js')
 });
 
 socket.on(`update-leader-board`, (cars) => {
